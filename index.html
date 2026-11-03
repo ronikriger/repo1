@@ -198,6 +198,21 @@ nav.tabs button.on{color:var(--gold)}
 .toast.on{opacity:1}
 @media (prefers-reduced-motion: reduce){.sheet{transition:none}.foilbit{display:none}}
 @media (min-width:700px){body{font-size:17px}.title{font-size:40px}}
+/* days off */
+:root{--off1:#E3E6DE;--off2:#C9CDC2}
+@media (prefers-color-scheme: dark){:root{--off1:#2A2225;--off2:#51454A}}
+.cell.off{background:repeating-linear-gradient(135deg,var(--off1) 0 4px,var(--off2) 4px 8px);color:var(--muted)}
+.legend i.lg-off{background:repeating-linear-gradient(135deg,var(--off1) 0 3px,var(--off2) 3px 6px)}
+.offcard{border:1px dashed var(--line);border-radius:18px;margin:16px 0 12px;padding:18px;
+  background:repeating-linear-gradient(135deg,transparent 0 10px,color-mix(in srgb,var(--off2) 30%,transparent) 10px 20px),var(--surface)}
+.offcard .t{font-family:var(--serif);font-size:30px;font-weight:700}
+.offcard p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.btn.wide{display:block;width:100%;margin:6px 0}
+.status .btn.catch{margin:10px 0 2px;color:var(--ink);font-weight:700}
+.offlink{text-align:center;margin:6px 0 0}
+.toast{pointer-events:none;max-width:calc(100% - 32px);width:max-content;text-align:center}
+.toast.on{pointer-events:auto}
+.toast .undo{background:none;border:0;padding:0 0 0 12px;font-weight:700;color:inherit;text-decoration:underline;text-underline-offset:3px}
 </style>
 </head>
 <body>
@@ -241,9 +256,19 @@ const SEG = D.seg.map((s, i) => {
 });
 const TW = wsum;
 function chapOf(x){ let lo = 0, hi = MCH.length - 1; while (lo < hi){ const mid = (lo + hi + 1) >> 1; if (MCH[mid].first <= x) lo = mid; else hi = mid - 1; } return MCH[lo]; }
+/* Every mishnah and Rambam chapter is an "atom" placed at the centre of its share of its topic stretch.
+   A day covers the atoms whose centre falls inside its slice of the plan; this is the same split as
+   interpolating mishnah and Rambam positions through each stretch. */
+const MSEG = new Int32Array(NM + 1), RSEG = new Int32Array(NR + 1), ATOMS = [];
+SEG.forEach(g => {
+  for (let j = 1; j <= g.m; j++){ MSEG[g.cm + j] = g.i; ATOMS.push({k: 0, x: g.cm + j, c: g.w0 + (j - .5) / g.m * g.w}); }
+  for (let j = 1; j <= g.r; j++){ RSEG[g.cr + j] = g.i; ATOMS.push({k: 1, x: g.cr + j, c: g.w0 + (j - .5) / g.r * g.w}); }
+});
+ATOMS.sort((a, b) => a.c - b.c);
 
 /* ---------- dates ---------- */
 const DAY = 864e5;
+const isoRe = /^\d{4}-\d{2}-\d{2}$/;
 const parseDN = s => { const [y, m, d] = s.split("-").map(Number); return Date.UTC(y, m - 1, d) / DAY; };
 const dnDate = dn => new Date(dn * DAY);
 const wd = dn => dnDate(dn).getUTCDay();
@@ -253,89 +278,156 @@ const fmt = (dn, o) => dnDate(dn).toLocaleDateString("en-GB", {timeZone: "UTC", 
 const dayName = dn => wd(dn) === 6 ? "Shabbat" : fmt(dn, {weekday: "long"});
 const longDate = dn => `${dayName(dn)}, ${fmt(dn, {day: "numeric", month: "long"})}`;
 const shortDate = dn => `${wd(dn) === 6 ? "Shabbat" : fmt(dn, {weekday: "short"})} ${fmt(dn, {day: "numeric", month: "short"})}`;
+const fullDate = dn => fmt(dn, {day: "numeric", month: "short", year: "numeric"});
 const isoOf = dn => dnDate(dn).toISOString().slice(0, 10);
 
 /* ---------- Hebrew numerals ---------- */
 function heL(n){ const o = ["","א","ב","ג","ד","ה","ו","ז","ח","ט"], t = ["","י","כ","ל","מ","נ","ס","ע","פ","צ"]; if (n === 15) return "טו"; if (n === 16) return "טז"; return t[Math.floor(n / 10)] + o[n % 10]; }
 
 /* ---------- storage ---------- */
-let S = {settings: {...DEFAULTS}, log: {}};
-try { const raw = localStorage.getItem(KEY); if (raw) { const p = JSON.parse(raw); S = {settings: {...DEFAULTS, ...(p.settings || {})}, log: p.log || {}}; } } catch (e) {}
+/* The log is keyed by date ("2026-11-03"). Older versions keyed it by plan day number; those keys
+   are converted using the start date they were saved with. */
+function normLog(log, start){
+  const s0 = parseDN(start), out = {};
+  for (const [k, v] of Object.entries(log || {})){
+    if (!v || typeof v !== "object") continue;
+    const key = /^\d+$/.test(k) ? isoOf(s0 + +k - 1) : isoRe.test(k) ? k : null;
+    if (key) out[key] = v;
+  }
+  return out;
+}
+let S = {v: 2, settings: {...DEFAULTS}, log: {}};
+try { const raw = localStorage.getItem(KEY); if (raw) { const p = JSON.parse(raw); const settings = {...DEFAULTS, ...(p.settings || {})}; S = {v: 2, settings, log: normLog(p.log, settings.start)}; } } catch (e) {}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast("Couldn't save on this device"); } }
+const stOf = iso => (S.log[iso] && S.log[iso].s) || "";
+const st = d => stOf(d.iso);
+function tidy(iso){ const e = S.log[iso]; if (e && !e.s && !e.m) delete S.log[iso]; }
+function shiftLog(delta){ const out = {}; for (const [k, v] of Object.entries(S.log)) out[isoOf(parseDN(k) + delta)] = v; S.log = out; }
 
 /* ---------- plan ---------- */
+/* The pace (material per hour) comes from the start date, plan length and daily hours.
+   Days are then filled in order: a day off takes nothing, a day marked done keeps exactly what it
+   held when it was marked ("k"), and every other day takes the next material by its hours.
+   Skipping therefore pushes everything after it later and the plan simply runs longer. */
 let P;
+function toRanges(xs){ const out = []; for (const x of xs){ const l = out[out.length - 1]; if (l && x === l[1] + 1) l[1] = x; else out.push([x, x]); } return out; }
 function computePlan(){
-  const st = S.settings, s0 = parseDN(st.start), pd = Math.max(1, edateDN(st.start, +st.months) - s0);
-  const days = []; let cum = 0;
-  for (let n = 1; n <= pd; n++){ const dn = s0 + n - 1, sat = wd(dn) === 6, load = sat ? +st.sh : +st.wk; cum += load; days.push({n, dn, sat, load, cum}); }
-  const tload = cum; let pm = 0, pr = 0, si = 0;
-  for (const d of days){
-    const T = tload === 0 ? 0 : d.cum / tload * TW; d.T = T;
-    while (si + 1 < SEG.length && SEG[si + 1].w0 <= T) si++;
-    const g = SEG[si], f = (T - g.w0) / g.w;
-    d.seg = si; d.mTo = Math.round(g.cm + f * g.m); d.rTo = Math.round(g.cr + f * g.r);
-    d.mFrom = pm + 1; d.rFrom = pr + 1; d.mc = Math.max(0, d.mTo - d.mFrom + 1); d.rc = Math.max(0, d.rTo - d.rFrom + 1);
-    pm = d.mTo; pr = d.rTo;
+  const s = S.settings, s0 = parseDN(s.start), basePd = Math.max(1, edateDN(s.start, +s.months) - s0);
+  const loadOf = dn => wd(dn) === 6 ? +s.sh : +s.wk;
+  let tload = 0; for (let n = 1; n <= basePd; n++) tload += loadOf(s0 + n - 1);
+  const pace = tload ? TW / tload : 0;
+  const mDay = new Int32Array(NM + 1), rDay = new Int32Array(NR + 1);
+  let lastLock = 0;
+  for (const [iso, e] of Object.entries(S.log)){
+    if (!e || e.s !== "done" || !e.k) continue;
+    const n = parseDN(iso) - s0 + 1; if (!(n >= 1)) continue;
+    lastLock = Math.max(lastLock, n);
+    for (const [a, b] of e.k.m || []) for (let x = Math.max(1, a); x <= Math.min(NM, b); x++) if (!mDay[x]) mDay[x] = n;
+    for (const [a, b] of e.k.r || []) for (let x = Math.max(1, a); x <= Math.min(NR, b); x++) if (!rDay[x]) rDay[x] = n;
   }
-  const firstDay = (key, pos) => { for (const d of days) if (d[key] >= pos) return d.n; return pd; };
-  const events = D.ev.map((e, i) => {
-    const day = e.k === "M" ? firstDay("mTo", e.p) : e.k === "R" ? firstDay("rTo", e.p) : Math.max(firstDay("mTo", e.p), firstDay("rTo", e.p2));
-    return {...e, i, day};
+  let left = 0; for (const a of ATOMS) if (!(a.k ? rDay : mDay)[a.x]) left++;
+  const days = [], heal = []; let cum = 0, ptr = 0;
+  for (let n = 1; n <= 9000; n++){
+    if (n > 1 && left === 0 && n > lastLock) break;
+    const dn = s0 + n - 1, iso = isoOf(dn), e = S.log[iso], s1 = (e && e.s) || "", load = loadOf(dn);
+    const d = {n, dn, iso, sat: wd(dn) === 6, load, off: s1 === "off"};
+    days.push(d);
+    if (d.off) continue;
+    cum += load;
+    if (s1 === "done" && e.k) continue;
+    const T = cum * pace + 1e-7;
+    while (ptr < ATOMS.length && ATOMS[ptr].c <= T){ const a = ATOMS[ptr++], arr = a.k ? rDay : mDay; if (!arr[a.x]){ arr[a.x] = n; left--; } }
+    if (s1 === "done") heal.push(d);
+  }
+  const pd = days.length, mL = days.map(() => []), rL = days.map(() => []);
+  for (let x = 1; x <= NM; x++) if (mDay[x] >= 1 && mDay[x] <= pd) mL[mDay[x] - 1].push(x);
+  for (let x = 1; x <= NR; x++) if (rDay[x] >= 1 && rDay[x] <= pd) rL[rDay[x] - 1].push(x);
+  let cumW = 0, lastSeg = 0;
+  days.forEach((d, i) => {
+    d.mr = toRanges(mL[i]); d.rr = toRanges(rL[i]); d.mc = mL[i].length; d.rc = rL[i].length; d.w = d.mc + W * d.rc;
+    cumW += d.w; d.cumW = cumW;
+    if (d.mc || d.rc) lastSeg = Math.max(d.mc ? MSEG[mL[i][d.mc - 1]] : 0, d.rc ? RSEG[rL[i][d.rc - 1]] : 0);
+    d.seg = lastSeg;
   });
+  // Done days saved before locking existed get locked to what they hold now.
+  if (heal.length){ heal.forEach(d => { S.log[d.iso].k = {m: d.mr.map(r => r.slice()), r: d.rr.map(r => r.slice())}; }); save(); }
+  const unitMax = (arr, u) => { let mx = 0; for (let x = u.first; x <= u.last; x++) mx = Math.max(mx, arr[x]); return mx; };
+  const mU = MU.map(u => unitMax(mDay, u)), rU = RU.map(u => unitMax(rDay, u));
+  const mx = a => Math.min(pd, Math.max(1, ...a));
+  const evDay = e => {
+    if (e.t === "Masechet") return mx([mU[MU.find(u => u.n === e.n).i]]);
+    if (e.t === "Seder"){ const g = e.n.replace("Seder ", ""); return mx(MU.filter(u => u.s === g).map(u => mU[u.i])); }
+    if (e.t === "Shas") return mx(mU);
+    if (e.t === "Sefer"){ const g = e.n.replace("Sefer ", ""); return mx(RU.filter(u => u.s === g).map(u => rU[u.i])); }
+    if (e.t === "Rambam") return mx(rU);
+    return mx([mU[0], rU[0]]);
+  };
+  const events = D.ev.map((e, i) => ({...e, i, day: evDay(e)})).sort((a, b) => a.day - b.day || a.i - b.i);
   const evByDay = {}; events.forEach(e => (evByDay[e.day] = evByDay[e.day] || []).push(e));
-  const segDays = SEG.map(g => ({start: Math.min(firstDay("mTo", g.cm + 1), firstDay("rTo", g.cr + 1)), end: Math.max(firstDay("mTo", g.cm + g.m), firstDay("rTo", g.cr + g.r))}));
-  P = {s0, pd, days, tload, events, evByDay, segDays, totMin: NM * st.minM + NR * st.minR};
+  const segDays = SEG.map(() => ({start: Infinity, end: 0}));
+  const touch = (g, n) => { if (n){ g.start = Math.min(g.start, n); g.end = Math.max(g.end, n); } };
+  for (let x = 1; x <= NM; x++) touch(segDays[MSEG[x]], mDay[x]);
+  for (let x = 1; x <= NR; x++) touch(segDays[RSEG[x]], rDay[x]);
+  segDays.forEach(g => { if (g.start === Infinity) g.start = g.end = 1; });
+  P = {s0, pd, end: s0 + pd - 1, days, tload, events, evByDay, segDays, mDay, rDay, offCount: days.filter(d => d.off).length, totMin: NM * s.minM + NR * s.minR};
   P.minPerLoad = tload ? P.totMin / tload : 0;
 }
 function mParts(d){
-  if (!d.mc) return [];
-  const out = []; let x = d.mFrom;
-  while (x <= d.mTo){
-    const u = MU[chapOf(x).u], y = Math.min(d.mTo, u.last), cx = chapOf(x), cy = chapOf(y);
-    const m1 = x - cx.first + 1, m2 = y - cy.first + 1, whole = m1 === 1 && y === cy.last;
-    const en = whole ? `${u.n} ${cx.p}${cy.p > cx.p ? "–" + cy.p : ""}` : `${u.n} ${cx.p}:${m1}${y > x ? "–" + (cy.p === cx.p ? m2 : cy.p + ":" + m2) : ""}`;
-    const he = whole ? (cy.p > cx.p ? `פרקים ${heL(cx.p)}–${heL(cy.p)}` : `פרק ${heL(cx.p)}`) : `${heL(cx.p)}:${heL(m1)}${y > x ? " – " + (cy.p === cx.p ? heL(m2) : heL(cy.p) + ":" + heL(m2)) : ""}`;
-    const ref = whole ? `${cx.p}${cy.p > cx.p ? "-" + cy.p : ""}` : `${cx.p}.${m1}${y > x ? "-" + (cy.p === cx.p ? m2 : cy.p + "." + m2) : ""}`;
-    out.push({u, n: y - x + 1, en, title: u.he, he, url: `https://www.sefaria.org/${encodeURIComponent(u.u)}.${ref}?lang=bi`});
-    x = y + 1;
+  const out = [];
+  for (const [a, b] of d.mr){
+    let x = a;
+    while (x <= b){
+      const cx = chapOf(x), u = MU[cx.u], y = Math.min(b, u.last), cy = chapOf(y);
+      const m1 = x - cx.first + 1, m2 = y - cy.first + 1, whole = m1 === 1 && y === cy.last;
+      const en = whole ? `${u.n} ${cx.p}${cy.p > cx.p ? "–" + cy.p : ""}` : `${u.n} ${cx.p}:${m1}${y > x ? "–" + (cy.p === cx.p ? m2 : cy.p + ":" + m2) : ""}`;
+      const he = whole ? (cy.p > cx.p ? `פרקים ${heL(cx.p)}–${heL(cy.p)}` : `פרק ${heL(cx.p)}`) : `${heL(cx.p)}:${heL(m1)}${y > x ? " – " + (cy.p === cx.p ? heL(m2) : heL(cy.p) + ":" + heL(m2)) : ""}`;
+      const ref = whole ? `${cx.p}${cy.p > cx.p ? "-" + cy.p : ""}` : `${cx.p}.${m1}${y > x ? "-" + (cy.p === cx.p ? m2 : cy.p + "." + m2) : ""}`;
+      out.push({u, n: y - x + 1, en, title: u.he, he, url: `https://www.sefaria.org/${encodeURIComponent(u.u)}.${ref}?lang=bi`});
+      x = y + 1;
+    }
   }
   return out;
 }
 function rParts(d){
-  if (!d.rc) return [];
-  const out = []; let x = d.rFrom;
-  while (x <= d.rTo){
-    const u = RU[RUNIT[x]], y = Math.min(d.rTo, u.last), c1 = x - u.first + 1, c2 = y - u.first + 1;
-    out.push({u, n: y - x + 1, en: `${u.n} ${c1}${c2 > c1 ? "–" + c2 : ""}`, title: u.he,
-      he: c2 > c1 ? `פרקים ${heL(c1)}–${heL(c2)}` : `פרק ${heL(c1)}`,
-      url: `https://www.sefaria.org/${encodeURIComponent(u.u)}.${c1 + (u.o || 0)}${c2 > c1 ? "-" + (c2 + (u.o || 0)) : ""}?lang=bi`});
-    x = y + 1;
+  const out = [];
+  for (const [a, b] of d.rr){
+    let x = a;
+    while (x <= b){
+      const u = RU[RUNIT[x]], y = Math.min(b, u.last), c1 = x - u.first + 1, c2 = y - u.first + 1;
+      out.push({u, n: y - x + 1, en: `${u.n} ${c1}${c2 > c1 ? "–" + c2 : ""}`, title: u.he,
+        he: c2 > c1 ? `פרקים ${heL(c1)}–${heL(c2)}` : `פרק ${heL(c1)}`,
+        url: `https://www.sefaria.org/${encodeURIComponent(u.u)}.${c1 + (u.o || 0)}${c2 > c1 ? "-" + (c2 + (u.o || 0)) : ""}?lang=bi`});
+      x = y + 1;
+    }
   }
   return out;
 }
 const est = d => d.mc * S.settings.minM + d.rc * S.settings.minR;
-const st = n => (S.log[n] && S.log[n].s) || "";
 
 /* ---------- progress ---------- */
 function progress(){
-  const tday = todayDN() - P.s0 + 1, done = new Uint8Array(P.pd + 2), pre = new Int32Array(P.pd + 2);
-  let doneW = 0, mDone = 0, rDone = 0, mins = 0, logged = 0, estOnLogged = 0, minsOnLogged = 0;
+  const tday = todayDN() - P.s0 + 1, pd = P.pd, done = new Uint8Array(pd + 2), off = new Uint8Array(pd + 2);
+  let doneW = 0, mDone = 0, rDone = 0, mins = 0, logged = 0, estOnLogged = 0, minsOnLogged = 0, behindW = 0, aheadW = 0, late = 0, catchable = 0;
   for (const d of P.days){
-    const s = st(d.n); done[d.n] = s === "done" ? 1 : 0;
-    if (s === "done"){ doneW += d.mc + W * d.rc; mDone += d.mc; rDone += d.rc; }
-    const m = S.log[d.n] && +S.log[d.n].m; if (m > 0){ mins += m; logged++; if (s === "done"){ minsOnLogged += m; estOnLogged += est(d); } }
+    const s = st(d);
+    if (s === "done"){ done[d.n] = 1; doneW += d.w; mDone += d.mc; rDone += d.rc; if (d.n >= tday) aheadW += d.w; }
+    if (s === "off") off[d.n] = 1;
+    if (d.n < tday){ if (s !== "done" && s !== "off") behindW += d.w; if (!s) late++; if (!s || s === "missed") catchable++; }
+    const m = S.log[d.iso] && +S.log[d.iso].m; if (m > 0){ mins += m; logged++; if (s === "done"){ minsOnLogged += m; estOnLogged += est(d); } }
   }
-  for (let n = 1; n <= P.pd + 1; n++) pre[n] = pre[n - 1] + (done[n] || 0);
-  const allDone = (a, b) => pre[b] - pre[a - 1] === b - a + 1;
-  const dayOfM = pos => { let lo = 0, hi = P.days.length - 1; while (lo < hi){ const mid = (lo + hi) >> 1; if (P.days[mid].mTo >= pos) hi = mid; else lo = mid + 1; } return P.days[lo].n; };
-  const chDone = MCH.map(c => allDone(dayOfM(c.first), dayOfM(c.last)));
-  const rChDone = new Uint8Array(NR + 1); for (const d of P.days) if (done[d.n]) for (let k = d.rFrom; k <= d.rTo; k++) rChDone[k] = 1;
-  const yi = Math.min(tday - 1, P.pd), expW = yi < 1 ? 0 : P.days[yi - 1].T, gapW = expW - doneW;
-  let streak = 0; { let n = Math.min(Math.max(tday, 0), P.pd); if (n >= 1 && !done[n]) n--; while (n >= 1 && done[n]){ streak++; n--; } }
-  let best = 0, run = 0; for (let n = 1; n <= P.pd; n++){ run = done[n] ? run + 1 : 0; best = Math.max(best, run); }
-  const late = P.days.filter(d => d.n < tday && !st(d.n)).length;
-  const proj = tday >= 1 && doneW > 0 ? P.s0 + Math.ceil(tday * TW / doneW) - 1 : null;
+  const chDone = MCH.map(c => { for (let x = c.first; x <= c.last; x++) if (!done[P.mDay[x]]) return false; return true; });
+  const rChDone = new Uint8Array(NR + 1); for (let k = 1; k <= NR; k++) rChDone[k] = done[P.rDay[k]];
+  const gapW = behindW - aheadW;
+  // Days off neither add to a streak nor break it.
+  let streak = 0; { let n = Math.min(Math.max(tday, 0), pd); if (n >= 1 && !done[n] && !off[n]) n--; while (n >= 1){ if (off[n]){ n--; continue; } if (!done[n]) break; streak++; n--; } }
+  let best = 0, run = 0; for (let n = 1; n <= pd; n++){ if (off[n]) continue; run = done[n] ? run + 1 : 0; best = Math.max(best, run); }
+  let proj = null;
+  if (tday >= 1 && doneW > 0){
+    let el = 0; for (let n = 1; n <= Math.min(tday, pd); n++) if (!off[n]) el++;
+    const need = Math.ceil(el * TW / doneW); let c = 0, n = 0;
+    while (c < need && n < 40000){ n++; if (n > pd || !off[n]) c++; }
+    proj = P.s0 + n - 1;
+  }
   const evDone = e => {
     if (e.t === "Masechet"){ const u = MU.find(u => u.n === e.n); return MCH.every((c, i) => c.u !== u.i || chDone[i]); }
     if (e.t === "Seder"){ const g = e.n.replace("Seder ", ""); return MCH.every((c, i) => MU[c.u].s !== g || chDone[i]); }
@@ -344,18 +436,26 @@ function progress(){
     if (e.t === "Rambam") return rChDone.slice(1).every(Boolean);
     return MCH.every((c, i) => c.u !== 0 || chDone[i]) && [...Array(RU[0].c)].every((_, k) => rChDone[RU[0].first + k]);
   };
-  const evDoneMap = P.events.map(evDone);
-  return {tday, doneW, mDone, rDone, chDone, rChDone, gapW, streak, best, late, proj, mins, logged, estOnLogged, minsOnLogged, evDoneMap,
+  const evDoneMap = []; P.events.forEach(e => { evDoneMap[e.i] = evDone(e); });
+  return {tday, doneW, mDone, rDone, chDone, rChDone, gapW, streak, best, late, catchable, proj, mins, logged, estOnLogged, minsOnLogged, evDoneMap,
     pct: doneW / TW, perakim: chDone.filter(Boolean).length, rch: rChDone.reduce((a, b) => a + b, 0)};
 }
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let toastT; function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), 1800); }
+let toastT, undoFn = null;
+function toast(t, undo){
+  const el = $("#toast"); undoFn = undo || null;
+  el.innerHTML = esc(t) + (undo ? `<button class="undo" data-undo>Undo</button>` : "");
+  el.classList.add("on"); clearTimeout(toastT);
+  toastT = setTimeout(() => { el.classList.remove("on"); undoFn = null; }, undo ? 6000 : 1800);
+}
 const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
 const inDays = k => k === 0 ? "today" : k === 1 ? "tomorrow" : k > 0 ? `in ${k} days` : `${-k} days ago`;
 const evHe = e => e.t === "Dedication" ? "תענית: משנה ורמב״ם" : e.he;
+const endsLine = () => `Plan ends ${fullDate(P.end)}${P.offCount ? ` (${plural(P.offCount, "day")} off)` : ""}`;
+const dayAt = iso => P.days[parseDN(iso) - P.s0];
 
 function partsHTML(parts, kind){
   if (!parts.length) return "";
@@ -369,44 +469,54 @@ function partsHTML(parts, kind){
     <a class="open" href="${p.url}" target="_blank" rel="noopener">Open on Sefaria</a></div>`).join("")}
     <div class="en" style="margin-top:10px">${unit}</div></div>`;
 }
-function dayCard(d, opts = {}){
+function dayCard(d){
   const evs = P.evByDay[d.n] || [];
   const band = evs.length ? `<div class="siyum-band he">סיום ${evs.map(e => esc(evHe(e))).join(" · ")}</div>` : "";
   const g = SEG[d.seg];
   const pair = `${g.mu.map(j => MU[j].n).join(", ")} with ${g.ru.map(j => RU[j].n).join(", ")}`;
-  return `<div class="leaf">${band}${partsHTML(mParts(d), "m")}${partsHTML(rParts(d), "r")}
+  const body = partsHTML(mParts(d), "m") + partsHTML(rParts(d), "r");
+  return `<div class="leaf">${band}${body || `<div class="part"><div class="en">Nothing is planned for this day.</div></div>`}
     <div class="meta"><span style="white-space:nowrap">About <b>${Math.round(est(d))} min</b></span><span style="text-align:right">${esc(pair)}</span></div></div>`;
 }
-function statusButtons(n){
-  const s = st(n), m = (S.log[n] && S.log[n].m) || "";
+function offCard(d, isToday){
+  return `<div class="offcard"><div class="t">Day off</div>
+    <p>No learning ${isToday ? "today" : "on this day"}. Its learning moved to the days after it, and the plan ends later.</p></div>
+    <button class="btn wide" data-skip="${d.iso}">Day off · Undo</button>`;
+}
+function statusButtons(d){
+  const s = st(d), m = (S.log[d.iso] && S.log[d.iso].m) || "";
   return `<div class="actions">
-    <button class="btn primary ${s === "done" ? "sel-done" : ""}" data-set="done" data-n="${n}">${s === "done" ? "Done" : "Mark done"}</button>
-    <button class="btn ${s === "partial" ? "sel-partial" : ""}" data-set="partial" data-n="${n}">Partial</button>
-    <button class="btn ${s === "missed" ? "sel-missed" : ""}" data-set="missed" data-n="${n}">Missed</button></div>
+    <button class="btn primary ${s === "done" ? "sel-done" : ""}" data-set="done" data-d="${d.iso}">${s === "done" ? "Done" : "Mark done"}</button>
+    <button class="btn ${s === "partial" ? "sel-partial" : ""}" data-set="partial" data-d="${d.iso}">Partial</button>
+    <button class="btn ${s === "missed" ? "sel-missed" : ""}" data-set="missed" data-d="${d.iso}">Missed</button></div>
     <div class="mins"><span>Minutes learned</span><span class="step">
-      <button data-min="-5" data-n="${n}" aria-label="5 minutes less">−</button>
-      <input inputmode="numeric" pattern="[0-9]*" aria-label="Minutes learned" data-mins="${n}" value="${esc(m)}" placeholder="0">
-      <button data-min="5" data-n="${n}" aria-label="5 minutes more">+</button></span></div>`;
+      <button data-min="-5" data-d="${d.iso}" aria-label="5 minutes less">−</button>
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Minutes learned" data-mins="${d.iso}" value="${esc(m)}" placeholder="0">
+      <button data-min="5" data-d="${d.iso}" aria-label="5 minutes more">+</button></span></div>`;
 }
 
 /* ---------- screens ---------- */
 function renderToday(){
   const G = progress(), t = G.tday, idx = Math.max(1, Math.min(t, P.pd)), d = P.days[idx - 1];
+  const isToday = t >= 1 && t <= P.pd;
   const head = t < 1 ? `First session ${longDate(P.s0)}` : t > P.pd ? "The plan period is over" : longDate(todayDN());
   const ded = S.settings.ded ? `<div class="ded he">לעילוי נשמת ${esc(S.settings.ded)}</div>` : "";
   let status;
-  if (t < 1) status = `<div class="status wait">Starts ${longDate(P.s0)}</div>`;
+  if (t < 1) status = `<div class="status wait">Starts ${longDate(P.s0)}<small>${endsLine()}</small></div>`;
   else if (G.pct >= 0.9999) status = `<div class="status ok">Finished. Mazal tov!</div>`;
-  else if (G.gapW <= 0.5) status = `<div class="status ok">On track${G.gapW < -0.5 ? ", ahead of plan" : ""}<small>Day ${Math.min(t, P.pd)} of ${P.pd}${G.proj ? `, projected finish ${fmt(G.proj, {day: "numeric", month: "short", year: "numeric"})}` : ""}</small></div>`;
-  else status = `<div class="status behind">Behind by about ${(G.gapW * P.totMin / TW / 60).toFixed(1)} hours<small>${G.late ? `${plural(G.late, "past day")} not logged. ` : ""}Shabbat is a good time to catch up.</small></div>`;
-  const nx = P.events.find((e, i) => e.day >= Math.max(1, t) && !G.evDoneMap[i]);
-  const nd = idx < P.pd ? P.days[idx] : null;
+  else if (G.gapW <= 0.5) status = `<div class="status ok">On track${G.gapW < -0.5 ? ", ahead of plan" : ""}<small>Day ${Math.min(t, P.pd)} of ${P.pd}${G.proj ? `, projected finish ${fullDate(G.proj)}` : ""}</small><small>${endsLine()}</small></div>`;
+  else status = `<div class="status behind">Behind by about ${(G.gapW * P.totMin / TW / 60).toFixed(1)} hours<small>${G.late ? `${plural(G.late, "past day")} not logged. ` : ""}Shabbat is a good time to catch up.</small>
+    ${G.catchable ? `<button class="btn wide catch" data-catchup>Push the plan back instead</button><small>Turns ${plural(G.catchable, "past day")} with no learning into days off. Days marked done or partial stay.</small>` : ""}<small>${endsLine()}</small></div>`;
+  const nx = P.events.find(e => e.day >= Math.max(1, t) && !G.evDoneMap[e.i]);
+  let nd = null; for (let j = idx; j < P.pd; j++){ const x = P.days[j]; if (!x.off && (x.mc || x.rc)){ nd = x; break; } }
   const nextHTML = nd ? `<div class="next"><h3>Next: ${longDate(nd.dn)}</h3>
     ${mParts(nd).map(p => `<div class="row"><span>${esc(p.en)}</span><span class="he muted">${esc(p.title)}</span></div>`).join("")}
     ${rParts(nd).map(p => `<div class="row"><span>${esc(p.en)}</span><span class="he muted">${esc(p.title)}</span></div>`).join("")}</div>` : "";
+  const card = d.off ? offCard(d, isToday)
+    : dayCard(d) + statusButtons(d) + (isToday && st(d) !== "done" ? `<button class="btn wide" data-skip="${d.iso}">Busy today, push to tomorrow</button>` : "");
   $("#today").innerHTML = `
-    <div class="top"><div class="date">${head}</div><div class="day">${t >= 1 && t <= P.pd ? `Day ${t}` : ""}</div></div>${ded}
-    ${dayCard(d)}${statusButtons(d.n)}${status}
+    <div class="top"><div class="date">${head}</div><div class="day">${isToday ? `Day ${t}` : ""}</div></div>${ded}
+    ${card}<p class="offlink"><button class="linkish" data-offpanel>Plan days off…</button></p>${status}
     <div class="facts">
       <div class="fact siyum"><div class="k">Next siyum</div>${nx ? `<div class="v he">${esc(evHe(nx))}</div><div class="s">${esc(nx.n)}, ${longDate(P.s0 + nx.day - 1)}, ${inDays(nx.day - t)}</div>` : `<div class="v">All done</div>`}</div>
       <div class="fact"><div class="k">Streak</div><div class="v">${plural(G.streak, "day")}</div><div class="s">Best ${G.best}</div></div>
@@ -416,29 +526,29 @@ function renderToday(){
 let calMonth = null;
 function renderCalendar(){
   const G = progress(), t = G.tday;
-  if (calMonth === null){ const base = dnDate(Math.min(Math.max(todayDN(), P.s0), P.s0 + P.pd - 1)); calMonth = [base.getUTCFullYear(), base.getUTCMonth()]; }
+  if (calMonth === null){ const base = dnDate(Math.min(Math.max(todayDN(), P.s0), P.end)); calMonth = [base.getUTCFullYear(), base.getUTCMonth()]; }
   const [y, m] = calMonth, first = Date.UTC(y, m, 1) / DAY, dim = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
   const lead = wd(first); let cells = "";
   for (let i = 0; i < lead; i++) cells += `<div></div>`;
-  let mDone = 0, mPlan = 0, mSiy = 0;
+  let mDone = 0, mPlan = 0, mOff = 0, mSiy = 0;
   for (let k = 0; k < dim; k++){
-    const dn = first + k, n = dn - P.s0 + 1, inPlan = n >= 1 && n <= P.pd, s = inPlan ? st(n) : "";
+    const dn = first + k, n = dn - P.s0 + 1, inPlan = n >= 1 && n <= P.pd, s = inPlan ? st(P.days[n - 1]) : "";
     let cls = "cell"; if (!inPlan) cls += " out"; else if (s) cls += " " + s; else if (n < t) cls += " late";
     if (n === t) cls += " today"; if (wd(dn) === 6 && inPlan) cls += " sh";
     const siy = inPlan && P.evByDay[n];
-    if (inPlan){ mPlan++; if (s === "done") mDone++; if (siy) mSiy += siy.length; }
-    cells += `<button class="${cls}" ${inPlan ? `data-day="${n}"` : "disabled"} aria-label="${fmt(dn, {day: "numeric", month: "long"})}${s ? ", " + s : ""}${siy ? ", siyum" : ""}">${k + 1}${siy ? '<span class="dot"></span>' : ""}</button>`;
+    if (inPlan){ if (s === "off") mOff++; else { mPlan++; if (s === "done") mDone++; } if (siy) mSiy += siy.length; }
+    cells += `<button class="${cls}" ${inPlan ? `data-day="${n}"` : "disabled"} aria-label="${fmt(dn, {day: "numeric", month: "long"})}${s ? ", " + (s === "off" ? "day off" : s) : ""}${siy ? ", siyum" : ""}">${k + 1}${siy ? '<span class="dot"></span>' : ""}</button>`;
   }
   $("#calendar").innerHTML = `
     <div class="calhead"><button data-cal="-1" aria-label="Previous month">‹</button><h2>${fmt(first, {month: "long", year: "numeric"})}</h2><button data-cal="1" aria-label="Next month">›</button></div>
     <div class="grid">${["Sun","Mon","Tue","Wed","Thu","Fri","Shab"].map((x, i) => `<div class="dow ${i === 6 ? "sh" : ""}">${x}</div>`).join("")}${cells}</div>
-    <div class="legend"><span><i style="background:var(--done)"></i>Done</span><span><i style="background:var(--partial)"></i>Partial</span><span><i style="background:var(--missed)"></i>Missed</span><span><i style="background:var(--late)"></i>Not logged</span><span><i style="background:var(--gold);border-radius:50%"></i>Siyum</span></div>
-    <p class="monthsum muted small">${mPlan ? `${mDone} of ${plural(mPlan, "day")} done this month${mSiy ? `, ${plural(mSiy, "siyum")} planned`.replace("siyums", "siyumim") : ""}. Tap a day to see its learning or log it.` : "No learning planned this month."}</p>`;
+    <div class="legend"><span><i style="background:var(--done)"></i>Done</span><span><i style="background:var(--partial)"></i>Partial</span><span><i style="background:var(--missed)"></i>Missed</span><span><i class="lg-off"></i>Day off</span><span><i style="background:var(--late)"></i>Not logged</span><span><i style="background:var(--gold);border-radius:50%"></i>Siyum</span></div>
+    <p class="monthsum muted small">${mPlan || mOff ? `${mDone} of ${plural(mPlan, "day")} done this month${mOff ? `, ${plural(mOff, "day")} off` : ""}${mSiy ? `, ${plural(mSiy, "siyum")} planned`.replace("siyums", "siyumim") : ""}. Tap a day to see its learning or log it.` : "No learning planned this month."}</p>`;
 }
 let syFilter = "all";
 function renderSiyumim(){
   const G = progress(), t = G.tday;
-  const nextI = P.events.findIndex((e, i) => e.day >= Math.max(1, t) && !G.evDoneMap[i]);
+  const nx = P.events.find(e => e.day >= Math.max(1, t) && !G.evDoneMap[e.i]), nextI = nx ? nx.i : -1;
   const major = e => e.t !== "Masechet";
   const list = P.events.filter(e => syFilter === "all" || (syFilter === "major" ? major(e) : syFilter === "left" ? !G.evDoneMap[e.i] : true));
   let html = `<h2>Siyumim</h2><p class="muted small">${G.evDoneMap.filter(Boolean).length} of ${P.events.length} made. The next one is highlighted.</p>
@@ -457,12 +567,13 @@ function renderSiyumim(){
 let shelfSel = null;
 function lineChart(G){
   const pts = 52, w = 320, h = 150, pad = 26; let plan = "", act = "";
+  const dc = new Float64Array(P.pd + 1); for (let i = 1; i <= P.pd; i++){ const d = P.days[i - 1]; dc[i] = dc[i - 1] + (st(d) === "done" ? d.w : 0); }
   for (let k = 0; k <= pts; k++){
     const n = Math.round(k * P.pd / pts), x = pad + (w - pad - 6) * k / pts;
-    const pv = n === 0 ? 0 : P.days[n - 1].T / TW; plan += `${k ? "L" : "M"}${x.toFixed(1)},${(h - 18 - pv * (h - 30)).toFixed(1)}`;
+    const pv = n === 0 ? 0 : P.days[n - 1].cumW / TW; plan += `${k ? "L" : "M"}${x.toFixed(1)},${(h - 18 - pv * (h - 30)).toFixed(1)}`;
     const prevN = Math.round((k - 1) * P.pd / pts);
     if (G.tday >= 1 && (k === 0 || prevN < G.tday)){
-      const upto = Math.min(n, G.tday); let cw = 0; for (let i = 1; i <= upto; i++) if (st(i) === "done"){ const d = P.days[i - 1]; cw += d.mc + W * d.rc; }
+      const cw = dc[Math.min(n, G.tday, P.pd)];
       act += `${act ? "L" : "M"}${x.toFixed(1)},${(h - 18 - cw / TW * (h - 30)).toFixed(1)}`;
     }
   }
@@ -517,7 +628,7 @@ function renderShelf(){
 function weekBars(){
   const weeks = Math.ceil(P.pd / 7), w = 320, h = 120, bw = (w - 10) / weeks, plan = [], log = [];
   for (let k = 0; k < weeks; k++){
-    let p = 0, l = 0; for (let n = k * 7 + 1; n <= Math.min(P.pd, k * 7 + 7); n++){ p += est(P.days[n - 1]); l += +(S.log[n] && S.log[n].m) || 0; }
+    let p = 0, l = 0; for (let n = k * 7 + 1; n <= Math.min(P.pd, k * 7 + 7); n++){ const d = P.days[n - 1]; p += est(d); l += +(S.log[d.iso] && S.log[d.iso].m) || 0; }
     plan.push(p); log.push(l);
   }
   const max = Math.max(1, ...plan, ...log); let bars = "";
@@ -537,7 +648,7 @@ function renderSettings(){
       <div class="field"><label for="f-months">Plan length (months)</label><input id="f-months" type="number" min="6" max="24" step="1" value="${s.months}" data-set-field="months"></div>
       <div class="field"><label for="f-wk">Weekday study (hours)</label><input id="f-wk" type="number" min="0.25" max="16" step="0.25" value="${s.wk}" data-set-field="wk"></div>
       <div class="field"><label for="f-sh">Shabbat study (hours)</label><input id="f-sh" type="number" min="0" max="16" step="0.25" value="${s.sh}" data-set-field="sh"></div>
-      <div class="field"><span class="hint">These four spread the whole plan. Changing them later moves learning between days, including days you already logged.</span></div>
+      <div class="field"><span class="hint">These four set the pace of the whole plan. Days off push the end date later. Changing these only moves learning on days you haven't marked done; done days keep what you learned. Moving the start date moves your logged days and days off along with it.</span></div>
       <div class="field"><label for="f-mm">Minutes per mishnah</label><input id="f-mm" type="number" min="0.2" max="30" step="0.1" value="${s.minM}" data-set-field="minM"></div>
       <div class="field"><label for="f-mr">Minutes per Rambam chapter</label><input id="f-mr" type="number" min="1" max="240" step="1" value="${s.minR}" data-set-field="minR"></div>
       <div class="field"><span class="hint">Only the time estimates use these. Lower them as your reading gets faster.</span></div>
@@ -546,7 +657,9 @@ function renderSettings(){
     <div class="card"><div class="row"><span>Weekday session at this pace</span><b>${Math.round(wkNeed)} min</b></div>
       <div class="row"><span>Shabbat session at this pace</span><b>${Math.round(shNeed)} min</b></div>
       <div class="row"><span>Total learning</span><b>${Math.round(P.totMin / 60)} hours</b></div>
-      <div class="row"><span>Plan ends</span><b>${fmt(P.s0 + P.pd - 1, {day: "numeric", month: "short", year: "numeric"})}</b></div></div>
+      <div class="row"><span>Plan ends</span><b>${fullDate(P.end)}</b></div>
+      <div class="row"><span>Days off</span><b>${P.offCount}</b></div></div>
+    <p class="note">Add or remove days off from Today, under “Plan days off…”.</p>
     <h3 style="margin-top:20px">Backup</h3>
     <p class="note">Your progress is saved on this phone. Make a backup now and then, especially before changing phones.</p>
     <div class="btnrow"><button class="btn" id="b-export">Save backup file</button><button class="btn" id="b-copy">Copy backup</button></div>
@@ -562,13 +675,33 @@ function render(){ R[tab](); }
 function go(t){ tab = t; document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === t)); document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t)); render(); window.scrollTo(0, 0); }
 
 /* ---------- sheet + celebration ---------- */
-let sheetDay = null;
+let sheet = null, offFrom = "", offTo = "";
 function openSheet(n){
-  sheetDay = n; const d = P.days[n - 1];
-  $("#sheetInner").innerHTML = `<button class="closex" data-close>Close</button><div class="date">${longDate(d.dn)}</div><div class="muted small">Day ${n} of ${P.pd}</div>${dayCard(d)}${statusButtons(n)}`;
+  const d = P.days[n - 1]; if (!d){ closeSheet(); return; }
+  sheet = {k: "day", n};
+  const isToday = n === todayDN() - P.s0 + 1;
+  $("#sheetInner").innerHTML = `<button class="closex" data-close>Close</button><div class="date">${longDate(d.dn)}</div><div class="muted small">Day ${n} of ${P.pd}</div>${d.off ? offCard(d, isToday) : dayCard(d) + statusButtons(d)}`;
   $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
 }
-function closeSheet(){ sheetDay = null; $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); }
+function offRanges(){
+  const ks = Object.keys(S.log).filter(k => S.log[k].s === "off" && parseDN(k) >= P.s0).sort(), out = [];
+  for (const k of ks){ const dn = parseDN(k), l = out[out.length - 1]; if (l && dn === l[1] + 1) l[1] = dn; else out.push([dn, dn]); }
+  return out;
+}
+function openOffPanel(){
+  sheet = {k: "off"};
+  const min = isoOf(P.s0), f = offFrom || isoOf(Math.max(todayDN(), P.s0)), to = offTo || f, rs = offRanges();
+  $("#sheetInner").innerHTML = `<button class="closex" data-close>Close</button><div class="date">Days off</div>
+    <p class="note">A day off has no learning. Its learning moves to the days after it and the plan ends later. Days you've marked done never change. Pick one date or a range, in the past or the future.</p>
+    <div class="card"><div class="field"><label for="o-from">From</label><input id="o-from" type="date" value="${f}" min="${min}"></div>
+      <div class="field"><label for="o-to">To</label><input id="o-to" type="date" value="${to}" min="${min}"></div></div>
+    <button class="btn primary wide" id="o-add">Add days off</button>
+    <h3 style="margin-top:18px">Your days off</h3>
+    <div class="card">${rs.length ? rs.map(([a, b]) => `<div class="row"><span>${a === b ? shortDate(a) : `${shortDate(a)} – ${shortDate(b)}`} <span class="muted small">${plural(b - a + 1, "day")}</span></span><button class="linkish" data-unoff="${a}|${b}">Remove</button></div>`).join("") : `<div class="row"><span class="muted">None yet</span></div>`}</div>
+    <p class="note">${endsLine()}</p>`;
+  $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
+}
+function closeSheet(){ sheet = null; $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); }
 function celebrate(evs){
   const lines = evs.map(e => e.t === "Masechet" ? `הדרן עלך מסכת ${e.he.replace("מסכת ", "")}` : e.t === "Seder" ? `הדרן עלך ${e.he}` : e.t === "Shas" ? "הדרן עלך ששה סדרי משנה" : e.t === "Dedication" ? "סיום תענית" : `סיום ${e.he}`);
   $("#celebrateBox").innerHTML = `<div class="hadran">${lines.map(esc).join("<br>")}</div><p>${esc(evs.map(e => e.t === "Dedication" ? "Mishnah and Rambam on Taanit both complete" : e.n).join(", "))}. Mazal tov!</p><button class="btn primary" data-close-cel style="width:100%">Close</button>`;
@@ -580,30 +713,74 @@ function celebrate(evs){
       document.body.appendChild(b); setTimeout(() => b.remove(), 3800); }
   }
 }
-function setStatus(n, s){
-  const cur = S.log[n] || {}; const was = cur.s;
+function setStatus(iso, s){
+  const d = dayAt(iso); if (!d || d.off) return;
+  const cur = S.log[iso] || {}, was = cur.s;
   if (was === s) delete cur.s; else cur.s = s;
-  if (cur.s || cur.m) S.log[n] = cur; else delete S.log[n];
-  save();
-  if (cur.s === "done"){ const G = progress(); const evs = (P.evByDay[n] || []).filter(e => G.evDoneMap[e.i]); if (evs.length) celebrate(evs); else toast("Marked done"); }
+  if (cur.s === "done") cur.k = {m: d.mr.map(r => r.slice()), r: d.rr.map(r => r.slice())}; else delete cur.k;
+  S.log[iso] = cur; tidy(iso);
+  save(); computePlan();
+  if (cur.s === "done"){ const G = progress(); const evs = (P.evByDay[d.n] || []).filter(e => G.evDoneMap[e.i]); if (evs.length) celebrate(evs); else toast("Marked done"); }
   else toast(cur.s ? `Marked ${cur.s}` : "Cleared");
   refresh();
 }
-function setMins(n, v){
-  const cur = S.log[n] || {}; const m = Math.max(0, Math.min(900, Math.round(+v || 0)));
+function setMins(iso, v){
+  const cur = S.log[iso] || {}; const m = Math.max(0, Math.min(900, Math.round(+v || 0)));
   if (m) cur.m = m; else delete cur.m;
-  if (cur.s || cur.m) S.log[n] = cur; else delete S.log[n];
+  S.log[iso] = cur; tidy(iso);
   save();
 }
-function refresh(){ render(); if (sheetDay) openSheet(sheetDay); }
+/* Changes to days off all go through here so each one can be undone from the toast. */
+function change(mutate, msg){
+  const snap = JSON.stringify(S.log);
+  const r = mutate(); if (r === false) return;
+  save(); computePlan(); refresh();
+  toast(msg(r), () => { S.log = JSON.parse(snap); save(); computePlan(); refresh(); toast("Undone"); });
+}
+function makeOff(iso){ const c = S.log[iso] || {}; if (c.s === "done" || c.s === "off") return false; c.s = "off"; delete c.k; S.log[iso] = c; return true; }
+function unOff(iso){ const c = S.log[iso]; if (!c || c.s !== "off") return false; delete c.s; tidy(iso); return true; }
+function toggleSkip(iso){
+  const s = stOf(iso); if (s === "done") return;
+  const wasOff = s === "off", isT = iso === isoOf(todayDN());
+  change(() => wasOff ? unOff(iso) : makeOff(iso),
+    () => wasOff ? `Day off removed. Plan ends ${fullDate(P.end)}.` : `${isT ? "Pushed to tomorrow" : "Day off added"}. Plan now ends ${fullDate(P.end)}.`);
+}
+function addOffRange(){
+  const fv = $("#o-from").value, tv = $("#o-to").value;
+  if (!isoRe.test(fv) || !isoRe.test(tv)){ toast("Pick a from and to date"); return; }
+  let a = parseDN(fv), b = parseDN(tv); if (a > b) [a, b] = [b, a];
+  a = Math.max(a, P.s0);
+  if (b < a){ toast("Pick dates on or after the start date"); return; }
+  if (b - a > 730){ toast("Pick a range of two years or less"); return; }
+  let kept = 0, already = 0;
+  change(() => { let n = 0; for (let dn = a; dn <= b; dn++){ const iso = isoOf(dn), s = stOf(iso); if (s === "done") kept++; else if (s === "off") already++; else if (makeOff(iso)) n++; }
+      if (!n){ toast(kept && !already ? "Those days are already done" : "Those days are already off"); return false; } offFrom = offTo = ""; return n; },
+    n => `${plural(n, "day")} off added${kept ? `, ${kept} done ${kept === 1 ? "day" : "days"} kept` : ""}. Plan now ends ${fullDate(P.end)}.`);
+}
+function removeOffRange(a, b){
+  change(() => { let n = 0; for (let dn = a; dn <= b; dn++) if (unOff(isoOf(dn))) n++; return n || false; },
+    n => `${plural(n, "day")} off removed. Plan ends ${fullDate(P.end)}.`);
+}
+function catchUp(){
+  const tday = todayDN() - P.s0 + 1;
+  change(() => { let n = 0; for (const d of P.days){ if (d.n >= tday) break; const s = st(d); if ((!s || s === "missed") && makeOff(d.iso)) n++; } return n || false; },
+    n => `${plural(n, "past day")} turned into days off. Plan now ends ${fullDate(P.end)}.`);
+}
+function refresh(){ render(); if (sheet && sheet.k === "day") openSheet(sheet.n); else if (sheet && sheet.k === "off") openOffPanel(); }
 
 /* ---------- events ---------- */
 document.addEventListener("click", e => {
   const b = e.target.closest("button, [data-close]"); if (!b) return;
+  if (b.hasAttribute("data-undo")){ const f = undoFn; undoFn = null; $("#toast").classList.remove("on"); if (f) f(); return; }
   if (b.dataset.tab){ go(b.dataset.tab); return; }
   if (b.dataset.tabGo){ go(b.dataset.tabGo); return; }
-  if (b.dataset.set){ setStatus(+b.dataset.n, b.dataset.set); return; }
-  if (b.dataset.min){ const n = +b.dataset.n, cur = +(S.log[n] && S.log[n].m) || 0; setMins(n, cur + +b.dataset.min); refresh(); return; }
+  if (b.dataset.set){ setStatus(b.dataset.d, b.dataset.set); return; }
+  if (b.dataset.min){ const iso = b.dataset.d, cur = +(S.log[iso] && S.log[iso].m) || 0; setMins(iso, cur + +b.dataset.min); refresh(); return; }
+  if (b.dataset.skip){ toggleSkip(b.dataset.skip); return; }
+  if (b.hasAttribute("data-offpanel")){ offFrom = offTo = ""; openOffPanel(); return; }
+  if (b.dataset.unoff){ const [a, c] = b.dataset.unoff.split("|").map(Number); removeOffRange(a, c); return; }
+  if (b.hasAttribute("data-catchup")){ catchUp(); return; }
+  if (b.id === "o-add"){ addOffRange(); return; }
   if (b.dataset.day){ openSheet(+b.dataset.day); return; }
   if (b.dataset.cal){ let [y, m] = calMonth; m += +b.dataset.cal; if (m < 0){ m = 11; y--; } if (m > 11){ m = 0; y++; } calMonth = [y, m]; render(); return; }
   if (b.dataset.filter){ syFilter = b.dataset.filter; render(); return; }
@@ -614,22 +791,24 @@ document.addEventListener("click", e => {
   if (b.id === "b-copy"){ navigator.clipboard.writeText(JSON.stringify(S)).then(() => toast("Backup copied"), () => { $("#b-text").value = JSON.stringify(S); toast("Copy the text in the box"); }); return; }
   if (b.id === "b-import"){ restore($("#b-text").value); return; }
   if (b.id === "b-file"){ $("#b-filein").click(); return; }
-  if (b.id === "b-reset"){ if (confirm("Clear every day you logged? Settings stay.")){ S.log = {}; save(); toast("Progress cleared"); render(); } return; }
+  if (b.id === "b-reset"){ if (confirm("Clear every day you logged, including days off? Settings stay.")){ S.log = {}; save(); computePlan(); toast("Progress cleared"); render(); } return; }
 });
 $("#scrim").addEventListener("click", closeSheet);
 document.addEventListener("change", e => {
   const el = e.target;
-  if (el.dataset.mins){ setMins(+el.dataset.mins, el.value); refresh(); return; }
+  if (el.id === "o-from"){ offFrom = el.value; if (!offTo || offTo < offFrom){ offTo = offFrom; const t = $("#o-to"); if (t) t.value = offFrom; } return; }
+  if (el.id === "o-to"){ offTo = el.value; return; }
+  if (el.dataset.mins){ setMins(el.dataset.mins, el.value); refresh(); return; }
   if (el.dataset.setField){
     const k = el.dataset.setField; let v = el.value;
-    if (k === "start"){ if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return; }
+    if (k === "start"){ if (!isoRe.test(v)) return; const delta = parseDN(v) - parseDN(S.settings.start); if (delta) shiftLog(delta); }
     else if (k !== "ded"){ v = +v; const lim = {months: [6, 24], wk: [0.25, 16], sh: [0, 16], minM: [0.2, 30], minR: [1, 240]}[k]; if (!(v >= lim[0] && v <= lim[1])){ toast(`Enter ${lim[0]} to ${lim[1]}`); render(); return; } if (k === "months") v = Math.round(v); }
     S.settings[k] = v; save(); computePlan(); calMonth = null; render(); toast("Saved");
   }
   if (el.id === "b-filein" && el.files[0]){ el.files[0].text().then(restore); }
 });
 function restore(txt){
-  try { const p = JSON.parse(txt); if (!p || typeof p !== "object" || !p.log) throw 0; S = {settings: {...DEFAULTS, ...(p.settings || {})}, log: p.log}; save(); computePlan(); calMonth = null; render(); toast("Backup restored"); }
+  try { const p = JSON.parse(txt); if (!p || typeof p !== "object" || !p.log || typeof p.log !== "object") throw 0; const settings = {...DEFAULTS, ...(p.settings || {})}; S = {v: 2, settings, log: normLog(p.log, settings.start)}; save(); computePlan(); calMonth = null; render(); toast("Backup restored"); }
   catch (e){ toast("That isn't a Limud backup"); }
 }
 document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeSheet(); $("#celebrate").classList.remove("on"); } });
