@@ -13,6 +13,7 @@ Progress is saved on the device; use Settings, Backup to keep a copy.
 
 ## Hosting
 
-Pushes to `main` deploy to GitHub Pages via `.github/workflows/pages.yml`.
-One-time setup: repo Settings, Pages, set Source to "GitHub Actions".
-The app is then at https://ronikriger.github.io/repo1/
+Live at https://ronikriger.github.io/repo1/
+
+Every push to `main` deploys to GitHub Pages via `.github/workflows/pages.yml`
+(repo Settings, Pages, Source: "GitHub Actions").
