@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Limud">
+<meta name="theme-color" content="#ECEEE9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A1416" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<title>Limud: Mishnah and Rambam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#ECEEE9; --surface:#FFFFFF; --surface2:#F4F5F1; --line:#D8DBD2;
+  --ink:#1E1A1C; --muted:#696366; --gold:#A47A1F; --gold-soft:#F3E7C6; --on-gold:#FFFFFF;
+  --mishnah:#2E7454; --rambam:#3C5398; --done:#3E8E62; --partial:#C48A1C; --missed:#B9483F;
+  --late:#E9CFCB; --ahead:#E3E6DE; --shadow:0 1px 0 rgba(30,26,28,.06);
+  --spine-m1:#23402F; --spine-m2:#2D5039; --spine-r1:#1F2C52; --spine-r2:#2A3866; --spine-i:#4A1F27; --shelf:#B9A57C;
+  --serif:"Frank Ruhl Libre","Times New Roman",Georgia,serif;
+  --sans:"Assistant",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1A1416; --surface:#241C1F; --surface2:#2D2427; --line:#3B3034;
+    --ink:#F1EADF; --muted:#A99D96; --gold:#D6B160; --gold-soft:#3A2F1E; --on-gold:#1A1416;
+    --mishnah:#6DB088; --rambam:#8EA2E0; --done:#5FA37C; --partial:#D9A441; --missed:#D0675D;
+    --late:#4A2E2E; --ahead:#2D2427; --shadow:none; --shelf:#5A4632;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--sans);font-size:17px;line-height:1.45;min-height:100vh;
+  padding:env(safe-area-inset-top,0px) 0 calc(76px + env(safe-area-inset-bottom,0px));}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding:12px 18px 24px}
+.screen{display:none}
+.screen.on{display:block}
+.he{font-family:var(--serif);direction:rtl;unicode-bidi:isolate}
+.muted{color:var(--muted)}
+a{color:inherit}
+h1,h2,h3{margin:0;font-weight:700}
+h2{font-family:var(--serif);font-size:26px;letter-spacing:.2px}
+h3{font-size:17px}
+.small{font-size:14px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:6px 0 2px}
+.top .day{font-size:15px;color:var(--muted);white-space:nowrap}
+.date{font-family:var(--serif);font-size:24px}
+.ded{color:var(--gold);font-size:18px;margin-top:2px;text-align:right}
+/* learning sheet */
+.leaf{background:var(--surface);border:1px solid var(--line);border-radius:18px;margin:16px 0 12px;overflow:hidden;box-shadow:var(--shadow)}
+.part{padding:16px 18px 14px;text-align:right}
+.part+.part{border-top:1px solid var(--line)}
+.kind{font-family:var(--serif);font-size:16px;font-weight:700}
+.kind.m{color:var(--mishnah)} .kind.r{color:var(--rambam)}
+.title{font-family:var(--serif);font-size:34px;line-height:1.15;font-weight:700;margin:2px 0}
+.title.sm{font-size:24px}
+.ref{font-family:var(--serif);font-size:20px}
+.en{direction:ltr;text-align:right;color:var(--muted);font-size:15px;margin-top:4px}
+.open{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:15px;font-weight:600;text-decoration:none;
+  padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface2)}
+.parts-line{margin-top:10px}
+.siyum-band{background:var(--gold-soft);color:var(--gold);padding:12px 18px;text-align:right;font-family:var(--serif);font-size:20px;font-weight:700}
+.meta{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 18px;border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+/* actions */
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 8px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:13px 14px;font-weight:600;font-size:16px}
+.btn.primary{grid-column:1/-1;background:var(--gold);border-color:var(--gold);color:var(--on-gold);font-size:18px;padding:15px}
+.btn.sel-done{background:var(--done);border-color:var(--done);color:#fff}
+.btn.sel-partial{background:var(--partial);border-color:var(--partial);color:#fff}
+.btn.sel-missed{background:var(--missed);border-color:var(--missed);color:#fff}
+.mins{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 10px 8px 16px;margin-bottom:6px}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);font-size:20px;line-height:1}
+.step input{width:64px;text-align:center;border:1px solid var(--line);border-radius:10px;padding:8px 4px;background:var(--surface2)}
+/* status line */
+.status{border-radius:14px;padding:12px 16px;margin:14px 0 6px;font-weight:600}
+.status.ok{background:color-mix(in srgb,var(--done) 16%,transparent);color:var(--done)}
+.status.behind{background:color-mix(in srgb,var(--missed) 15%,transparent);color:var(--missed)}
+.status.wait{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.status small{display:block;font-weight:400;color:var(--muted);margin-top:2px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.fact .k{font-size:14px;color:var(--muted)}
+.fact .v{font-size:22px;font-weight:700;line-height:1.2;margin-top:2px}
+.fact .s{font-size:14px;color:var(--muted)}
+.fact.siyum{grid-column:1/-1}
+.fact.siyum .v{font-family:var(--serif);font-size:24px}
+.next{margin-top:18px}
+.next h3{margin-bottom:6px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.linkish{background:none;border:0;padding:0;color:var(--gold);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+/* calendar */
+.calhead{display:flex;align-items:center;justify-content:space-between;margin:8px 0 12px}
+.calhead button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dow{text-align:center;font-size:13px;color:var(--muted);padding-bottom:2px}
+.dow.sh{color:var(--gold)}
+.cell{aspect-ratio:1/1.05;border-radius:10px;border:0;background:var(--ahead);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px;position:relative;padding:0}
+.cell.out{background:transparent;color:var(--muted);opacity:.35}
+.cell.done{background:var(--done);color:#fff;font-weight:700}
+.cell.partial{background:var(--partial);color:#fff;font-weight:700}
+.cell.missed{background:var(--missed);color:#fff;font-weight:700}
+.cell.late{background:var(--late)}
+.cell.today{outline:2px solid var(--ink);outline-offset:-2px;font-weight:700}
+.cell .dot{position:absolute;bottom:5px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.cell.done .dot,.cell.partial .dot,.cell.missed .dot{background:#fff}
+.cell.sh{box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--gold) 55%,transparent)}
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin:14px 0 4px;font-size:14px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.monthsum{margin-top:14px}
+/* siyumim */
+.mh{font-family:var(--serif);font-size:20px;margin:20px 0 6px;color:var(--muted)}
+.sy{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);margin-bottom:8px}
+.sy .nm{font-family:var(--serif);font-size:21px;font-weight:700;text-align:right;grid-column:1/-1;direction:rtl}
+.sy .en2{font-size:15px}
+.sy .when{font-size:15px;color:var(--muted);text-align:right;white-space:nowrap}
+.sy.major{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}
+.sy.major .nm{color:var(--gold)}
+.sy.done{opacity:.6}
+.sy.done .when{color:var(--done);font-weight:600}
+.sy.nextone{background:var(--gold-soft);border-color:var(--gold)}
+.filters{display:flex;gap:8px;margin:10px 0 2px;overflow-x:auto}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:15px;white-space:nowrap}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+/* shelf */
+.shelf{display:flex;align-items:flex-end;gap:6px;padding:14px 10px 0;border-bottom:10px solid var(--shelf);border-radius:2px;margin:6px 0 2px;min-height:210px}
+.spine{flex:1;position:relative;border-radius:4px 4px 2px 2px;overflow:hidden;border:0;padding:0;
+  display:flex;align-items:center;justify-content:center;color:#E9D7A6;box-shadow:inset -3px 0 0 rgba(0,0,0,.25), inset 3px 0 0 rgba(255,255,255,.06)}
+.spine .foil{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#E8CB7E,#B88A2E);opacity:.92}
+.spine .lbl{position:relative;writing-mode:vertical-rl;font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:1px;text-shadow:0 1px 0 rgba(0,0,0,.35)}
+.spine .bands{position:absolute;left:0;right:0;top:10px;height:5px;border-top:1px solid rgba(233,215,166,.55);border-bottom:1px solid rgba(233,215,166,.55)}
+.spine.sel{outline:2px solid var(--gold);outline-offset:2px}
+.shelfcap{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:12px}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin:6px 0 16px}
+.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:99px}
+.unit{padding:10px 0;border-bottom:1px solid var(--line)}
+.unit:last-child{border-bottom:0}
+.unit .u1{display:flex;justify-content:space-between;gap:10px;font-size:15px}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 12px 6px;margin:10px 0 16px}
+.chart svg{width:100%;height:auto;display:block}
+.stretch{display:grid;grid-template-columns:1fr;gap:2px;padding:10px 0;border-bottom:1px solid var(--line)}
+.stretch.now{background:var(--gold-soft);margin:0 -14px;padding:10px 14px;border-radius:10px}
+.stretch .pair{font-size:15px}
+.stretch .pair b{color:var(--mishnah)} .stretch .pair em{font-style:normal;color:var(--rambam)}
+.stretch .dates{font-size:14px;color:var(--muted)}
+details summary{cursor:pointer;font-weight:600;padding:8px 0}
+/* settings */
+.field{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.field label{font-size:16px}
+.field .hint{grid-column:1/-1;font-size:14px;color:var(--muted);margin-top:-4px}
+.field input{width:150px;text-align:right;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:var(--surface)}
+.field input[type=text]{width:100%;grid-column:1/-1;text-align:right;direction:rtl}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 16px;margin:12px 0}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:10px;font:14px/1.4 var(--sans);color:var(--ink)}
+.note{font-size:14px;color:var(--muted)}
+/* tab bar */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+nav.tabs .in{display:flex;max-width:560px;width:100%}
+nav.tabs button{flex:1;background:none;border:0;padding:6px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--muted)}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button.on{color:var(--gold)}
+/* sheet + modal */
+.scrim{position:fixed;inset:0;background:rgba(10,8,9,.5);z-index:30;display:none}
+.scrim.on{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--bg);border-radius:20px 20px 0 0;max-height:88vh;overflow:auto;
+  padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px));transform:translateY(calc(100% + 40px));visibility:hidden;transition:transform .28s ease,visibility 0s linear .28s}
+.sheet.on{transform:none;visibility:visible;transition:transform .28s ease}
+.sheet .grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 10px}
+.sheet .inner{max-width:560px;margin:0 auto}
+.closex{float:right;background:none;border:0;font-size:16px;color:var(--muted);padding:6px}
+.celebrate{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(10,8,9,.6)}
+.celebrate.on{display:flex}
+.celebrate .box{background:var(--surface);border:1px solid var(--gold);border-radius:20px;padding:26px 22px;text-align:center;max-width:420px;width:100%}
+.celebrate .hadran{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--gold);direction:rtl;line-height:1.3}
+.celebrate p{margin:10px 0 18px;color:var(--muted)}
+.foilbit{position:fixed;top:-20px;width:9px;height:14px;z-index:41;pointer-events:none;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:10px 16px;border-radius:12px;font-size:15px;z-index:50;opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion: reduce){.sheet{transition:none}.foilbit{display:none}}
+@media (min-width:700px){body{font-size:17px}.title{font-size:40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="screen on" id="today" aria-label="Today"></section>
+  <section class="screen" id="calendar" aria-label="Calendar"></section>
+  <section class="screen" id="siyumim" aria-label="Siyumim"></section>
+  <section class="screen" id="shelf" aria-label="Progress"></section>
+  <section class="screen" id="settings" aria-label="Settings"></section>
+</div>
+<nav class="tabs" aria-label="Sections"><div class="in">
+  <button data-tab="today" class="on" aria-label="Today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5v-13zM20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5v-13z"/></svg>Today</button>
+  <button data-tab="calendar" aria-label="Calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendar</button>
+  <button data-tab="siyumim" aria-label="Siyumim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8-4.3-4.1 5.9-.9z"/></svg>Siyumim</button>
+  <button data-tab="shelf" aria-label="Progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4v15M9.5 6v13M14 4v15M17.2 6.5l3.3 12.3M3 20h18"/></svg>Progress</button>
+  <button data-tab="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Settings</button>
+</div></nav>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div class="inner" id="sheetInner"></div></div>
+<div class="celebrate" id="celebrate" role="dialog" aria-modal="true"><div class="box" id="celebrateBox"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const D = {"m":[{"n":"Taanit","he":"תענית","s":"Moed","she":"מועד","u":"Mishnah_Taanit","c":[7,10,9,8]},{"n":"Berachot","he":"ברכות","s":"Zeraim","she":"זרעים","u":"Mishnah_Berakhot","c":[5,8,6,7,5,8,5,8,5]},{"n":"Peah","he":"פאה","s":"Zeraim","she":"זרעים","u":"Mishnah_Peah","c":[6,8,8,11,8,11,8,9]},{"n":"Demai","he":"דמאי","s":"Zeraim","she":"זרעים","u":"Mishnah_Demai","c":[4,5,6,7,11,12,8]},{"n":"Kilayim","he":"כלאים","s":"Zeraim","she":"זרעים","u":"Mishnah_Kilayim","c":[9,11,7,9,8,9,8,6,10]},{"n":"Sheviit","he":"שביעית","s":"Zeraim","she":"זרעים","u":"Mishnah_Sheviit","c":[8,10,10,10,9,6,7,11,9,9]},{"n":"Terumot","he":"תרומות","s":"Zeraim","she":"זרעים","u":"Mishnah_Terumot","c":[10,6,9,13,9,6,7,12,7,12,10]},{"n":"Maasrot","he":"מעשרות","s":"Zeraim","she":"זרעים","u":"Mishnah_Maasrot","c":[8,8,10,6,8]},{"n":"Maaser Sheni","he":"מעשר שני","s":"Zeraim","she":"זרעים","u":"Mishnah_Maaser_Sheni","c":[7,10,13,12,15]},{"n":"Challah","he":"חלה","s":"Zeraim","she":"זרעים","u":"Mishnah_Challah","c":[9,8,10,11]},{"n":"Orlah","he":"ערלה","s":"Zeraim","she":"זרעים","u":"Mishnah_Orlah","c":[9,17,9]},{"n":"Bikkurim","he":"ביכורים","s":"Zeraim","she":"זרעים","u":"Mishnah_Bikkurim","c":[11,11,12,5]},{"n":"Shabbat","he":"שבת","s":"Moed","she":"מועד","u":"Mishnah_Shabbat","c":[11,7,6,2,4,10,4,7,7,6,6,6,7,4,3,8,8,3,6,5,3,6,5,5]},{"n":"Eruvin","he":"עירובין","s":"Moed","she":"מועד","u":"Mishnah_Eruvin","c":[10,6,9,11,9,10,11,11,4,15]},{"n":"Pesachim","he":"פסחים","s":"Moed","she":"מועד","u":"Mishnah_Pesachim","c":[7,8,8,9,10,6,13,8,11,9]},{"n":"Shekalim","he":"שקלים","s":"Moed","she":"מועד","u":"Mishnah_Shekalim","c":[7,5,4,9,6,6,7,8]},{"n":"Yoma","he":"יומא","s":"Moed","she":"מועד","u":"Mishnah_Yoma","c":[8,7,11,6,7,8,5,9]},{"n":"Sukkah","he":"סוכה","s":"Moed","she":"מועד","u":"Mishnah_Sukkah","c":[11,9,15,10,8]},{"n":"Beitzah","he":"ביצה","s":"Moed","she":"מועד","u":"Mishnah_Beitzah","c":[10,10,8,7,7]},{"n":"Rosh Hashanah","he":"ראש השנה","s":"Moed","she":"מועד","u":"Mishnah_Rosh_Hashanah","c":[9,9,8,9]},{"n":"Megillah","he":"מגילה","s":"Moed","she":"מועד","u":"Mishnah_Megillah","c":[11,6,6,10]},{"n":"Moed Katan","he":"מועד קטן","s":"Moed","she":"מועד","u":"Mishnah_Moed_Katan","c":[10,5,9]},{"n":"Chagigah","he":"חגיגה","s":"Moed","she":"מועד","u":"Mishnah_Chagigah","c":[8,7,8]},{"n":"Yevamot","he":"יבמות","s":"Nashim","she":"נשים","u":"Mishnah_Yevamot","c":[4,10,10,13,6,6,6,6,6,9,7,6,13,9,10,7]},{"n":"Ketubot","he":"כתובות","s":"Nashim","she":"נשים","u":"Mishnah_Ketubot","c":[10,10,9,12,9,7,10,8,9,6,6,4,11]},{"n":"Nedarim","he":"נדרים","s":"Nashim","she":"נשים","u":"Mishnah_Nedarim","c":[4,5,11,8,6,10,9,7,10,8,12]},{"n":"Nazir","he":"נזיר","s":"Nashim","she":"נשים","u":"Mishnah_Nazir","c":[7,10,7,7,7,11,4,2,5]},{"n":"Sotah","he":"סוטה","s":"Nashim","she":"נשים","u":"Mishnah_Sotah","c":[9,6,8,5,5,4,8,7,15]},{"n":"Gittin","he":"גיטין","s":"Nashim","she":"נשים","u":"Mishnah_Gittin","c":[6,7,8,9,9,7,9,10,10]},{"n":"Kiddushin","he":"קידושין","s":"Nashim","she":"נשים","u":"Mishnah_Kiddushin","c":[10,10,13,14]},{"n":"Bava Kamma","he":"בבא קמא","s":"Nezikin","she":"נזיקין","u":"Mishnah_Bava_Kamma","c":[4,6,11,9,7,6,7,7,12,10]},{"n":"Bava Metzia","he":"בבא מציעא","s":"Nezikin","she":"נזיקין","u":"Mishnah_Bava_Metzia","c":[8,11,12,12,11,8,11,9,13,6]},{"n":"Bava Batra","he":"בבא בתרא","s":"Nezikin","she":"נזיקין","u":"Mishnah_Bava_Batra","c":[6,14,8,9,11,8,4,8,10,8]},{"n":"Sanhedrin","he":"סנהדרין","s":"Nezikin","she":"נזיקין","u":"Mishnah_Sanhedrin","c":[6,5,8,5,5,6,11,7,6,6,6]},{"n":"Makkot","he":"מכות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Makkot","c":[10,8,16]},{"n":"Shevuot","he":"שבועות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Shevuot","c":[7,5,11,13,5,7,8,6]},{"n":"Eduyot","he":"עדיות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Eduyot","c":[14,10,12,12,7,3,9,7]},{"n":"Avodah Zarah","he":"עבודה זרה","s":"Nezikin","she":"נזיקין","u":"Mishnah_Avodah_Zarah","c":[9,7,10,12,12]},{"n":"Avot","he":"אבות","s":"Nezikin","she":"נזיקין","u":"Pirkei_Avot","c":[18,16,18,22,23,11]},{"n":"Horayot","he":"הוריות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Horayot","c":[5,7,8]},{"n":"Zevachim","he":"זבחים","s":"Kodashim","she":"קדשים","u":"Mishnah_Zevachim","c":[4,5,6,6,8,7,6,12,7,8,8,6,8,10]},{"n":"Menachot","he":"מנחות","s":"Kodashim","she":"קדשים","u":"Mishnah_Menachot","c":[4,5,7,5,9,7,6,7,9,9,9,5,11]},{"n":"Chullin","he":"חולין","s":"Kodashim","she":"קדשים","u":"Mishnah_Chullin","c":[7,10,7,7,5,7,6,6,8,4,2,5]},{"n":"Bechorot","he":"בכורות","s":"Kodashim","she":"קדשים","u":"Mishnah_Bekhorot","c":[7,9,4,10,6,12,7,10,8]},{"n":"Arachin","he":"ערכין","s":"Kodashim","she":"קדשים","u":"Mishnah_Arakhin","c":[4,6,5,4,6,5,5,7,8]},{"n":"Temurah","he":"תמורה","s":"Kodashim","she":"קדשים","u":"Mishnah_Temurah","c":[6,3,5,4,6,5,6]},{"n":"Keritot","he":"כריתות","s":"Kodashim","she":"קדשים","u":"Mishnah_Keritot","c":[7,6,10,3,8,9]},{"n":"Meilah","he":"מעילה","s":"Kodashim","she":"קדשים","u":"Mishnah_Meilah","c":[4,9,8,6,5,6]},{"n":"Tamid","he":"תמיד","s":"Kodashim","she":"קדשים","u":"Mishnah_Tamid","c":[4,5,9,3,6,3,4]},{"n":"Middot","he":"מידות","s":"Kodashim","she":"קדשים","u":"Mishnah_Middot","c":[9,6,8,7,4]},{"n":"Kinnim","he":"קינים","s":"Kodashim","she":"קדשים","u":"Mishnah_Kinnim","c":[4,5,6]},{"n":"Kelim","he":"כלים","s":"Taharot","she":"טהרות","u":"Mishnah_Kelim","c":[9,8,8,4,11,4,6,11,8,8,9,8,8,8,6,8,17,9,10,7,3,10,5,17,9,9,12,10,8,4]},{"n":"Oholot","he":"אהלות","s":"Taharot","she":"טהרות","u":"Mishnah_Oholot","c":[8,7,7,3,7,7,6,6,16,7,9,8,6,7,10,5,5,10]},{"n":"Negaim","he":"נגעים","s":"Taharot","she":"טהרות","u":"Mishnah_Negaim","c":[6,5,8,11,5,8,5,10,3,10,12,7,12,13]},{"n":"Parah","he":"פרה","s":"Taharot","she":"טהרות","u":"Mishnah_Parah","c":[4,5,11,4,9,5,12,11,9,6,9,11]},{"n":"Taharot","he":"טהרות","s":"Taharot","she":"טהרות","u":"Mishnah_Tahorot","c":[9,8,8,13,9,10,9,9,9,8]},{"n":"Mikvaot","he":"מקואות","s":"Taharot","she":"טהרות","u":"Mishnah_Mikvaot","c":[8,10,4,5,6,11,7,5,7,8]},{"n":"Niddah","he":"נדה","s":"Taharot","she":"טהרות","u":"Mishnah_Niddah","c":[7,7,7,7,9,14,5,4,11,8]},{"n":"Machshirin","he":"מכשירין","s":"Taharot","she":"טהרות","u":"Mishnah_Makhshirin","c":[6,11,8,10,11,8]},{"n":"Zavim","he":"זבים","s":"Taharot","she":"טהרות","u":"Mishnah_Zavim","c":[6,4,3,7,12]},{"n":"Tevul Yom","he":"טבול יום","s":"Taharot","she":"טהרות","u":"Mishnah_Tevul_Yom","c":[5,8,6,7]},{"n":"Yadayim","he":"ידים","s":"Taharot","she":"טהרות","u":"Mishnah_Yadayim","c":[5,4,5,8]},{"n":"Uktzin","he":"עוקצים","s":"Taharot","she":"טהרות","u":"Mishnah_Oktzin","c":[6,10,12]}],"r":[{"n":"Taaniyot","he":"הלכות תעניות","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Fasts","o":0,"c":5},{"n":"Kriat Shema","he":"הלכות קריאת שמע","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Reading_the_Shema","o":0,"c":4},{"n":"Tefillah","he":"הלכות תפילה","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Prayer_and_the_Priestly_Blessing","o":0,"c":15},{"n":"Berachot","he":"הלכות ברכות","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Blessings","o":0,"c":11},{"n":"Seder Tefillot","he":"סדר התפילות","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_The_Order_of_Prayer","o":0,"c":4},{"n":"Matnot Aniyim","he":"הלכות מתנות עניים","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Gifts_to_the_Poor","o":0,"c":10},{"n":"Maaser","he":"הלכות מעשרות","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Tithes","o":0,"c":14},{"n":"Kilayim","he":"הלכות כלאים","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Diverse_Species","o":0,"c":10},{"n":"Shemitah vYovel","he":"הלכות שמיטה ויובל","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Sabbatical_Year_and_the_Jubilee","o":0,"c":13},{"n":"Terumot","he":"הלכות תרומות","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Heave_Offerings","o":0,"c":15},{"n":"Maaser Sheni","he":"הלכות מעשר שני ונטע רבעי","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Second_Tithes_and_Fourth_Year's_Fruit","o":0,"c":11},{"n":"Bikkurim","he":"הלכות ביכורים","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary","o":0,"c":12},{"n":"Shabbat","he":"הלכות שבת","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Sabbath","o":0,"c":30},{"n":"Milah","he":"הלכות מילה","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Circumcision","o":0,"c":3},{"n":"Eruvin","he":"הלכות עירובין","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Eruvin","o":0,"c":8},{"n":"Chametz uMatzah","he":"הלכות חמץ ומצה","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Leavened_and_Unleavened_Bread","o":0,"c":8},{"n":"Nusach HaHaggadah","he":"נוסח ההגדה","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Leavened_and_Unleavened_Bread","o":8,"c":1},{"n":"Korban Pesach","he":"הלכות קרבן פסח","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Paschal_Offering","o":0,"c":10},{"n":"Shekalim","he":"הלכות שקלים","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Sheqel_Dues","o":0,"c":4},{"n":"Shevitat Asor","he":"הלכות שביתת עשור","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Rest_on_the_Tenth_of_Tishrei","o":0,"c":3},{"n":"Avodat Yom HaKippurim","he":"הלכות עבודת יום הכפורים","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Service_on_the_Day_of_Atonement","o":0,"c":5},{"n":"Teshuvah","he":"הלכות תשובה","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Repentance","o":0,"c":10},{"n":"Shofar, Sukkah, Lulav","he":"הלכות שופר וסוכה ולולב","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Shofar,_Sukkah_and_Lulav","o":0,"c":8},{"n":"Shevitat Yom Tov","he":"הלכות שביתת יום טוב","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Rest_on_a_Holiday","o":0,"c":8},{"n":"Kiddush HaChodesh","he":"הלכות קידוש החודש","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Sanctification_of_the_New_Month","o":0,"c":19},{"n":"Megillah vaChanukah","he":"הלכות מגילה וחנוכה","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Scroll_of_Esther_and_Hanukkah","o":0,"c":4},{"n":"Evel","he":"הלכות אבל","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_Mourning","o":0,"c":14},{"n":"Chagigah","he":"הלכות חגיגה","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Festival_Offering","o":0,"c":3},{"n":"Yesodei HaTorah","he":"הלכות יסודי התורה","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Foundations_of_the_Torah","o":0,"c":10},{"n":"Yibbum vaChalitzah","he":"הלכות יבום וחליצה","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Levirate_Marriage_and_Release","o":0,"c":8},{"n":"Ishut","he":"הלכות אישות","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Marriage","o":0,"c":25},{"n":"Naarah Betulah","he":"הלכות נערה בתולה","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Virgin_Maiden","o":0,"c":3},{"n":"Nedarim","he":"הלכות נדרים","s":"Haflaah","she":"הפלאה","u":"Mishneh_Torah,_Vows","o":0,"c":13},{"n":"Nezirut","he":"הלכות נזירות","s":"Haflaah","she":"הפלאה","u":"Mishneh_Torah,_Nazariteship","o":0,"c":10},{"n":"Sotah","he":"הלכות סוטה","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Woman_Suspected_of_Infidelity","o":0,"c":4},{"n":"Gerushin","he":"הלכות גירושין","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Divorce","o":0,"c":13},{"n":"Avadim","he":"הלכות עבדים","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Slaves","o":0,"c":9},{"n":"Nizkei Mamon","he":"הלכות נזקי ממון","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_Damages_to_Property","o":0,"c":14},{"n":"Geneivah","he":"הלכות גניבה","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_Theft","o":0,"c":9},{"n":"Gezelah vaAvedah","he":"הלכות גזילה ואבידה","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_Robbery_and_Lost_Property","o":0,"c":18},{"n":"Chovel uMazik","he":"הלכות חובל ומזיק","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_One_Who_Injures_a_Person_or_Property","o":0,"c":8},{"n":"Sechirut","he":"הלכות שכירות","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Hiring","o":0,"c":13},{"n":"Malveh vLoveh","he":"הלכות מלוה ולוה","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Creditor_and_Debtor","o":0,"c":27},{"n":"Shechenim","he":"הלכות שכנים","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Neighbors","o":0,"c":14},{"n":"Mechirah","he":"הלכות מכירה","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Sales","o":0,"c":30},{"n":"Zechiyah uMatanah","he":"הלכות זכייה ומתנה","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Ownerless_Property_and_Gifts","o":0,"c":12},{"n":"Sheluchin vShutafin","he":"הלכות שלוחין ושותפין","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Agents_and_Partners","o":0,"c":10},{"n":"Nachalot","he":"הלכות נחלות","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Inheritances","o":0,"c":11},{"n":"Sanhedrin","he":"הלכות סנהדרין","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction","o":0,"c":26},{"n":"Edut","he":"הלכות עדות","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_Testimony","o":0,"c":22},{"n":"Rotzeach uShmirat Nefesh","he":"הלכות רוצח ושמירת נפש","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_Murderer_and_the_Preservation_of_Life","o":0,"c":13},{"n":"Shevuot","he":"הלכות שבועות","s":"Haflaah","she":"הפלאה","u":"Mishneh_Torah,_Oaths","o":0,"c":12},{"n":"Toen vNitan","he":"הלכות טוען ונטען","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Plaintiff_and_Defendant","o":0,"c":16},{"n":"Sheelah uFikadon","he":"הלכות שאלה ופקדון","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Borrowing_and_Deposit","o":0,"c":8},{"n":"Mamrim","he":"הלכות ממרים","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_Rebels","o":0,"c":7},{"n":"Avodah Zarah","he":"הלכות עבודה זרה","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Foreign_Worship_and_Customs_of_the_Nations","o":0,"c":12},{"n":"Hakdamah","he":"הקדמה","s":"Introduction","she":"הקדמה","u":"Mishneh_Torah,_Transmission_of_the_Oral_Law","o":0,"c":3},{"n":"Mitzvot Aseh","he":"מצוות עשה","s":"Introduction","she":"הקדמה","u":"Mishneh_Torah,_Positive_Mitzvot","o":0,"c":3},{"n":"Mitzvot Lo Taaseh","he":"מצוות לא תעשה","s":"Introduction","she":"הקדמה","u":"Mishneh_Torah,_Negative_Mitzvot","o":0,"c":3},{"n":"Contents of the Books","he":"תוכן הספרים","s":"Introduction","she":"הקדמה","u":"Mishneh_Torah,_Overview_of_Mishneh_Torah_Contents","o":0,"c":3},{"n":"Deot","he":"הלכות דעות","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Human_Dispositions","o":0,"c":7},{"n":"Talmud Torah","he":"הלכות תלמוד תורה","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Torah_Study","o":0,"c":7},{"n":"Maaseh HaKorbanot","he":"הלכות מעשה הקרבנות","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Sacrificial_Procedure","o":0,"c":19},{"n":"Pesulei HaMukdashin","he":"הלכות פסולי המוקדשין","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Sacrifices_Rendered_Unfit","o":0,"c":19},{"n":"Tefillin, Mezuzah, Sefer Torah","he":"הלכות תפילין ומזוזה וספר תורה","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Tefillin,_Mezuzah_and_the_Torah_Scroll","o":0,"c":10},{"n":"Tzitzit","he":"הלכות ציצית","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Fringes","o":0,"c":3},{"n":"Issurei HaMizbeach","he":"הלכות איסורי המזבח","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Things_Forbidden_on_the_Altar","o":0,"c":7},{"n":"Shechitah","he":"הלכות שחיטה","s":"Kedushah","she":"קדושה","u":"Mishneh_Torah,_Ritual_Slaughter","o":0,"c":14},{"n":"Maachalot Asurot","he":"הלכות מאכלות אסורות","s":"Kedushah","she":"קדושה","u":"Mishneh_Torah,_Forbidden_Foods","o":0,"c":17},{"n":"Bechorot","he":"הלכות בכורות","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Firstlings","o":0,"c":8},{"n":"Biat HaMikdash","he":"הלכות ביאת המקדש","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Admission_into_the_Sanctuary","o":0,"c":9},{"n":"Arachin vaCharamin","he":"הלכות ערכים וחרמים","s":"Haflaah","she":"הפלאה","u":"Mishneh_Torah,_Appraisals_and_Devoted_Property","o":0,"c":8},{"n":"Temurah","he":"הלכות תמורה","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Substitution","o":0,"c":4},{"n":"Shegagot","he":"הלכות שגגות","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Offerings_for_Unintentional_Transgressions","o":0,"c":15},{"n":"Mechusarei Kapparah","he":"הלכות מחוסרי כפרה","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Offerings_for_Those_with_Incomplete_Atonement","o":0,"c":5},{"n":"Meilah","he":"הלכות מעילה","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Trespass","o":0,"c":8},{"n":"Temidin uMusafin","he":"הלכות תמידין ומוספין","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Daily_Offerings_and_Additional_Offerings","o":0,"c":10},{"n":"Klei HaMikdash","he":"הלכות כלי המקדש","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein","o":0,"c":10},{"n":"Beit HaBechirah","he":"הלכות בית הבחירה","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_The_Chosen_Temple","o":0,"c":8},{"n":"Kelim","he":"הלכות כלים","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Vessels","o":0,"c":28},{"n":"Tumat Met","he":"הלכות טומאת מת","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Defilement_by_a_Corpse","o":0,"c":25},{"n":"Tumat Tzaraat","he":"הלכות טומאת צרעת","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Defilement_by_Leprosy","o":0,"c":16},{"n":"Parah Adumah","he":"הלכות פרה אדומה","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Red_Heifer","o":0,"c":15},{"n":"Shear Avot HaTumah","he":"הלכות שאר אבות הטומאות","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Other_Sources_of_Defilement","o":0,"c":20},{"n":"Mikvaot","he":"הלכות מקואות","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Immersion_Pools","o":0,"c":11},{"n":"Issurei Biah","he":"הלכות איסורי ביאה","s":"Kedushah","she":"קדושה","u":"Mishneh_Torah,_Forbidden_Intercourse","o":0,"c":22},{"n":"Tumat Ochalin","he":"הלכות טומאת אוכלין","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Defilement_of_Foods","o":0,"c":16},{"n":"Metamei Mishkav uMoshav","he":"הלכות מטמאי משכב ומושב","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Those_Who_Defile_Bed_or_Seat","o":0,"c":13},{"n":"Melachim uMilchamot","he":"הלכות מלכים ומלחמות","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_Kings_and_Wars","o":0,"c":12}],"seg":[{"m":[0],"r":[0]},{"m":[1],"r":[1,2,3,4]},{"m":[2],"r":[5]},{"m":[3],"r":[6]},{"m":[4],"r":[7]},{"m":[5],"r":[8]},{"m":[6],"r":[9]},{"m":[7,8],"r":[10]},{"m":[9,10,11],"r":[11]},{"m":[12],"r":[12,13]},{"m":[13],"r":[14]},{"m":[14],"r":[15,16,17]},{"m":[15],"r":[18]},{"m":[16],"r":[19,20,21]},{"m":[17],"r":[22]},{"m":[18],"r":[23]},{"m":[19],"r":[24]},{"m":[20],"r":[25]},{"m":[21],"r":[26]},{"m":[22],"r":[27,28]},{"m":[23],"r":[29]},{"m":[24],"r":[30,31]},{"m":[25],"r":[32]},{"m":[26],"r":[33]},{"m":[27],"r":[34]},{"m":[28],"r":[35]},{"m":[29],"r":[36]},{"m":[30],"r":[37,38,39,40]},{"m":[31],"r":[41,42]},{"m":[32],"r":[43,44,45,46,47]},{"m":[33],"r":[48,49]},{"m":[34],"r":[50]},{"m":[35],"r":[51,52,53]},{"m":[36],"r":[54]},{"m":[37],"r":[55]},{"m":[38,39],"r":[56,57,58,59,60,61]},{"m":[40],"r":[62,63]},{"m":[41],"r":[64,65,66]},{"m":[42],"r":[67,68]},{"m":[43],"r":[69,70]},{"m":[44],"r":[71]},{"m":[45],"r":[72]},{"m":[46],"r":[73,74]},{"m":[47],"r":[75]},{"m":[48],"r":[76,77]},{"m":[49,50],"r":[78]},{"m":[51],"r":[79]},{"m":[52],"r":[80]},{"m":[53],"r":[81]},{"m":[54],"r":[82]},{"m":[55],"r":[83]},{"m":[56],"r":[84]},{"m":[57],"r":[85]},{"m":[58],"r":[86]},{"m":[59],"r":[87]},{"m":[60,61,62],"r":[88]}],"ev":[{"k":"M","p":34,"p2":null,"n":"Taanit","he":"מסכת תענית","t":"Masechet"},{"k":"D","p":34,"p2":5,"n":"Taanit: Mishnah and Rambam","he":"תענית","t":"Dedication"},{"k":"M","p":91,"p2":null,"n":"Berachot","he":"מסכת ברכות","t":"Masechet"},{"k":"M","p":160,"p2":null,"n":"Peah","he":"מסכת פאה","t":"Masechet"},{"k":"M","p":213,"p2":null,"n":"Demai","he":"מסכת דמאי","t":"Masechet"},{"k":"M","p":290,"p2":null,"n":"Kilayim","he":"מסכת כלאים","t":"Masechet"},{"k":"M","p":379,"p2":null,"n":"Sheviit","he":"מסכת שביעית","t":"Masechet"},{"k":"M","p":480,"p2":null,"n":"Terumot","he":"מסכת תרומות","t":"Masechet"},{"k":"M","p":520,"p2":null,"n":"Maasrot","he":"מסכת מעשרות","t":"Masechet"},{"k":"M","p":577,"p2":null,"n":"Maaser Sheni","he":"מסכת מעשר שני","t":"Masechet"},{"k":"M","p":615,"p2":null,"n":"Challah","he":"מסכת חלה","t":"Masechet"},{"k":"M","p":650,"p2":null,"n":"Orlah","he":"מסכת ערלה","t":"Masechet"},{"k":"R","p":124,"p2":null,"n":"Sefer Zeraim","he":"ספר זרעים","t":"Sefer"},{"k":"M","p":689,"p2":null,"n":"Bikkurim","he":"מסכת ביכורים","t":"Masechet"},{"k":"M","p":689,"p2":null,"n":"Seder Zeraim","he":"סדר זרעים","t":"Seder"},{"k":"M","p":828,"p2":null,"n":"Shabbat","he":"מסכת שבת","t":"Masechet"},{"k":"M","p":924,"p2":null,"n":"Eruvin","he":"מסכת עירובין","t":"Masechet"},{"k":"M","p":1013,"p2":null,"n":"Pesachim","he":"מסכת פסחים","t":"Masechet"},{"k":"M","p":1065,"p2":null,"n":"Shekalim","he":"מסכת שקלים","t":"Masechet"},{"k":"M","p":1126,"p2":null,"n":"Yoma","he":"מסכת יומא","t":"Masechet"},{"k":"M","p":1179,"p2":null,"n":"Sukkah","he":"מסכת סוכה","t":"Masechet"},{"k":"M","p":1221,"p2":null,"n":"Beitzah","he":"מסכת ביצה","t":"Masechet"},{"k":"M","p":1256,"p2":null,"n":"Rosh Hashanah","he":"מסכת ראש השנה","t":"Masechet"},{"k":"R","p":245,"p2":null,"n":"Sefer Zemanim","he":"ספר זמנים","t":"Sefer"},{"k":"M","p":1289,"p2":null,"n":"Megillah","he":"מסכת מגילה","t":"Masechet"},{"k":"M","p":1313,"p2":null,"n":"Moed Katan","he":"מסכת מועד קטן","t":"Masechet"},{"k":"M","p":1336,"p2":null,"n":"Chagigah","he":"מסכת חגיגה","t":"Masechet"},{"k":"M","p":1336,"p2":null,"n":"Seder Moed","he":"סדר מועד","t":"Seder"},{"k":"M","p":1464,"p2":null,"n":"Yevamot","he":"מסכת יבמות","t":"Masechet"},{"k":"M","p":1575,"p2":null,"n":"Ketubot","he":"מסכת כתובות","t":"Masechet"},{"k":"M","p":1665,"p2":null,"n":"Nedarim","he":"מסכת נדרים","t":"Masechet"},{"k":"M","p":1725,"p2":null,"n":"Nazir","he":"מסכת נזיר","t":"Masechet"},{"k":"M","p":1792,"p2":null,"n":"Sotah","he":"מסכת סוטה","t":"Masechet"},{"k":"R","p":348,"p2":null,"n":"Sefer Nashim","he":"ספר נשים","t":"Sefer"},{"k":"M","p":1867,"p2":null,"n":"Gittin","he":"מסכת גיטין","t":"Masechet"},{"k":"M","p":1914,"p2":null,"n":"Kiddushin","he":"מסכת קידושין","t":"Masechet"},{"k":"M","p":1914,"p2":null,"n":"Seder Nashim","he":"סדר נשים","t":"Seder"},{"k":"M","p":1993,"p2":null,"n":"Bava Kamma","he":"מסכת בבא קמא","t":"Masechet"},{"k":"M","p":2094,"p2":null,"n":"Bava Metzia","he":"מסכת בבא מציעא","t":"Masechet"},{"k":"R","p":512,"p2":null,"n":"Sefer Kinyan","he":"ספר קנין","t":"Sefer"},{"k":"M","p":2180,"p2":null,"n":"Bava Batra","he":"מסכת בבא בתרא","t":"Masechet"},{"k":"M","p":2251,"p2":null,"n":"Sanhedrin","he":"מסכת סנהדרין","t":"Masechet"},{"k":"R","p":584,"p2":null,"n":"Sefer Nezikin","he":"ספר נזיקין","t":"Sefer"},{"k":"M","p":2285,"p2":null,"n":"Makkot","he":"מסכת מכות","t":"Masechet"},{"k":"R","p":620,"p2":null,"n":"Sefer Mishpatim","he":"ספר משפטים","t":"Sefer"},{"k":"M","p":2347,"p2":null,"n":"Shevuot","he":"מסכת שבועות","t":"Masechet"},{"k":"M","p":2421,"p2":null,"n":"Eduyot","he":"מסכת עדיות","t":"Masechet"},{"k":"M","p":2471,"p2":null,"n":"Avodah Zarah","he":"מסכת עבודה זרה","t":"Masechet"},{"k":"M","p":2579,"p2":null,"n":"Avot","he":"מסכת אבות","t":"Masechet"},{"k":"R","p":665,"p2":null,"n":"Sefer Madda","he":"ספר מדע","t":"Sefer"},{"k":"M","p":2599,"p2":null,"n":"Horayot","he":"מסכת הוריות","t":"Masechet"},{"k":"M","p":2599,"p2":null,"n":"Seder Nezikin","he":"סדר נזיקין","t":"Seder"},{"k":"M","p":2700,"p2":null,"n":"Zevachim","he":"מסכת זבחים","t":"Masechet"},{"k":"R","p":716,"p2":null,"n":"Sefer Ahavah","he":"ספר אהבה","t":"Sefer"},{"k":"M","p":2793,"p2":null,"n":"Menachot","he":"מסכת מנחות","t":"Masechet"},{"k":"M","p":2867,"p2":null,"n":"Chullin","he":"מסכת חולין","t":"Masechet"},{"k":"M","p":2940,"p2":null,"n":"Bechorot","he":"מסכת בכורות","t":"Masechet"},{"k":"R","p":779,"p2":null,"n":"Sefer Haflaah","he":"ספר הפלאה","t":"Sefer"},{"k":"M","p":2990,"p2":null,"n":"Arachin","he":"מסכת ערכין","t":"Masechet"},{"k":"M","p":3025,"p2":null,"n":"Temurah","he":"מסכת תמורה","t":"Masechet"},{"k":"R","p":803,"p2":null,"n":"Sefer Korbanot","he":"ספר קרבנות","t":"Sefer"},{"k":"M","p":3068,"p2":null,"n":"Keritot","he":"מסכת כריתות","t":"Masechet"},{"k":"M","p":3106,"p2":null,"n":"Meilah","he":"מסכת מעילה","t":"Masechet"},{"k":"M","p":3140,"p2":null,"n":"Tamid","he":"מסכת תמיד","t":"Masechet"},{"k":"M","p":3174,"p2":null,"n":"Middot","he":"מסכת מידות","t":"Masechet"},{"k":"R","p":839,"p2":null,"n":"Sefer Avodah","he":"ספר עבודה","t":"Sefer"},{"k":"M","p":3189,"p2":null,"n":"Kinnim","he":"מסכת קינים","t":"Masechet"},{"k":"M","p":3189,"p2":null,"n":"Seder Kodashim","he":"סדר קדשים","t":"Seder"},{"k":"M","p":3443,"p2":null,"n":"Kelim","he":"מסכת כלים","t":"Masechet"},{"k":"M","p":3577,"p2":null,"n":"Oholot","he":"מסכת אהלות","t":"Masechet"},{"k":"M","p":3692,"p2":null,"n":"Negaim","he":"מסכת נגעים","t":"Masechet"},{"k":"M","p":3788,"p2":null,"n":"Parah","he":"מסכת פרה","t":"Masechet"},{"k":"M","p":3880,"p2":null,"n":"Taharot","he":"מסכת טהרות","t":"Masechet"},{"k":"M","p":3951,"p2":null,"n":"Mikvaot","he":"מסכת מקואות","t":"Masechet"},{"k":"R","p":976,"p2":null,"n":"Sefer Kedushah","he":"ספר קדושה","t":"Sefer"},{"k":"M","p":4030,"p2":null,"n":"Niddah","he":"מסכת נדה","t":"Masechet"},{"k":"M","p":4084,"p2":null,"n":"Machshirin","he":"מסכת מכשירין","t":"Masechet"},{"k":"R","p":1005,"p2":null,"n":"Sefer Taharah","he":"ספר טהרה","t":"Sefer"},{"k":"M","p":4116,"p2":null,"n":"Zavim","he":"מסכת זבים","t":"Masechet"},{"k":"M","p":4142,"p2":null,"n":"Tevul Yom","he":"מסכת טבול יום","t":"Masechet"},{"k":"M","p":4164,"p2":null,"n":"Yadayim","he":"מסכת ידים","t":"Masechet"},{"k":"R","p":1017,"p2":null,"n":"Sefer Shoftim","he":"ספר שופטים","t":"Sefer"},{"k":"R","p":1017,"p2":null,"n":"Mishneh Torah","he":"משנה תורה","t":"Rambam"},{"k":"M","p":4192,"p2":null,"n":"Uktzin","he":"מסכת עוקצים","t":"Masechet"},{"k":"M","p":4192,"p2":null,"n":"Seder Taharot","he":"סדר טהרות","t":"Seder"},{"k":"M","p":4192,"p2":null,"n":"Shas Mishnayot","he":"ש״ס משניות","t":"Shas"}],"sedarim":[["Zeraim","זרעים"],["Moed","מועד"],["Nashim","נשים"],["Nezikin","נזיקין"],["Kodashim","קדשים"],["Taharot","טהרות"]],"sefarim":[["Introduction","הקדמה"],["Madda","מדע"],["Ahavah","אהבה"],["Zemanim","זמנים"],["Nashim","נשים"],["Kedushah","קדושה"],["Haflaah","הפלאה"],["Zeraim","זרעים"],["Avodah","עבודה"],["Korbanot","קרבנות"],["Taharah","טהרה"],["Nezikin","נזיקין"],["Kinyan","קנין"],["Mishpatim","משפטים"],["Shoftim","שופטים"]]};
+const W = 14;
+const KEY = "limud-plan-v1";
+const DEFAULTS = {start:"2026-11-03", months:12, wk:1, sh:3.5, minM:2, minR:28, ded:""};
+
+/* ---------- static structures ---------- */
+let mi = 0;
+const MU = D.m.map((u, i) => { const starts = []; u.c.forEach(n => { starts.push(mi + 1); mi += n; }); return {...u, i, first: starts[0], last: mi, starts}; });
+const NM = mi;
+const MCH = []; MU.forEach(u => u.c.forEach((n, p) => MCH.push({u: u.i, p: p + 1, first: u.starts[p], last: u.starts[p] + n - 1})));
+let ri = 0;
+const RU = D.r.map((u, i) => { const first = ri + 1; ri += u.c; return {...u, i, first, last: ri}; });
+const NR = ri;
+const RUNIT = new Array(NR + 1); RU.forEach(u => { for (let k = u.first; k <= u.last; k++) RUNIT[k] = u.i; });
+let cm = 0, cr = 0, wsum = 0;
+const SEG = D.seg.map((s, i) => {
+  const m = s.m.reduce((a, j) => a + MU[j].last - MU[j].first + 1, 0), r = s.r.reduce((a, j) => a + RU[j].c, 0);
+  const o = {i, mu: s.m, ru: s.r, m, r, cm, cr, w0: wsum, w: m + W * r}; cm += m; cr += r; wsum += o.w; return o;
+});
+const TW = wsum;
+function chapOf(x){ let lo = 0, hi = MCH.length - 1; while (lo < hi){ const mid = (lo + hi + 1) >> 1; if (MCH[mid].first <= x) lo = mid; else hi = mid - 1; } return MCH[lo]; }
+
+/* ---------- dates ---------- */
+const DAY = 864e5;
+const parseDN = s => { const [y, m, d] = s.split("-").map(Number); return Date.UTC(y, m - 1, d) / DAY; };
+const dnDate = dn => new Date(dn * DAY);
+const wd = dn => dnDate(dn).getUTCDay();
+function edateDN(s, k){ const [y, m, d] = s.split("-").map(Number); const t = new Date(Date.UTC(y, m - 1 + k, 1)); const dim = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate(); return Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), Math.min(d, dim)) / DAY; }
+function todayDN(){ const n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) / DAY; }
+const fmt = (dn, o) => dnDate(dn).toLocaleDateString("en-GB", {timeZone: "UTC", ...o});
+const dayName = dn => wd(dn) === 6 ? "Shabbat" : fmt(dn, {weekday: "long"});
+const longDate = dn => `${dayName(dn)}, ${fmt(dn, {day: "numeric", month: "long"})}`;
+const shortDate = dn => `${wd(dn) === 6 ? "Shabbat" : fmt(dn, {weekday: "short"})} ${fmt(dn, {day: "numeric", month: "short"})}`;
+const isoOf = dn => dnDate(dn).toISOString().slice(0, 10);
+
+/* ---------- Hebrew numerals ---------- */
+function heL(n){ const o = ["","א","ב","ג","ד","ה","ו","ז","ח","ט"], t = ["","י","כ","ל","מ","נ","ס","ע","פ","צ"]; if (n === 15) return "טו"; if (n === 16) return "טז"; return t[Math.floor(n / 10)] + o[n % 10]; }
+
+/* ---------- storage ---------- */
+let S = {settings: {...DEFAULTS}, log: {}};
+try { const raw = localStorage.getItem(KEY); if (raw) { const p = JSON.parse(raw); S = {settings: {...DEFAULTS, ...(p.settings || {})}, log: p.log || {}}; } } catch (e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast("Couldn't save on this device"); } }
+
+/* ---------- plan ---------- */
+let P;
+function computePlan(){
+  const st = S.settings, s0 = parseDN(st.start), pd = Math.max(1, edateDN(st.start, +st.months) - s0);
+  const days = []; let cum = 0;
+  for (let n = 1; n <= pd; n++){ const dn = s0 + n - 1, sat = wd(dn) === 6, load = sat ? +st.sh : +st.wk; cum += load; days.push({n, dn, sat, load, cum}); }
+  const tload = cum; let pm = 0, pr = 0, si = 0;
+  for (const d of days){
+    const T = tload === 0 ? 0 : d.cum / tload * TW; d.T = T;
+    while (si + 1 < SEG.length && SEG[si + 1].w0 <= T) si++;
+    const g = SEG[si], f = (T - g.w0) / g.w;
+    d.seg = si; d.mTo = Math.round(g.cm + f * g.m); d.rTo = Math.round(g.cr + f * g.r);
+    d.mFrom = pm + 1; d.rFrom = pr + 1; d.mc = Math.max(0, d.mTo - d.mFrom + 1); d.rc = Math.max(0, d.rTo - d.rFrom + 1);
+    pm = d.mTo; pr = d.rTo;
+  }
+  const firstDay = (key, pos) => { for (const d of days) if (d[key] >= pos) return d.n; return pd; };
+  const events = D.ev.map((e, i) => {
+    const day = e.k === "M" ? firstDay("mTo", e.p) : e.k === "R" ? firstDay("rTo", e.p) : Math.max(firstDay("mTo", e.p), firstDay("rTo", e.p2));
+    return {...e, i, day};
+  });
+  const evByDay = {}; events.forEach(e => (evByDay[e.day] = evByDay[e.day] || []).push(e));
+  const segDays = SEG.map(g => ({start: Math.min(firstDay("mTo", g.cm + 1), firstDay("rTo", g.cr + 1)), end: Math.max(firstDay("mTo", g.cm + g.m), firstDay("rTo", g.cr + g.r))}));
+  P = {s0, pd, days, tload, events, evByDay, segDays, totMin: NM * st.minM + NR * st.minR};
+  P.minPerLoad = tload ? P.totMin / tload : 0;
+}
+function mParts(d){
+  if (!d.mc) return [];
+  const out = []; let x = d.mFrom;
+  while (x <= d.mTo){
+    const u = MU[chapOf(x).u], y = Math.min(d.mTo, u.last), cx = chapOf(x), cy = chapOf(y);
+    const m1 = x - cx.first + 1, m2 = y - cy.first + 1, whole = m1 === 1 && y === cy.last;
+    const en = whole ? `${u.n} ${cx.p}${cy.p > cx.p ? "–" + cy.p : ""}` : `${u.n} ${cx.p}:${m1}${y > x ? "–" + (cy.p === cx.p ? m2 : cy.p + ":" + m2) : ""}`;
+    const he = whole ? (cy.p > cx.p ? `פרקים ${heL(cx.p)}–${heL(cy.p)}` : `פרק ${heL(cx.p)}`) : `${heL(cx.p)}:${heL(m1)}${y > x ? " – " + (cy.p === cx.p ? heL(m2) : heL(cy.p) + ":" + heL(m2)) : ""}`;
+    const ref = whole ? `${cx.p}${cy.p > cx.p ? "-" + cy.p : ""}` : `${cx.p}.${m1}${y > x ? "-" + (cy.p === cx.p ? m2 : cy.p + "." + m2) : ""}`;
+    out.push({u, n: y - x + 1, en, title: u.he, he, url: `https://www.sefaria.org/${encodeURIComponent(u.u)}.${ref}?lang=bi`});
+    x = y + 1;
+  }
+  return out;
+}
+function rParts(d){
+  if (!d.rc) return [];
+  const out = []; let x = d.rFrom;
+  while (x <= d.rTo){
+    const u = RU[RUNIT[x]], y = Math.min(d.rTo, u.last), c1 = x - u.first + 1, c2 = y - u.first + 1;
+    out.push({u, n: y - x + 1, en: `${u.n} ${c1}${c2 > c1 ? "–" + c2 : ""}`, title: u.he,
+      he: c2 > c1 ? `פרקים ${heL(c1)}–${heL(c2)}` : `פרק ${heL(c1)}`,
+      url: `https://www.sefaria.org/${encodeURIComponent(u.u)}.${c1 + (u.o || 0)}${c2 > c1 ? "-" + (c2 + (u.o || 0)) : ""}?lang=bi`});
+    x = y + 1;
+  }
+  return out;
+}
+const est = d => d.mc * S.settings.minM + d.rc * S.settings.minR;
+const st = n => (S.log[n] && S.log[n].s) || "";
+
+/* ---------- progress ---------- */
+function progress(){
+  const tday = todayDN() - P.s0 + 1, done = new Uint8Array(P.pd + 2), pre = new Int32Array(P.pd + 2);
+  let doneW = 0, mDone = 0, rDone = 0, mins = 0, logged = 0, estOnLogged = 0, minsOnLogged = 0;
+  for (const d of P.days){
+    const s = st(d.n); done[d.n] = s === "done" ? 1 : 0;
+    if (s === "done"){ doneW += d.mc + W * d.rc; mDone += d.mc; rDone += d.rc; }
+    const m = S.log[d.n] && +S.log[d.n].m; if (m > 0){ mins += m; logged++; if (s === "done"){ minsOnLogged += m; estOnLogged += est(d); } }
+  }
+  for (let n = 1; n <= P.pd + 1; n++) pre[n] = pre[n - 1] + (done[n] || 0);
+  const allDone = (a, b) => pre[b] - pre[a - 1] === b - a + 1;
+  const dayOfM = pos => { let lo = 0, hi = P.days.length - 1; while (lo < hi){ const mid = (lo + hi) >> 1; if (P.days[mid].mTo >= pos) hi = mid; else lo = mid + 1; } return P.days[lo].n; };
+  const chDone = MCH.map(c => allDone(dayOfM(c.first), dayOfM(c.last)));
+  const rChDone = new Uint8Array(NR + 1); for (const d of P.days) if (done[d.n]) for (let k = d.rFrom; k <= d.rTo; k++) rChDone[k] = 1;
+  const yi = Math.min(tday - 1, P.pd), expW = yi < 1 ? 0 : P.days[yi - 1].T, gapW = expW - doneW;
+  let streak = 0; { let n = Math.min(Math.max(tday, 0), P.pd); if (n >= 1 && !done[n]) n--; while (n >= 1 && done[n]){ streak++; n--; } }
+  let best = 0, run = 0; for (let n = 1; n <= P.pd; n++){ run = done[n] ? run + 1 : 0; best = Math.max(best, run); }
+  const late = P.days.filter(d => d.n < tday && !st(d.n)).length;
+  const proj = tday >= 1 && doneW > 0 ? P.s0 + Math.ceil(tday * TW / doneW) - 1 : null;
+  const evDone = e => {
+    if (e.t === "Masechet"){ const u = MU.find(u => u.n === e.n); return MCH.every((c, i) => c.u !== u.i || chDone[i]); }
+    if (e.t === "Seder"){ const g = e.n.replace("Seder ", ""); return MCH.every((c, i) => MU[c.u].s !== g || chDone[i]); }
+    if (e.t === "Shas") return chDone.every(Boolean);
+    if (e.t === "Sefer"){ const g = e.n.replace("Sefer ", ""); return RU.every(u => u.s !== g || [...Array(u.c)].every((_, k) => rChDone[u.first + k])); }
+    if (e.t === "Rambam") return rChDone.slice(1).every(Boolean);
+    return MCH.every((c, i) => c.u !== 0 || chDone[i]) && [...Array(RU[0].c)].every((_, k) => rChDone[RU[0].first + k]);
+  };
+  const evDoneMap = P.events.map(evDone);
+  return {tday, doneW, mDone, rDone, chDone, rChDone, gapW, streak, best, late, proj, mins, logged, estOnLogged, minsOnLogged, evDoneMap,
+    pct: doneW / TW, perakim: chDone.filter(Boolean).length, rch: rChDone.reduce((a, b) => a + b, 0)};
+}
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let toastT; function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), 1800); }
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+const inDays = k => k === 0 ? "today" : k === 1 ? "tomorrow" : k > 0 ? `in ${k} days` : `${-k} days ago`;
+const evHe = e => e.t === "Dedication" ? "תענית: משנה ורמב״ם" : e.he;
+
+function partsHTML(parts, kind){
+  if (!parts.length) return "";
+  const label = kind === "m" ? "משנה" : "רמב״ם";
+  const total = parts.reduce((a, p) => a + p.n, 0);
+  const unit = kind === "m" ? plural(total, "mishnah").replace("mishnahs", "mishnayot") : plural(total, "chapter");
+  return `<div class="part"><div class="kind ${kind}">${label}</div>${parts.map((p, i) => `
+    <div class="${i ? "parts-line" : ""}"><div class="title he ${parts.length > 1 ? "sm" : ""}">${esc(p.title)}</div>
+    <div class="ref he">${esc(p.he)}</div>
+    <div class="en">${esc(p.en)}</div>
+    <a class="open" href="${p.url}" target="_blank" rel="noopener">Open on Sefaria</a></div>`).join("")}
+    <div class="en" style="margin-top:10px">${unit}</div></div>`;
+}
+function dayCard(d, opts = {}){
+  const evs = P.evByDay[d.n] || [];
+  const band = evs.length ? `<div class="siyum-band he">סיום ${evs.map(e => esc(evHe(e))).join(" · ")}</div>` : "";
+  const g = SEG[d.seg];
+  const pair = `${g.mu.map(j => MU[j].n).join(", ")} with ${g.ru.map(j => RU[j].n).join(", ")}`;
+  return `<div class="leaf">${band}${partsHTML(mParts(d), "m")}${partsHTML(rParts(d), "r")}
+    <div class="meta"><span style="white-space:nowrap">About <b>${Math.round(est(d))} min</b></span><span style="text-align:right">${esc(pair)}</span></div></div>`;
+}
+function statusButtons(n){
+  const s = st(n), m = (S.log[n] && S.log[n].m) || "";
+  return `<div class="actions">
+    <button class="btn primary ${s === "done" ? "sel-done" : ""}" data-set="done" data-n="${n}">${s === "done" ? "Done" : "Mark done"}</button>
+    <button class="btn ${s === "partial" ? "sel-partial" : ""}" data-set="partial" data-n="${n}">Partial</button>
+    <button class="btn ${s === "missed" ? "sel-missed" : ""}" data-set="missed" data-n="${n}">Missed</button></div>
+    <div class="mins"><span>Minutes learned</span><span class="step">
+      <button data-min="-5" data-n="${n}" aria-label="5 minutes less">−</button>
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Minutes learned" data-mins="${n}" value="${esc(m)}" placeholder="0">
+      <button data-min="5" data-n="${n}" aria-label="5 minutes more">+</button></span></div>`;
+}
+
+/* ---------- screens ---------- */
+function renderToday(){
+  const G = progress(), t = G.tday, idx = Math.max(1, Math.min(t, P.pd)), d = P.days[idx - 1];
+  const head = t < 1 ? `First session ${longDate(P.s0)}` : t > P.pd ? "The plan period is over" : longDate(todayDN());
+  const ded = S.settings.ded ? `<div class="ded he">לעילוי נשמת ${esc(S.settings.ded)}</div>` : "";
+  let status;
+  if (t < 1) status = `<div class="status wait">Starts ${longDate(P.s0)}</div>`;
+  else if (G.pct >= 0.9999) status = `<div class="status ok">Finished. Mazal tov!</div>`;
+  else if (G.gapW <= 0.5) status = `<div class="status ok">On track${G.gapW < -0.5 ? ", ahead of plan" : ""}<small>Day ${Math.min(t, P.pd)} of ${P.pd}${G.proj ? `, projected finish ${fmt(G.proj, {day: "numeric", month: "short", year: "numeric"})}` : ""}</small></div>`;
+  else status = `<div class="status behind">Behind by about ${(G.gapW * P.totMin / TW / 60).toFixed(1)} hours<small>${G.late ? `${plural(G.late, "past day")} not logged. ` : ""}Shabbat is a good time to catch up.</small></div>`;
+  const nx = P.events.find((e, i) => e.day >= Math.max(1, t) && !G.evDoneMap[i]);
+  const nd = idx < P.pd ? P.days[idx] : null;
+  const nextHTML = nd ? `<div class="next"><h3>Next: ${longDate(nd.dn)}</h3>
+    ${mParts(nd).map(p => `<div class="row"><span>${esc(p.en)}</span><span class="he muted">${esc(p.title)}</span></div>`).join("")}
+    ${rParts(nd).map(p => `<div class="row"><span>${esc(p.en)}</span><span class="he muted">${esc(p.title)}</span></div>`).join("")}</div>` : "";
+  $("#today").innerHTML = `
+    <div class="top"><div class="date">${head}</div><div class="day">${t >= 1 && t <= P.pd ? `Day ${t}` : ""}</div></div>${ded}
+    ${dayCard(d)}${statusButtons(d.n)}${status}
+    <div class="facts">
+      <div class="fact siyum"><div class="k">Next siyum</div>${nx ? `<div class="v he">${esc(evHe(nx))}</div><div class="s">${esc(nx.n)}, ${longDate(P.s0 + nx.day - 1)}, ${inDays(nx.day - t)}</div>` : `<div class="v">All done</div>`}</div>
+      <div class="fact"><div class="k">Streak</div><div class="v">${plural(G.streak, "day")}</div><div class="s">Best ${G.best}</div></div>
+      <div class="fact"><div class="k">Overall</div><div class="v">${(G.pct * 100).toFixed(1)}%</div><div class="s">${G.perakim}/${MCH.length} perakim, ${G.rch}/${NR} chapters</div></div>
+    </div>${G.late ? `<p class="note">${plural(G.late, "past day")} not logged. <button class="linkish" data-tab-go="calendar">Open the calendar</button></p>` : ""}${nextHTML}`;
+}
+let calMonth = null;
+function renderCalendar(){
+  const G = progress(), t = G.tday;
+  if (calMonth === null){ const base = dnDate(Math.min(Math.max(todayDN(), P.s0), P.s0 + P.pd - 1)); calMonth = [base.getUTCFullYear(), base.getUTCMonth()]; }
+  const [y, m] = calMonth, first = Date.UTC(y, m, 1) / DAY, dim = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  const lead = wd(first); let cells = "";
+  for (let i = 0; i < lead; i++) cells += `<div></div>`;
+  let mDone = 0, mPlan = 0, mSiy = 0;
+  for (let k = 0; k < dim; k++){
+    const dn = first + k, n = dn - P.s0 + 1, inPlan = n >= 1 && n <= P.pd, s = inPlan ? st(n) : "";
+    let cls = "cell"; if (!inPlan) cls += " out"; else if (s) cls += " " + s; else if (n < t) cls += " late";
+    if (n === t) cls += " today"; if (wd(dn) === 6 && inPlan) cls += " sh";
+    const siy = inPlan && P.evByDay[n];
+    if (inPlan){ mPlan++; if (s === "done") mDone++; if (siy) mSiy += siy.length; }
+    cells += `<button class="${cls}" ${inPlan ? `data-day="${n}"` : "disabled"} aria-label="${fmt(dn, {day: "numeric", month: "long"})}${s ? ", " + s : ""}${siy ? ", siyum" : ""}">${k + 1}${siy ? '<span class="dot"></span>' : ""}</button>`;
+  }
+  $("#calendar").innerHTML = `
+    <div class="calhead"><button data-cal="-1" aria-label="Previous month">‹</button><h2>${fmt(first, {month: "long", year: "numeric"})}</h2><button data-cal="1" aria-label="Next month">›</button></div>
+    <div class="grid">${["Sun","Mon","Tue","Wed","Thu","Fri","Shab"].map((x, i) => `<div class="dow ${i === 6 ? "sh" : ""}">${x}</div>`).join("")}${cells}</div>
+    <div class="legend"><span><i style="background:var(--done)"></i>Done</span><span><i style="background:var(--partial)"></i>Partial</span><span><i style="background:var(--missed)"></i>Missed</span><span><i style="background:var(--late)"></i>Not logged</span><span><i style="background:var(--gold);border-radius:50%"></i>Siyum</span></div>
+    <p class="monthsum muted small">${mPlan ? `${mDone} of ${plural(mPlan, "day")} done this month${mSiy ? `, ${plural(mSiy, "siyum")} planned`.replace("siyums", "siyumim") : ""}. Tap a day to see its learning or log it.` : "No learning planned this month."}</p>`;
+}
+let syFilter = "all";
+function renderSiyumim(){
+  const G = progress(), t = G.tday;
+  const nextI = P.events.findIndex((e, i) => e.day >= Math.max(1, t) && !G.evDoneMap[i]);
+  const major = e => e.t !== "Masechet";
+  const list = P.events.filter(e => syFilter === "all" || (syFilter === "major" ? major(e) : syFilter === "left" ? !G.evDoneMap[e.i] : true));
+  let html = `<h2>Siyumim</h2><p class="muted small">${G.evDoneMap.filter(Boolean).length} of ${P.events.length} made. The next one is highlighted.</p>
+    <div class="filters">${[["all","All"],["left","Still ahead"],["major","Sedarim and sefarim"]].map(([k, l]) => `<button class="chip ${syFilter === k ? "on" : ""}" data-filter="${k}">${l}</button>`).join("")}</div>`;
+  let lastM = "";
+  for (const e of list){
+    const dn = P.s0 + e.day - 1, mh = fmt(dn, {month: "long", year: "numeric"});
+    if (mh !== lastM){ html += `<div class="mh">${mh}</div>`; lastM = mh; }
+    const done = G.evDoneMap[e.i];
+    html += `<div class="sy ${major(e) ? "major" : ""} ${done ? "done" : ""} ${e.i === nextI ? "nextone" : ""}">
+      <div class="nm">${esc(evHe(e))}</div><div class="en2">${esc(e.n)}<div class="muted small">${shortDate(dn)}</div></div>
+      <div class="when">${done ? "Made" : e.day < t ? "Not made yet" : inDays(e.day - t)}</div></div>`;
+  }
+  $("#siyumim").innerHTML = html;
+}
+let shelfSel = null;
+function lineChart(G){
+  const pts = 52, w = 320, h = 150, pad = 26; let plan = "", act = "";
+  for (let k = 0; k <= pts; k++){
+    const n = Math.round(k * P.pd / pts), x = pad + (w - pad - 6) * k / pts;
+    const pv = n === 0 ? 0 : P.days[n - 1].T / TW; plan += `${k ? "L" : "M"}${x.toFixed(1)},${(h - 18 - pv * (h - 30)).toFixed(1)}`;
+    const prevN = Math.round((k - 1) * P.pd / pts);
+    if (G.tday >= 1 && (k === 0 || prevN < G.tday)){
+      const upto = Math.min(n, G.tday); let cw = 0; for (let i = 1; i <= upto; i++) if (st(i) === "done"){ const d = P.days[i - 1]; cw += d.mc + W * d.rc; }
+      act += `${act ? "L" : "M"}${x.toFixed(1)},${(h - 18 - cw / TW * (h - 30)).toFixed(1)}`;
+    }
+  }
+  const yl = [0, 0.5, 1].map(v => `<text x="2" y="${(h - 15 - v * (h - 30)).toFixed(1)}" font-size="10" fill="currentColor" opacity=".6">${v * 100}%</text>`).join("");
+  const xl = [0, 26, 52].map(k => { const n = Math.max(1, Math.round(k * P.pd / pts)); return `<text x="${(pad + (w - pad - 6) * k / pts).toFixed(1)}" y="${h - 2}" font-size="10" fill="currentColor" opacity=".6" text-anchor="${k ? (k === 52 ? "end" : "middle") : "start"}">${fmt(P.s0 + n - 1, {month: "short", year: "2-digit"})}</text>`; }).join("");
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Planned and actual progress over the year">${yl}${xl}
+    <path d="${plan}" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="4 4"/>
+    ${act ? `<path d="${act}" fill="none" stroke="var(--gold)" stroke-width="2.6" stroke-linejoin="round"/>` : ""}</svg>
+    <div class="legend" style="margin:6px 4px"><span><i style="background:var(--muted)"></i>Plan</span><span><i style="background:var(--gold)"></i>Done</span></div>`;
+}
+function renderShelf(){
+  const G = progress();
+  const groupsM = D.sedarim.map(([en, he]) => { const idx = MCH.map((c, i) => i).filter(i => MU[MCH[i].u].s === en); return {k: "m:" + en, en, he, tot: idx.length, done: idx.filter(i => G.chDone[i]).length}; });
+  const groupsR = D.sefarim.map(([en, he]) => { let tot = 0, done = 0; RU.forEach(u => { if (u.s === en) for (let k = u.first; k <= u.last; k++){ tot++; done += G.rChDone[k]; } }); return {k: "r:" + en, en, he, tot, done}; });
+  const maxM = Math.max(...groupsM.map(g => g.tot)), maxR = Math.max(...groupsR.map(g => g.tot));
+  const spine = (g, kind, i, max) => {
+    const hgt = 120 + 80 * g.tot / max, pct = g.tot ? g.done / g.tot : 0;
+    const bg = kind === "m" ? (i % 2 ? "var(--spine-m2)" : "var(--spine-m1)") : g.en === "Introduction" ? "var(--spine-i)" : (i % 2 ? "var(--spine-r2)" : "var(--spine-r1)");
+    return `<button class="spine ${shelfSel === g.k ? "sel" : ""}" data-spine="${esc(g.k)}" style="height:${hgt.toFixed(0)}px;background:${bg}" aria-label="${esc(g.en)}, ${Math.round(pct * 100)}% done">
+      <span class="foil" style="height:${(pct * 100).toFixed(1)}%"></span><span class="bands"></span><span class="lbl">${esc(g.he)}</span></button>`;
+  };
+  const rA = groupsR.slice(0, 8), rB = groupsR.slice(8);
+  let detail = "";
+  if (shelfSel){
+    const [kind, en] = shelfSel.split(":");
+    const rows = kind === "m" ? MU.filter(u => u.s === en).map(u => { const ix = MCH.map((c, i) => i).filter(i => MCH[i].u === u.i); const dn = ix.filter(i => G.chDone[i]).length; return {en: u.n, he: u.he, dn, tot: ix.length}; })
+      : RU.filter(u => u.s === en).map(u => { let dn = 0; for (let k = u.first; k <= u.last; k++) dn += G.rChDone[k]; return {en: u.n, he: u.he, dn, tot: u.c}; });
+    detail = `<div class="detail">${rows.map(r => `<div class="unit"><div class="u1"><span>${esc(r.en)}</span><span class="he">${esc(r.he)}</span></div>
+      <div class="u1 muted"><span>${r.dn} of ${r.tot}</span></div><div class="bar"><i style="width:${(r.tot ? r.dn / r.tot * 100 : 0).toFixed(1)}%"></i></div></div>`).join("")}</div>`;
+  }
+  const t = G.tday, segNow = t >= 1 && t <= P.pd ? P.days[t - 1].seg : -1;
+  const minsChart = G.logged ? weekBars() : "";
+  $("#shelf").innerHTML = `<h2>Progress</h2>
+    <p class="muted small">Each binding fills with gold as you finish its chapters. Tap one to see what's inside.</p>
+    <h3 style="margin-top:14px">Mishnah</h3>
+    <div class="shelf">${groupsM.map((g, i) => spine(g, "m", i, maxM)).join("")}</div>
+    <div class="shelfcap"><span>${G.perakim} of ${MCH.length} perakim</span><span>${G.mDone.toLocaleString()} of ${NM.toLocaleString()} mishnayot</span></div>
+    ${shelfSel && shelfSel.startsWith("m:") ? detail : ""}
+    <h3 style="margin-top:18px">Mishneh Torah</h3>
+    <div class="shelf">${rA.map((g, i) => spine(g, "r", i, maxR)).join("")}</div>
+    <div class="shelf">${rB.map((g, i) => spine(g, "r", i + 8, maxR)).join("")}</div>
+    <div class="shelfcap"><span>${G.rch} of ${NR} chapters</span><span>${(G.rch / NR * 100).toFixed(1)}%</span></div>
+    ${shelfSel && shelfSel.startsWith("r:") ? detail : ""}
+    <h3 style="margin-top:18px">Plan and progress</h3><div class="chart">${lineChart(G)}</div>
+    ${minsChart}
+    <div class="facts"><div class="fact"><div class="k">Hours logged</div><div class="v">${(G.mins / 60).toFixed(1)}</div><div class="s">${G.logged ? `about ${Math.round(G.mins / G.logged)} min a session` : "Log minutes on any day"}</div></div>
+      <div class="fact"><div class="k">Your pace</div><div class="v">${G.estOnLogged ? Math.round(G.minsOnLogged / G.estOnLogged * 100) + "%" : "Not yet"}</div><div class="s">of the estimated time</div></div></div>
+    <details><summary>The ${SEG.length} topic stretches</summary><div class="detail">${SEG.map((g, i) => `<div class="stretch ${i === segNow ? "now" : ""}">
+      <div class="pair"><b>${esc(g.mu.map(j => MU[j].n).join(", "))}</b> with <em>${esc(g.ru.map(j => RU[j].n).join(", "))}</em></div>
+      <div class="dates">${shortDate(P.s0 + P.segDays[i].start - 1)} to ${shortDate(P.s0 + P.segDays[i].end - 1)}</div></div>`).join("")}</div></details>`;
+}
+function weekBars(){
+  const weeks = Math.ceil(P.pd / 7), w = 320, h = 120, bw = (w - 10) / weeks, plan = [], log = [];
+  for (let k = 0; k < weeks; k++){
+    let p = 0, l = 0; for (let n = k * 7 + 1; n <= Math.min(P.pd, k * 7 + 7); n++){ p += est(P.days[n - 1]); l += +(S.log[n] && S.log[n].m) || 0; }
+    plan.push(p); log.push(l);
+  }
+  const max = Math.max(1, ...plan, ...log); let bars = "";
+  plan.forEach((p, k) => {
+    const x = 5 + k * bw, ph = p / max * (h - 20), lh = log[k] / max * (h - 20);
+    bars += `<rect x="${x.toFixed(1)}" y="${(h - 14 - ph).toFixed(1)}" width="${Math.max(1, bw - 1.5).toFixed(1)}" height="${ph.toFixed(1)}" fill="var(--line)"/>`;
+    if (log[k]) bars += `<rect x="${(x + bw * .2).toFixed(1)}" y="${(h - 14 - lh).toFixed(1)}" width="${Math.max(1, bw * .6 - 1).toFixed(1)}" height="${lh.toFixed(1)}" fill="var(--gold)"/>`;
+  });
+  return `<h3 style="margin-top:18px">Minutes each week</h3><div class="chart"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Planned and logged minutes per week">${bars}</svg>
+    <div class="legend" style="margin:6px 4px"><span><i style="background:var(--line)"></i>Planned</span><span><i style="background:var(--gold)"></i>Logged</span></div></div>`;
+}
+function renderSettings(){
+  const s = S.settings, wkNeed = P.minPerLoad * s.wk, shNeed = P.minPerLoad * s.sh;
+  $("#settings").innerHTML = `<h2>Settings</h2>
+    <div class="card">
+      <div class="field"><label for="f-start">Start date</label><input id="f-start" type="date" value="${s.start}" data-set-field="start"></div>
+      <div class="field"><label for="f-months">Plan length (months)</label><input id="f-months" type="number" min="6" max="24" step="1" value="${s.months}" data-set-field="months"></div>
+      <div class="field"><label for="f-wk">Weekday study (hours)</label><input id="f-wk" type="number" min="0.25" max="16" step="0.25" value="${s.wk}" data-set-field="wk"></div>
+      <div class="field"><label for="f-sh">Shabbat study (hours)</label><input id="f-sh" type="number" min="0" max="16" step="0.25" value="${s.sh}" data-set-field="sh"></div>
+      <div class="field"><span class="hint">These four spread the whole plan. Changing them later moves learning between days, including days you already logged.</span></div>
+      <div class="field"><label for="f-mm">Minutes per mishnah</label><input id="f-mm" type="number" min="0.2" max="30" step="0.1" value="${s.minM}" data-set-field="minM"></div>
+      <div class="field"><label for="f-mr">Minutes per Rambam chapter</label><input id="f-mr" type="number" min="1" max="240" step="1" value="${s.minR}" data-set-field="minR"></div>
+      <div class="field"><span class="hint">Only the time estimates use these. Lower them as your reading gets faster.</span></div>
+      <div class="field"><label for="f-ded">Dedication (optional)</label><input id="f-ded" type="text" value="${esc(s.ded)}" placeholder="שם" data-set-field="ded"><span class="hint">Shown at the top of Today as לעילוי נשמת and the name.</span></div>
+    </div>
+    <div class="card"><div class="row"><span>Weekday session at this pace</span><b>${Math.round(wkNeed)} min</b></div>
+      <div class="row"><span>Shabbat session at this pace</span><b>${Math.round(shNeed)} min</b></div>
+      <div class="row"><span>Total learning</span><b>${Math.round(P.totMin / 60)} hours</b></div>
+      <div class="row"><span>Plan ends</span><b>${fmt(P.s0 + P.pd - 1, {day: "numeric", month: "short", year: "numeric"})}</b></div></div>
+    <h3 style="margin-top:20px">Backup</h3>
+    <p class="note">Your progress is saved on this phone. Make a backup now and then, especially before changing phones.</p>
+    <div class="btnrow"><button class="btn" id="b-export">Save backup file</button><button class="btn" id="b-copy">Copy backup</button></div>
+    <textarea id="b-text" placeholder="To restore, paste a backup here"></textarea>
+    <div class="btnrow"><button class="btn" id="b-import">Restore from pasted backup</button><button class="btn" id="b-file">Restore from file</button>
+      <input type="file" id="b-filein" accept="application/json,.json" hidden></div>
+    <div class="btnrow"><button class="btn" id="b-reset" style="color:var(--missed)">Clear all progress</button></div>
+    <p class="note">Plan data: perek and mishnah counts from the standard Mishnah Yomi division (4,192 mishnayot); Rambam chapters as divided for Rambam Yomi (1,017). Text links open Sefaria.</p>`;
+}
+const R = {today: renderToday, calendar: renderCalendar, siyumim: renderSiyumim, shelf: renderShelf, settings: renderSettings};
+let tab = "today";
+function render(){ R[tab](); }
+function go(t){ tab = t; document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === t)); document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t)); render(); window.scrollTo(0, 0); }
+
+/* ---------- sheet + celebration ---------- */
+let sheetDay = null;
+function openSheet(n){
+  sheetDay = n; const d = P.days[n - 1];
+  $("#sheetInner").innerHTML = `<button class="closex" data-close>Close</button><div class="date">${longDate(d.dn)}</div><div class="muted small">Day ${n} of ${P.pd}</div>${dayCard(d)}${statusButtons(n)}`;
+  $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
+}
+function closeSheet(){ sheetDay = null; $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); }
+function celebrate(evs){
+  const lines = evs.map(e => e.t === "Masechet" ? `הדרן עלך מסכת ${e.he.replace("מסכת ", "")}` : e.t === "Seder" ? `הדרן עלך ${e.he}` : e.t === "Shas" ? "הדרן עלך ששה סדרי משנה" : e.t === "Dedication" ? "סיום תענית" : `סיום ${e.he}`);
+  $("#celebrateBox").innerHTML = `<div class="hadran">${lines.map(esc).join("<br>")}</div><p>${esc(evs.map(e => e.t === "Dedication" ? "Mishnah and Rambam on Taanit both complete" : e.n).join(", "))}. Mazal tov!</p><button class="btn primary" data-close-cel style="width:100%">Close</button>`;
+  $("#celebrate").classList.add("on");
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches){
+    for (let i = 0; i < 46; i++){ const b = document.createElement("span"); b.className = "foilbit";
+      b.style.left = Math.random() * 100 + "vw"; b.style.background = ["#E8CB7E","#C9A44C","#F5E2AE","#B88A2E"][i % 4];
+      b.style.animationDuration = (1.6 + Math.random() * 1.4) + "s"; b.style.animationDelay = Math.random() * .5 + "s";
+      document.body.appendChild(b); setTimeout(() => b.remove(), 3800); }
+  }
+}
+function setStatus(n, s){
+  const cur = S.log[n] || {}; const was = cur.s;
+  if (was === s) delete cur.s; else cur.s = s;
+  if (cur.s || cur.m) S.log[n] = cur; else delete S.log[n];
+  save();
+  if (cur.s === "done"){ const G = progress(); const evs = (P.evByDay[n] || []).filter(e => G.evDoneMap[e.i]); if (evs.length) celebrate(evs); else toast("Marked done"); }
+  else toast(cur.s ? `Marked ${cur.s}` : "Cleared");
+  refresh();
+}
+function setMins(n, v){
+  const cur = S.log[n] || {}; const m = Math.max(0, Math.min(900, Math.round(+v || 0)));
+  if (m) cur.m = m; else delete cur.m;
+  if (cur.s || cur.m) S.log[n] = cur; else delete S.log[n];
+  save();
+}
+function refresh(){ render(); if (sheetDay) openSheet(sheetDay); }
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const b = e.target.closest("button, [data-close]"); if (!b) return;
+  if (b.dataset.tab){ go(b.dataset.tab); return; }
+  if (b.dataset.tabGo){ go(b.dataset.tabGo); return; }
+  if (b.dataset.set){ setStatus(+b.dataset.n, b.dataset.set); return; }
+  if (b.dataset.min){ const n = +b.dataset.n, cur = +(S.log[n] && S.log[n].m) || 0; setMins(n, cur + +b.dataset.min); refresh(); return; }
+  if (b.dataset.day){ openSheet(+b.dataset.day); return; }
+  if (b.dataset.cal){ let [y, m] = calMonth; m += +b.dataset.cal; if (m < 0){ m = 11; y--; } if (m > 11){ m = 0; y++; } calMonth = [y, m]; render(); return; }
+  if (b.dataset.filter){ syFilter = b.dataset.filter; render(); return; }
+  if (b.dataset.spine){ shelfSel = shelfSel === b.dataset.spine ? null : b.dataset.spine; render(); return; }
+  if (b.hasAttribute("data-close")){ closeSheet(); return; }
+  if (b.hasAttribute("data-close-cel")){ $("#celebrate").classList.remove("on"); return; }
+  if (b.id === "b-export"){ const blob = new Blob([JSON.stringify(S)], {type: "application/json"}); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `limud-backup-${isoOf(todayDN())}.json`; document.body.appendChild(a); a.click(); a.remove(); return; }
+  if (b.id === "b-copy"){ navigator.clipboard.writeText(JSON.stringify(S)).then(() => toast("Backup copied"), () => { $("#b-text").value = JSON.stringify(S); toast("Copy the text in the box"); }); return; }
+  if (b.id === "b-import"){ restore($("#b-text").value); return; }
+  if (b.id === "b-file"){ $("#b-filein").click(); return; }
+  if (b.id === "b-reset"){ if (confirm("Clear every day you logged? Settings stay.")){ S.log = {}; save(); toast("Progress cleared"); render(); } return; }
+});
+$("#scrim").addEventListener("click", closeSheet);
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (el.dataset.mins){ setMins(+el.dataset.mins, el.value); refresh(); return; }
+  if (el.dataset.setField){
+    const k = el.dataset.setField; let v = el.value;
+    if (k === "start"){ if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return; }
+    else if (k !== "ded"){ v = +v; const lim = {months: [6, 24], wk: [0.25, 16], sh: [0, 16], minM: [0.2, 30], minR: [1, 240]}[k]; if (!(v >= lim[0] && v <= lim[1])){ toast(`Enter ${lim[0]} to ${lim[1]}`); render(); return; } if (k === "months") v = Math.round(v); }
+    S.settings[k] = v; save(); computePlan(); calMonth = null; render(); toast("Saved");
+  }
+  if (el.id === "b-filein" && el.files[0]){ el.files[0].text().then(restore); }
+});
+function restore(txt){
+  try { const p = JSON.parse(txt); if (!p || typeof p !== "object" || !p.log) throw 0; S = {settings: {...DEFAULTS, ...(p.settings || {})}, log: p.log}; save(); computePlan(); calMonth = null; render(); toast("Backup restored"); }
+  catch (e){ toast("That isn't a Limud backup"); }
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeSheet(); $("#celebrate").classList.remove("on"); } });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+
+computePlan(); render();
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
