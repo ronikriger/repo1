@@ -17,7 +17,9 @@ Progress is saved on the phone only. Use Settings, Backup now and then.
 - **Behind**: shown in mishnayot. "Push the plan back instead" turns past days with nothing learned into days off.
 - **Learned days are locked**: skips and settings changes never change what a learned or partly ticked day holds.
 - **Siyumim** for every masechet, seder and all of Shas, with a Hadran when you finish one.
-- Calendar with Hebrew dates, progress shelf with a perek map, minute logging with a timer, light/dark and text size.
+- **Progress → You**: your year at a glance (every day, by status or by seder), milestones (first siyum, 10/25/50/75%, each seder, Shas) with reached or planned dates, plan vs learned, your best weekdays, minutes.
+- **Progress → Shas**: what you're learning now and what it's about, how Shas is divided, what each seder and masechet covers, the six-seder shelf with a perek map, all 63 masechtot by size, perek lengths, and record holders.
+- Calendar with Hebrew dates, minute logging with a timer, light/dark and text size.
 
 ## Hosting
 

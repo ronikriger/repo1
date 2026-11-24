@@ -30,6 +30,7 @@
   --serif:"Frank Ruhl Libre","Times New Roman",Georgia,serif;
   --sans:"Assistant",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
   --rs:1;
+  --s0:#5E8A3A; --s1:#3C6AA6; --s2:#B0567A; --s3:#B37A22; --s4:#7653A8; --s5:#2B8787;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -39,6 +40,7 @@
     --gold:#D6B160; --gold-soft:#3A2F1E; --on-gold:#1A1416; --accent:#6DB088; --accent-soft:#1F3328;
     --done:#5FA37C; --partial:#D9A441; --missed:#D0675D; --late:#4A2E2E; --future:#2D2427;
     --off1:#2A2225; --off2:#51454A; --shelf:#5A4632; --shadow:none;
+    --s0:#8DBE68; --s1:#7FA6DE; --s2:#DC89AA; --s3:#DDA858; --s4:#A98AD8; --s5:#5FBFBF;
   }
 }
 :root[data-theme="dark"]{
@@ -48,6 +50,7 @@
   --gold:#D6B160; --gold-soft:#3A2F1E; --on-gold:#1A1416; --accent:#6DB088; --accent-soft:#1F3328;
   --done:#5FA37C; --partial:#D9A441; --missed:#D0675D; --late:#4A2E2E; --future:#2D2427;
   --off1:#2A2225; --off2:#51454A; --shelf:#5A4632; --shadow:none;
+  --s0:#8DBE68; --s1:#7FA6DE; --s2:#DC89AA; --s3:#DDA858; --s4:#A98AD8; --s5:#5FBFBF;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;background:var(--bg)}
@@ -258,6 +261,48 @@ h1,h2,h3{margin:0;font-weight:700}
 .pmap i.f{background:var(--gold);border-color:var(--gold)}
 .chart{padding:12px 12px 6px;margin:0 0 12px}
 .chart svg{width:100%;height:auto;display:block}
+
+/* progress: you / shas */
+.ptop{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.sech{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.seg.sm button{padding:5px 10px;font-size:13px;min-width:0;text-transform:none;letter-spacing:0;color:var(--ink)}
+.seg.sm button.on{color:var(--bg)}
+.yeargrid{padding:12px 10px}
+.yr{display:grid;grid-template-columns:30px repeat(31,1fr);gap:2px;align-items:center;margin-bottom:2px}
+.ym{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.ym i{font-style:normal;opacity:.7;margin-left:2px}
+.yc{display:block;aspect-ratio:1;border-radius:2px;border:0;padding:0;background:var(--future);min-width:0}
+.yc.none{background:transparent}
+.yc.done{background:var(--done)}.yc.partial{background:var(--partial)}.yc.missed{background:var(--missed)}.yc.off{background:var(--off2)}.yc.late{background:var(--late)}.yc.fut{background:var(--future)}
+.yc.faded{opacity:.3}
+.yc.ms{box-shadow:0 0 0 1.5px var(--gold);position:relative;z-index:1}
+.yc.today{box-shadow:0 0 0 1.5px var(--ink);position:relative;z-index:2;opacity:1}
+.legend i.lg-ms{background:transparent;box-shadow:inset 0 0 0 2px var(--gold)}
+.mslist{padding:2px 14px}
+.msrow{display:grid;grid-template-columns:24px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.msrow:last-child{border-bottom:0}
+.msrow .mi{width:24px;height:24px;border-radius:50%;border:2px solid var(--line2);display:flex;align-items:center;justify-content:center}
+.msrow.got .mi{background:var(--gold);border-color:var(--gold);color:var(--on-gold)}
+.msrow .mi svg{width:14px;height:14px}
+.msrow .mw{font-size:13px;color:var(--muted);text-align:right}
+.msrow.got .mw{color:var(--done);font-weight:600}
+.msrow.big b{color:var(--gold)}
+.msrow .mhe{display:block;font-size:14px;line-height:1.2;text-align:left}
+.nowcard{padding:14px 16px;margin-top:12px}
+.nowtop{display:flex;justify-content:space-between;align-items:center;gap:10px;border-left:4px solid;padding-left:10px}
+.about{text-align:right;margin:4px 0 10px;font-size:15px}
+.nowstats{display:flex;justify-content:space-between;gap:8px;font-size:14px;color:var(--muted);margin-bottom:8px}
+.nowstats b{color:var(--ink);font-size:17px}
+.stack{display:flex;height:16px;border-radius:99px;overflow:hidden;gap:2px}
+.stack i{display:block}
+.sedlist{margin-top:10px;overflow:hidden}
+.sedrow{display:grid;grid-template-columns:14px 1fr auto;gap:12px;align-items:start;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:12px 14px;font-size:15px;line-height:1.4}
+.sedrow:last-child{border-bottom:0}
+.sedrow .dot{width:14px;height:14px;border-radius:50%;margin-top:4px}
+.sedrow .pc{font-weight:700}
+.sedrow.sel{background:var(--surface2)}
+.sdetail{margin-top:10px}
+.topic{text-align:right;font-size:14px;color:var(--muted);margin-top:2px}
 
 /* settings */
 .field{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -593,7 +638,7 @@ function dayCard(d, G){
         <div class="chips">${p.xs.map(x => { const k = x - c.first + 1, on = tk.has(x); return `<button class="mc ${on ? "on" : ""}" data-tick="${x}" data-d="${d.iso}" aria-pressed="${on}" aria-label="Perek ${c.p}, mishnah ${k}${on ? ", learned" : ""}">${heL(k)}</button>`; }).join("")}</div></div>`;
     }).join("");
     return `<div class="mas"><div class="meta"><span>Masechet ${g.u.i + 1} of ${MU.length}</span><span class="sd">סדר ${esc(g.u.sed.he)}</span></div>
-      <h2 class="mtitle">${esc(g.u.he)}</h2><div class="msub">${esc(rangeLabel(g.xs[0], g.xs[g.xs.length - 1]).join(", "))}</div>${per}</div>`;
+      <h2 class="mtitle">${esc(g.u.he)}</h2><div class="msub">${esc(rangeLabel(g.xs[0], g.xs[g.xs.length - 1]).join(", "))}</div>${ABOUT[g.u.n] ? `<div class="topic">${esc(ABOUT[g.u.n])}</div>` : ""}${per}</div>`;
   }).join("");
   const lu = MU[MCH[CHI[d.xs[d.xs.length - 1]]].u], lt = lu.last - lu.first + 1, ld = G ? G.uLearned[lu.i] : 0;
   return `<article class="card leaf">${band}${body}
@@ -715,12 +760,106 @@ function renderSiyumim(){
   if (list.length < all.length) html += `<button class="btn wide more" data-syall>Show all ${all.length}</button>`;
   $("#siyumim").innerHTML = html;
 }
-let shelfSel = null;
+/* ---------- about the Mishnah ---------- */
+const SED_INFO = {
+  Zeraim: ["Seeds", "Blessings and prayer, then the laws of the land: gifts to the poor, tithes, the Sabbatical year and first fruits."],
+  Moed: ["Appointed times", "Shabbat, the festivals and fast days, and the Temple service on them."],
+  Nashim: ["Women", "Marriage and divorce, levirate marriage, vows and the nazirite."],
+  Nezikin: ["Damages", "Civil and criminal law, courts and testimony, idolatry, and Pirkei Avot."],
+  Kodashim: ["Holy things", "Temple offerings, slaughter and kashrut, firstborn animals and the Temple itself."],
+  Taharot: ["Purities", "Ritual purity: vessels, tents, tzaraat, the red heifer, mikvaot and more."]
+};
+const ABOUT = {
+  "Taanit": "Public fasts in times of drought and trouble", "Berachot": "The Shema, prayer and blessings", "Peah": "Leaving the corner of the field and gifts to the poor",
+  "Demai": "Produce that may not have been tithed", "Kilayim": "Forbidden mixtures of plants, animals and fabrics", "Sheviit": "The Sabbatical year",
+  "Terumot": "The portion of produce given to the kohen", "Maasrot": "The first tithe and when produce must be tithed", "Maaser Sheni": "The second tithe, eaten in Jerusalem",
+  "Challah": "The portion of dough given to the kohen", "Orlah": "Fruit of a tree in its first three years", "Bikkurim": "First fruits brought to the Temple",
+  "Shabbat": "The labours forbidden on Shabbat", "Eruvin": "Carrying on Shabbat and Shabbat boundaries", "Pesachim": "Chametz, the Pesach offering and the Seder",
+  "Shekalim": "The half-shekel and the Temple treasury", "Yoma": "The Yom Kippur service and the fast", "Sukkah": "The sukkah, the lulav and Sukkot in the Temple",
+  "Beitzah": "What may be done on Yom Tov", "Rosh Hashanah": "The new month, the calendar and the shofar", "Megillah": "Reading the Megillah and the Torah readings",
+  "Moed Katan": "Work on Chol HaMoed and mourning on festivals", "Chagigah": "The festival pilgrimage offering", "Yevamot": "Levirate marriage and chalitzah",
+  "Ketubot": "The marriage contract and duties between spouses", "Nedarim": "Vows", "Nazir": "The nazirite vow", "Sotah": "The suspected wife, and the decline of the generations",
+  "Gittin": "Writing and giving a get", "Kiddushin": "Betrothal and lineage", "Bava Kamma": "Damage caused by people and property",
+  "Bava Metzia": "Lost property, deposits, loans and workers", "Bava Batra": "Neighbours, sales, inheritance and documents", "Sanhedrin": "Courts, capital cases and the World to Come",
+  "Makkot": "False witnesses, cities of refuge and lashes", "Shevuot": "Oaths", "Eduyot": "Testimonies about earlier rulings", "Avodah Zarah": "Keeping away from idolatry",
+  "Avot": "The ethics of the Sages", "Horayot": "Mistaken rulings of the court", "Zevachim": "Animal offerings", "Menachot": "Meal offerings",
+  "Chullin": "Shechitah and kashrut", "Bechorot": "Firstborn animals and blemishes", "Arachin": "Valuations pledged to the Temple", "Temurah": "Exchanging a consecrated animal",
+  "Keritot": "Sins that carry karet, and their offerings", "Meilah": "Misusing Temple property", "Tamid": "The daily offering in the Temple", "Middot": "The measurements of the Temple",
+  "Kinnim": "Mixed-up pairs of bird offerings", "Kelim": "Impurity of vessels", "Oholot": "Impurity of the dead under a roof", "Negaim": "Tzaraat",
+  "Parah": "The red heifer", "Taharot": "Impurity of food, and cases of doubt", "Mikvaot": "The mikveh", "Niddah": "Menstrual impurity",
+  "Machshirin": "Liquids that make food able to become impure", "Zavim": "The impurity of a zav", "Tevul Yom": "One who has immersed and awaits nightfall",
+  "Yadayim": "Impurity of the hands, and the holiness of Scripture", "Uktzin": "Stems and husks and impurity"
+};
+const sedColor = i => `var(--s${i})`;
+const unitSize = u => u.last - u.first + 1;
+const daySeder = d => d.mc ? MU[MCH[CHI[d.xs[d.xs.length - 1]]].u].sed.i : -1;
+
+/* ---------- progress: you ---------- */
+let shelfSel = null, progView = "you", yearMode = "status";
 function ring(p){
   const r = 50, c = 2 * Math.PI * r;
   return `<svg class="ring" viewBox="0 0 120 120" role="img" aria-label="${(p * 100).toFixed(1)} percent of Shas learned"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="11"/>
     <circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--gold)" stroke-width="11" stroke-linecap="round" stroke-dasharray="${(c * p).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 60 60)"/>
     <text x="60" y="62" text-anchor="middle" class="pct">${(p * 100).toFixed(p < .1 ? 1 : 0)}%</text><text x="60" y="80" text-anchor="middle" class="sub">of Shas</text></svg>`;
+}
+/* Milestones: the first siyum, 10/25/50/75%, each seder and all of Shas, each with the day it was reached or is planned. */
+function milestones(G){
+  const cum = new Int32Array(P.pd + 1);
+  for (let i = 1; i <= P.pd; i++){ let k = 0; for (const x of P.days[i - 1].xs) k += G.learned[x]; cum[i] = cum[i - 1] + k; }
+  const reachDay = need => { for (let i = 1; i <= P.pd; i++) if (cum[i] >= need) return i; return P.pd; };
+  const planDay = need => { for (const d of P.days) if (d.cumM >= need) return d.n; return P.pd; };
+  const lastDay = units => { let mx = 1; for (const u of units) for (let x = u.first; x <= u.last; x++) mx = Math.max(mx, P.mDay[x]); return mx; };
+  const out = [];
+  const firstEv = P.events.find(e => e.t === "Masechet"), doneM = MU.filter(u => G.uDone[u.i]);
+  out.push({label: "First siyum", he: "סיום ראשון", done: doneM.length > 0, day: doneM.length ? Math.min(...doneM.map(u => lastDay([u]))) : firstEv.day});
+  for (const pc of [10, 25, 50, 75]){ const need = Math.ceil(NM * pc / 100), done = G.mLearned >= need;
+    out.push({label: pc === 50 ? "Halfway" : `${pc}% of Shas`, he: pc === 50 ? "חצי הדרך" : `${pc}%`, done, day: done ? reachDay(need) : planDay(need), pct: true}); }
+  for (const e of P.events) if (e.t !== "Masechet"){ const done = G.evDone[e.i];
+    out.push({label: e.t === "Shas" ? "All of Shas Mishnah" : e.n, he: e.he, done, day: done ? lastDay(e.units) : e.day, big: e.t === "Shas"}); }
+  return out.sort((a, b) => a.day - b.day || (a.pct ? -1 : 1));
+}
+function yearGrid(G, ms){
+  const marks = new Set(ms.map(m => m.day)), sd = dnDate(P.s0), ed = dnDate(P.end);
+  let y = sd.getUTCFullYear(), m = sd.getUTCMonth(), rows = "", firstRow = true;
+  while (y < ed.getUTCFullYear() || (y === ed.getUTCFullYear() && m <= ed.getUTCMonth())){
+    const first = Date.UTC(y, m, 1) / DAY, dim = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    let cells = `<span class="ym">${fmt(first, {month: "short"})}${firstRow || m === 0 ? `<i>${String(y).slice(2)}</i>` : ""}</span>`;
+    for (let k = 0; k < 31; k++){
+      if (k >= dim){ cells += `<span class="yc none"></span>`; continue; }
+      const dn = first + k, n = dn - P.s0 + 1, inPlan = n >= 1 && n <= P.pd;
+      if (!inPlan){ cells += `<span class="yc none"></span>`; continue; }
+      const d = P.days[n - 1], s = G.status[n];
+      let cls = "yc", style = "";
+      if (yearMode === "status"){ cls += " " + (s || (n < G.tday ? "late" : "fut")); }
+      else if (d.off) cls += " off";
+      else if (!d.mc) cls += " fut";
+      else { style = `background:${sedColor(daySeder(d))}`; if (s !== "done") cls += " faded"; }
+      if (n === G.tday) cls += " today";
+      if (marks.has(n)) cls += " ms";
+      cells += `<button class="${cls}" style="${style}" data-day="${n}" aria-label="${longDate(dn)}${s ? ", " + (s === "off" ? "day off" : s) : ""}"></button>`;
+    }
+    rows += `<div class="yr">${cells}</div>`; firstRow = false;
+    if (++m > 11){ m = 0; y++; }
+  }
+  const legend = yearMode === "status"
+    ? `<span><i style="background:var(--done)"></i>Done</span><span><i style="background:var(--partial)"></i>Partly</span><span><i style="background:var(--missed)"></i>Missed</span><span><i style="background:var(--off2)"></i>Day off</span><span><i style="background:var(--late)"></i>Not logged</span>`
+    : SED.map(g => `<span><i style="background:${sedColor(g.i)}"></i>${esc(g.en)}</span>`).join("") + `<span class="muted">Faded: not learned yet</span>`;
+  return `<div class="card pad yeargrid">${rows}<div class="legend" style="margin:10px 0 0">${legend}<span><i class="lg-ms"></i>Milestone</span></div></div>`;
+}
+function weekdayChart(G){
+  const tot = [0, 0, 0, 0, 0, 0, 0], done = [0, 0, 0, 0, 0, 0, 0];
+  for (const d of P.days){ if (d.n >= G.tday) break; if (d.off || !d.mc) continue; const w = wd(d.dn); tot[w]++; if (G.status[d.n] === "done") done[w]++; }
+  if (tot.reduce((a, b) => a + b, 0) < 3) return `<p class="note" style="margin:4px 2px">This fills in after your first week.</p>`;
+  const w = 320, h = 120, bw = w / 7, names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Shab"];
+  let bars = "", best = -1, bestV = -1;
+  tot.forEach((t, i) => { const v = t ? done[i] / t : 0; if (t && v > bestV){ bestV = v; best = i; } });
+  tot.forEach((t, i) => { const v = t ? done[i] / t : 0, bh = v * (h - 40), x = i * bw + 8;
+    bars += `<rect x="${x.toFixed(1)}" y="${(h - 20 - (h - 40)).toFixed(1)}" width="${(bw - 16).toFixed(1)}" height="${h - 40}" rx="5" fill="var(--surface2)"/>`;
+    if (t) bars += `<rect x="${x.toFixed(1)}" y="${(h - 20 - bh).toFixed(1)}" width="${(bw - 16).toFixed(1)}" height="${bh.toFixed(1)}" rx="5" fill="${i === best ? "var(--gold)" : "var(--done)"}"/>`;
+    bars += `<text x="${(x + (bw - 16) / 2).toFixed(1)}" y="${h - 5}" font-size="11" text-anchor="middle" fill="currentColor" opacity=".7">${names[i]}</text>`;
+    bars += `<text x="${(x + (bw - 16) / 2).toFixed(1)}" y="${(h - 24 - bh).toFixed(1)}" font-size="11" font-weight="700" text-anchor="middle" fill="currentColor">${t ? Math.round(v * 100) + "%" : "–"}</text>`; });
+  return `<div class="card chart"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Share of days done for each day of the week">${bars}</svg>
+    <p class="note" style="margin:4px 6px 6px">${bestV > 0 ? `${names[best] === "Shab" ? "Shabbat" : names[best]} is your strongest day: ${Math.round(bestV * 100)}% done.` : "No days done yet."}</p></div>`;
 }
 function lineChart(G){
   const pts = 60, w = 320, h = 150, pad = 28; let plan = "", act = "";
@@ -749,36 +888,124 @@ function weekBars(){
   return `<div class="sec">Minutes each week</div><div class="card chart"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Planned and logged minutes per week">${bars}</svg>
     <div class="legend" style="margin:6px 4px"><span><i style="background:var(--line)"></i>Planned</span><span><i style="background:var(--gold)"></i>Logged</span></div></div>`;
 }
-function renderProgress(){
-  const G = progress();
+function progressYou(G){
+  const ms = milestones(G), pace = G.mOnDone ? G.minsOnDone / G.mOnDone : 0, t = G.tday;
+  const msHTML = ms.map(m => `<div class="msrow ${m.done ? "got" : ""} ${m.big ? "big" : ""}"><span class="mi">${m.done ? ICON.check : ""}</span>
+    <span class="ml"><b>${esc(m.label)}</b>${m.pct ? "" : `<span class="he muted mhe">${esc(m.he)}</span>`}</span>
+    <span class="mw">${m.done ? `Reached ${shortDate(P.s0 + m.day - 1)}` : m.day < t ? `was planned for ${shortDate(P.s0 + m.day - 1)}` : `${fmt(P.s0 + m.day - 1, {day: "numeric", month: "short", year: "2-digit"})} · ${inDays(m.day - t)}`}</span></div>`).join("");
+  return `<div class="card ringwrap">${ring(G.pct)}<div class="stats">
+      <span><b>${G.mLearned.toLocaleString()}</b> <span class="muted">of ${NM.toLocaleString()} mishnayot</span></span>
+      <span><b>${G.perakim}</b> <span class="muted">of ${MCH.length} perakim</span></span>
+      <span><b>${G.masechtot}</b> <span class="muted">of ${MU.length} masechtot</span></span>
+      <span><b>${G.sedarim}</b> <span class="muted">of 6 sedarim</span></span></div></div>
+    <div class="sec sech"><span>Your year at a glance</span><span class="seg sm">${[["status", "Your days"], ["seder", "Sedarim"]].map(([k, l]) => `<button class="${yearMode === k ? "on" : ""}" data-ym="${k}">${l}</button>`).join("")}</span></div>
+    ${yearGrid(G, ms)}
+    <div class="sec">Milestones</div><div class="card mslist">${msHTML}</div>
+    <div class="sec">Plan and progress</div><div class="card chart">${lineChart(G)}</div>
+    <div class="sec">Your best days</div>${weekdayChart(G)}
+    ${G.logged ? weekBars() : ""}
+    <div class="facts"><div class="card fact"><div class="k">Time logged</div><div class="v">${(G.mins / 60).toFixed(1)} h</div><div class="s">${G.logged ? `about ${Math.round(G.mins / G.logged)} min a day` : "Log minutes on any day"}</div></div>
+      <div class="card fact"><div class="k">Your pace</div><div class="v">${pace ? pace.toFixed(1) + " min" : "Not yet"}</div><div class="s">${pace ? "per mishnah" : "Log minutes on done days"}</div></div>
+      <div class="card fact"><div class="k">Streak</div><div class="v">${plural(G.streak, "day")}</div><div class="s">Best ${G.best}</div></div>
+      <div class="card fact"><div class="k">Days learned</div><div class="v">${G.status.filter(s => s === "done").length}</div><div class="s">${P.offCount ? plural(P.offCount, "day") + " off" : "no days off"}</div></div></div>
+    ${pace && Math.abs(pace - S.settings.minM) >= 0.2 ? `<div class="card remind"><span>Estimates use ${S.settings.minM} min per mishnah. Use your pace instead?</span><button class="btn" data-usepace="${pace.toFixed(1)}">Use ${pace.toFixed(1)}</button></div>` : ""}`;
+}
+
+/* ---------- progress: Shas ---------- */
+function skyline(G, curU){
+  const w = 340, h = 170, top = 18, base = h - 34, bw = w / MU.length, maxS = Math.max(...MU.map(unitSize));
+  let s = "";
+  MU.forEach(u => { const sz = unitSize(u), bh = sz / maxS * (base - top), x = u.i * bw, f = G.uLearned[u.i] / sz, c = sedColor(u.sed.i);
+    s += `<rect x="${(x + .4).toFixed(2)}" y="${(base - bh).toFixed(1)}" width="${(bw - .8).toFixed(2)}" height="${bh.toFixed(1)}" fill="${c}" opacity=".32"/>`;
+    if (f > 0) s += `<rect x="${(x + .4).toFixed(2)}" y="${(base - bh * f).toFixed(1)}" width="${(bw - .8).toFixed(2)}" height="${(bh * f).toFixed(1)}" fill="${c}"/>`;
+    s += `<rect x="${x.toFixed(2)}" y="${base + 3}" width="${bw.toFixed(2)}" height="5" fill="${c}"/>`; });
+  // label the seder runs and the tallest masechet
+  let run = null; const runs = [];
+  MU.forEach(u => { if (run && run.g === u.sed) run.b = u.i; else runs.push(run = {g: u.sed, a: u.i, b: u.i}); });
+  runs.forEach(r => { if (r.b - r.a >= 3) s += `<text x="${((r.a + r.b + 1) / 2 * bw).toFixed(1)}" y="${base + 22}" font-size="12" text-anchor="middle" font-family="var(--serif)" font-weight="700" fill="${sedColor(r.g.i)}">${esc(r.g.he)}</text>`; });
+  const tall = MU.reduce((a, u) => unitSize(u) > unitSize(a) ? u : a);
+  s += `<text x="${Math.min(w - 2, tall.i * bw + bw / 2).toFixed(1)}" y="${top - 6}" font-size="11" text-anchor="end" fill="currentColor" opacity=".75">${esc(tall.n)} ${unitSize(tall)}</text>`;
+  if (curU){ const x = curU.i * bw + bw / 2, bh = unitSize(curU) / maxS * (base - top); s += `<path d="M${(x - 5).toFixed(1)},${(base - bh - 11).toFixed(1)} h10 l-5,7 z" fill="var(--ink)"/>`; }
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="All 63 masechtot by number of mishnayot">${s}</svg>`;
+}
+function perekHist(curLen){
+  const lens = MCH.map(c => c.last - c.first + 1), mx = Math.max(...lens), cnt = new Array(mx + 1).fill(0);
+  lens.forEach(l => cnt[l]++);
+  const w = 320, h = 130, bw = (w - 10) / mx, top = Math.max(...cnt); let s = "";
+  for (let l = 1; l <= mx; l++){ const bh = cnt[l] / top * (h - 34), x = 5 + (l - 1) * bw;
+    if (cnt[l]) s += `<rect x="${x.toFixed(1)}" y="${(h - 20 - bh).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${bh.toFixed(1)}" rx="2" fill="${l === curLen ? "var(--gold)" : "var(--accent)"}" opacity="${l === curLen ? 1 : .55}"/>`;
+    if (l === 1 || l % 5 === 0 || l === mx) s += `<text x="${(x + (bw - 2) / 2).toFixed(1)}" y="${h - 6}" font-size="10" text-anchor="middle" fill="currentColor" opacity=".65">${l}</text>`; }
+  const mode = cnt.indexOf(top);
+  return {svg: `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="How many perakim have each number of mishnayot">${s}</svg>`, mode, top, avg: lens.reduce((a, b) => a + b, 0) / lens.length};
+}
+function progressShas(G){
+  const t = G.tday, td = t >= 1 && t <= P.pd ? P.days[t - 1] : null;
+  let curU = td && td.mc ? MU[MCH[CHI[td.xs[0]]].u] : null;
+  if (!curU) curU = MU.find(u => !G.uDone[u.i]) || null;
+  let now = "";
+  if (curU){
+    const sz = unitSize(curU), got = G.uLearned[curU.i], ev = P.events.find(e => e.t === "Masechet" && e.units[0] === curU), nextU = MU[curU.i + 1], info = SED_INFO[curU.s];
+    now = `<div class="card nowcard"><div class="nowtop" style="border-color:${sedColor(curU.sed.i)}"><span class="muted small">Now learning · Masechet ${curU.i + 1} of ${MU.length}</span><span class="he" style="color:${sedColor(curU.sed.i)};font-weight:700">סדר ${esc(curU.sed.he)}</span></div>
+      <h2 class="mtitle">${esc(curU.he)}</h2><div class="msub">${esc(curU.n)}</div><p class="about">${esc(ABOUT[curU.n] || "")}</p>
+      <div class="nowstats"><span><b>${curU.c.length}</b> perakim</span><span><b>${sz}</b> mishnayot</span><span><b>${Math.round(got / sz * 100)}%</b> learned</span></div>
+      <div class="bar"><i style="width:${(got / sz * 100).toFixed(1)}%;background:${sedColor(curU.sed.i)}"></i></div>
+      <p class="note" style="margin:10px 0 0">${G.uDone[curU.i] ? "Siyum made ✓" : ev ? `Siyum planned ${shortDate(P.s0 + ev.day - 1)}${ev.day >= t ? `, ${inDays(ev.day - t)}` : ""}` : ""}${info ? ` · Seder ${esc(curU.s)} means “${info[0]}”` : ""}</p>
+      ${nextU ? `<p class="note" style="margin:6px 0 0">Next: <b>${esc(nextU.n)}</b> <span class="he">${esc(nextU.he)}</span> · ${esc(ABOUT[nextU.n] || "")}</p>` : ""}</div>`;
+  }
+  // how Shas is divided
+  const segs = SED.map(g => { const m = g.units.reduce((a, u) => a + unitSize(u), 0), got = g.units.reduce((a, u) => a + G.uLearned[u.i], 0), per = g.units.reduce((a, u) => a + u.c.length, 0); return {g, m, got, per}; });
+  const stack = `<div class="stack">${segs.map(x => `<i style="flex:${x.m};background:${sedColor(x.g.i)}" title="${esc(x.g.en)}"></i>`).join("")}</div>`;
+  const rows = segs.map(x => `<button class="sedrow ${shelfSel === x.g.i ? "sel" : ""}" data-spine="${x.g.i}" aria-expanded="${shelfSel === x.g.i}">
+      <span class="dot" style="background:${sedColor(x.g.i)}"></span>
+      <span class="st"><b>${esc(x.g.en)}</b> <span class="he">${esc(x.g.he)}</span> <span class="muted">· ${esc(SED_INFO[x.g.en][0])}</span><br><span class="muted small">${x.g.units.length} masechtot · ${x.per} perakim · ${x.m.toLocaleString()} mishnayot · ${Math.round(x.m / NM * 100)}% of Shas</span>
+        <span class="bar" style="display:block;margin-top:6px"><i style="width:${(x.got / x.m * 100).toFixed(1)}%;background:${sedColor(x.g.i)}"></i></span></span>
+      <span class="pc">${Math.round(x.got / x.m * 100)}%</span></button>`).join("");
+  let detail = "";
+  if (shelfSel !== null){
+    const g = SED[shelfSel];
+    detail = `<div class="card pad sdetail" style="border-top:4px solid ${sedColor(g.i)}"><p class="note" style="margin:6px 0 4px"><b>Seder ${esc(g.en)}</b>, “${esc(SED_INFO[g.en][0])}”: ${esc(SED_INFO[g.en][1])}</p>
+      ${g.units.map(u => { const tot = unitSize(u), k = G.uLearned[u.i];
+      return `<div class="unit"><div class="u1"><span>${esc(u.n)} <span class="muted small">${k} / ${tot}</span></span><span class="he">${esc(u.he)}</span></div>
+        <div class="small muted">${esc(ABOUT[u.n] || "")}</div>
+        <div class="pmap" aria-label="${u.c.length} perakim">${MCH.filter(c => c.u === u.i).map(c => `<i class="${["", "p", "f"][G.chState[c.i]]}" title="Perek ${c.p}"></i>`).join("")}</div></div>`; }).join("")}</div>`;
+  }
+  // shelf
   const groups = SED.map(g => { const ix = MCH.filter(c => MU[c.u].s === g.en); return {g, tot: ix.length, done: ix.filter(c => G.chState[c.i] === 2).length}; });
   const max = Math.max(...groups.map(x => x.tot));
   const spines = groups.map((x, i) => { const p = x.tot ? x.done / x.tot : 0;
     return `<button class="spine ${shelfSel === x.g.i ? "sel" : ""}" data-spine="${x.g.i}" style="height:${(120 + 80 * x.tot / max).toFixed(0)}px;background:var(${i % 2 ? "--spine2" : "--spine1"})" aria-label="Seder ${esc(x.g.en)}, ${Math.round(p * 100)}% done" aria-expanded="${shelfSel === x.g.i}">
       <span class="foil" style="height:${(p * 100).toFixed(1)}%"></span><span class="bands"></span><span class="lbl">${esc(x.g.he)}</span></button>`; }).join("");
-  let detail = "";
-  if (shelfSel !== null){
-    const g = SED[shelfSel];
-    detail = `<div class="sec">Seder ${esc(g.en)} · ${esc(g.he)}</div><div class="card pad">${g.units.map(u => { const tot = u.last - u.first + 1, k = G.uLearned[u.i];
-      return `<div class="unit"><div class="u1"><span>${esc(u.n)} <span class="muted small">${k} / ${tot}</span></span><span class="he">${esc(u.he)}</span></div>
-        <div class="pmap" aria-label="${u.c.length} perakim">${MCH.filter(c => c.u === u.i).map(c => `<i class="${["", "p", "f"][G.chState[c.i]]}" title="Perek ${c.p}"></i>`).join("")}</div></div>`; }).join("")}</div>`;
-  }
-  const pace = G.mOnDone ? G.minsOnDone / G.mOnDone : 0;
-  $("#progress").innerHTML = `<h1 class="h2" style="margin-top:6px">Progress</h1>
-    <div class="card ringwrap" style="margin-top:12px">${ring(G.pct)}<div class="stats">
-      <span><b>${G.mLearned.toLocaleString()}</b> <span class="muted">of ${NM.toLocaleString()} mishnayot</span></span>
-      <span><b>${G.perakim}</b> <span class="muted">of ${MCH.length} perakim</span></span>
-      <span><b>${G.masechtot}</b> <span class="muted">of ${MU.length} masechtot</span></span>
-      <span><b>${G.sedarim}</b> <span class="muted">of 6 sedarim</span></span></div></div>
+  // facts
+  const bySize = [...MU].sort((a, b) => unitSize(b) - unitSize(a)), byPer = [...MU].sort((a, b) => b.c.length - a.c.length);
+  const lens = MCH.map(c => ({c, l: c.last - c.first + 1})), longP = lens.reduce((a, b) => b.l > a.l ? b : a), shortL = Math.min(...lens.map(x => x.l)), shortN = lens.filter(x => x.l === shortL);
+  const curC = td && td.mc ? MCH[CHI[td.xs[0]]] : null, curLen = curC ? curC.last - curC.first + 1 : 0, hist = perekHist(curLen);
+  const longer = curC ? Math.round(lens.filter(x => x.l < curLen).length / lens.length * 100) : 0;
+  const pn = c => `${MU[c.u].n} ${c.p}`;
+  return `${now}
+    <div class="sec">How Shas is divided</div>
+    <div class="card pad">${stack}<p class="note" style="margin:8px 0 2px">Six sedarim, ${MU.length} masechtot, ${MCH.length} perakim, ${NM.toLocaleString()} mishnayot. Tap a seder to see its masechtot.</p></div>
+    <div class="card sedlist">${rows}</div>
+    ${detail}
     <div class="sec">The six sedarim</div>
     <div class="shelf">${spines}</div>
     <div class="shelfcap"><span>Each binding fills as you finish its perakim</span><span>Tap one</span></div>
-    ${detail}
-    <div class="sec">Plan and progress</div><div class="card chart">${lineChart(G)}</div>
-    ${G.logged ? weekBars() : ""}
-    <div class="facts"><div class="card fact"><div class="k">Time logged</div><div class="v">${(G.mins / 60).toFixed(1)} h</div><div class="s">${G.logged ? `about ${Math.round(G.mins / G.logged)} min a day` : "Log minutes on any day"}</div></div>
-      <div class="card fact"><div class="k">Your pace</div><div class="v">${pace ? pace.toFixed(1) + " min" : "Not yet"}</div><div class="s">${pace ? "per mishnah" : "Log minutes on done days"}</div></div></div>
-    ${pace && Math.abs(pace - S.settings.minM) >= 0.2 ? `<div class="card remind"><span>Estimates use ${S.settings.minM} min per mishnah. Use your pace instead?</span><button class="btn" data-usepace="${pace.toFixed(1)}">Use ${pace.toFixed(1)}</button></div>` : ""}`;
+    <div class="sec">All 63 masechtot</div>
+    <div class="card chart">${skyline(G, curU)}<p class="note" style="margin:2px 6px 6px">In the order you learn them. Height is the number of mishnayot; the solid part is what you've learned.${curU ? ` The marker is ${esc(curU.n)}.` : ""}</p></div>
+    <div class="sec">How long is a perek?</div>
+    <div class="card chart">${hist.svg}<p class="note" style="margin:2px 6px 6px">Most often a perek has <b>${hist.mode}</b> mishnayot (${hist.top} perakim do). On average, ${hist.avg.toFixed(1)}.${curC ? ` Today's perek, ${esc(pn(curC))}, has <b>${curLen}</b>: longer than ${longer}% of perakim.` : ""}</p></div>
+    <div class="sec">Record holders</div>
+    <div class="facts">
+      <div class="card fact"><div class="k">Longest masechet</div><div class="v he">${esc(bySize[0].he)}</div><div class="s">${esc(bySize[0].n)} · ${unitSize(bySize[0])} mishnayot</div></div>
+      <div class="card fact"><div class="k">Shortest masechet</div><div class="v he">${esc(bySize[bySize.length - 1].he)}</div><div class="s">${esc(bySize[bySize.length - 1].n)} · ${unitSize(bySize[bySize.length - 1])} mishnayot</div></div>
+      <div class="card fact"><div class="k">Most perakim</div><div class="v he">${esc(byPer[0].he)}</div><div class="s">${esc(byPer[0].n)} · ${byPer[0].c.length} perakim</div></div>
+      <div class="card fact"><div class="k">Longest perek</div><div class="v he">${esc(MU[longP.c.u].he)} ${heL(longP.c.p)}</div><div class="s">${esc(pn(longP.c))} · ${longP.l} mishnayot</div></div>
+      <div class="card fact full"><div class="k">Shortest perakim</div><div class="v">${shortL} mishnayot</div><div class="s">${shortN.map(x => esc(pn(x.c))).join(", ")}</div></div>
+    </div>`;
+}
+function renderProgress(){
+  const G = progress();
+  $("#progress").innerHTML = `<div class="ptop"><h1 class="h2">Progress</h1><span class="seg">${[["you", "You"], ["shas", "Shas"]].map(([k, l]) => `<button class="${progView === k ? "on" : ""}" data-pv="${k}">${l}</button>`).join("")}</span></div>
+    ${progView === "you" ? progressYou(G) : progressShas(G)}`;
 }
 function renderSettings(){
   const s = S.settings, sh = planShape(s);
@@ -1000,6 +1227,8 @@ document.addEventListener("click", e => {
   if (ds.filter){ syFilter = ds.filter; render(); return; }
   if (b.hasAttribute("data-syall")){ syAll = true; render(); return; }
   if (ds.spine){ shelfSel = shelfSel === +ds.spine ? null : +ds.spine; render(); return; }
+  if (ds.pv){ progView = ds.pv; render(); return; }
+  if (ds.ym){ yearMode = ds.ym; render(); return; }
   if (ds.usepace){ S.settings.minM = +ds.usepace; save(); render(); toast(`Estimates now use ${ds.usepace} min per mishnah`); return; }
   if (ds.rs){ S.settings.rs = +ds.rs; save(); applyTheme(); render(); return; }
   if (ds.themeSet){ S.settings.theme = ds.themeSet; save(); applyTheme(); render(); return; }
