@@ -1,6 +1,7 @@
 {
- "name": "Limud: Mishnah and Rambam",
+ "name": "Limud: Shas Mishnah in a Year",
  "short_name": "Limud",
+ "description": "A daily plan for all 4,192 mishnayot in one year.",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",

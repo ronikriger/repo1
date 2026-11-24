@@ -7,212 +7,324 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Limud">
-<meta name="theme-color" content="#ECEEE9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#F3F1EA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1416" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Shas Mishnah in a year: a daily plan for all 4,192 mishnayot.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-180.png">
-<title>Limud: Mishnah and Rambam</title>
+<title>Limud: Shas Mishnah in a Year</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  color-scheme: light dark;
-  --bg:#ECEEE9; --surface:#FFFFFF; --surface2:#F4F5F1; --line:#D8DBD2;
-  --ink:#1E1A1C; --muted:#696366; --gold:#A47A1F; --gold-soft:#F3E7C6; --on-gold:#FFFFFF;
-  --mishnah:#2E7454; --rambam:#3C5398; --done:#3E8E62; --partial:#C48A1C; --missed:#B9483F;
-  --late:#E9CFCB; --ahead:#E3E6DE; --shadow:0 1px 0 rgba(30,26,28,.06);
-  --spine-m1:#23402F; --spine-m2:#2D5039; --spine-r1:#1F2C52; --spine-r2:#2A3866; --spine-i:#4A1F27; --shelf:#B9A57C;
+  color-scheme: light;
+  --bg:#F3F1EA; --surface:#FFFFFF; --surface2:#F7F5EF; --line:#E3DED2; --line2:#D3CDBE;
+  --ink:#1E1A1C; --muted:#6B6466; --faint:#9A9294;
+  --gold:#946B17; --gold-soft:#F4E9CC; --on-gold:#FFFFFF; --accent:#2E7454; --accent-soft:#E2EFE7;
+  --done:#2F8A5B; --partial:#C48A1C; --missed:#B9483F; --late:#F1DCD7; --future:#E9E6DD;
+  --off1:#ECE9E0; --off2:#D6D1C4;
+  --spine1:#23402F; --spine2:#2D5039; --shelf:#B9A57C; --foil1:#E8CB7E; --foil2:#B88A2E;
+  --shadow:0 1px 2px rgba(30,26,28,.05),0 4px 14px rgba(30,26,28,.04);
   --serif:"Frank Ruhl Libre","Times New Roman",Georgia,serif;
   --sans:"Assistant",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  --rs:1;
 }
 @media (prefers-color-scheme: dark){
-  :root{
-    --bg:#1A1416; --surface:#241C1F; --surface2:#2D2427; --line:#3B3034;
-    --ink:#F1EADF; --muted:#A99D96; --gold:#D6B160; --gold-soft:#3A2F1E; --on-gold:#1A1416;
-    --mishnah:#6DB088; --rambam:#8EA2E0; --done:#5FA37C; --partial:#D9A441; --missed:#D0675D;
-    --late:#4A2E2E; --ahead:#2D2427; --shadow:none; --shelf:#5A4632;
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#1A1416; --surface:#241C1F; --surface2:#2D2427; --line:#3B3034; --line2:#4A3E43;
+    --ink:#F1EADF; --muted:#ADA19A; --faint:#7E7370;
+    --gold:#D6B160; --gold-soft:#3A2F1E; --on-gold:#1A1416; --accent:#6DB088; --accent-soft:#1F3328;
+    --done:#5FA37C; --partial:#D9A441; --missed:#D0675D; --late:#4A2E2E; --future:#2D2427;
+    --off1:#2A2225; --off2:#51454A; --shelf:#5A4632; --shadow:none;
   }
 }
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#1A1416; --surface:#241C1F; --surface2:#2D2427; --line:#3B3034; --line2:#4A3E43;
+  --ink:#F1EADF; --muted:#ADA19A; --faint:#7E7370;
+  --gold:#D6B160; --gold-soft:#3A2F1E; --on-gold:#1A1416; --accent:#6DB088; --accent-soft:#1F3328;
+  --done:#5FA37C; --partial:#D9A441; --missed:#D0675D; --late:#4A2E2E; --future:#2D2427;
+  --off1:#2A2225; --off2:#51454A; --shelf:#5A4632; --shadow:none;
+}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
-body{font-family:var(--sans);font-size:17px;line-height:1.45;min-height:100vh;
-  padding:env(safe-area-inset-top,0px) 0 calc(76px + env(safe-area-inset-bottom,0px));}
-button,input{font:inherit;color:inherit}
-button{cursor:pointer}
+body{font-family:var(--sans);font-size:17px;line-height:1.45;min-height:100vh;-webkit-tap-highlight-color:transparent;
+  padding:env(safe-area-inset-top,0px) 0 calc(84px + env(safe-area-inset-bottom,0px));overscroll-behavior-y:none}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+input,select,textarea{font-size:16px}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.wrap{max-width:560px;margin:0 auto;padding:12px 18px 24px}
-.screen{display:none}
-.screen.on{display:block}
-.he{font-family:var(--serif);direction:rtl;unicode-bidi:isolate}
-.muted{color:var(--muted)}
 a{color:inherit}
 h1,h2,h3{margin:0;font-weight:700}
-h2{font-family:var(--serif);font-size:26px;letter-spacing:.2px}
-h3{font-size:17px}
+.wrap{max-width:560px;margin:0 auto;padding:10px 16px 24px}
+.screen{display:none}
+.screen.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:.4}to{opacity:1}}
+.he{font-family:var(--serif);direction:rtl;unicode-bidi:isolate}
+.muted{color:var(--muted)}
 .small{font-size:14px}
-.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:6px 0 2px}
-.top .day{font-size:15px;color:var(--muted);white-space:nowrap}
-.date{font-family:var(--serif);font-size:24px}
-.ded{color:var(--gold);font-size:18px;margin-top:2px;text-align:right}
-/* learning sheet */
-.leaf{background:var(--surface);border:1px solid var(--line);border-radius:18px;margin:16px 0 12px;overflow:hidden;box-shadow:var(--shadow)}
-.part{padding:16px 18px 14px;text-align:right}
-.part+.part{border-top:1px solid var(--line)}
-.kind{font-family:var(--serif);font-size:16px;font-weight:700}
-.kind.m{color:var(--mishnah)} .kind.r{color:var(--rambam)}
-.title{font-family:var(--serif);font-size:34px;line-height:1.15;font-weight:700;margin:2px 0}
-.title.sm{font-size:24px}
-.ref{font-family:var(--serif);font-size:20px}
-.en{direction:ltr;text-align:right;color:var(--muted);font-size:15px;margin-top:4px}
-.open{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:15px;font-weight:600;text-decoration:none;
-  padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface2)}
-.parts-line{margin-top:10px}
-.siyum-band{background:var(--gold-soft);color:var(--gold);padding:12px 18px;text-align:right;font-family:var(--serif);font-size:20px;font-weight:700}
-.meta{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 18px;border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
-.meta b{color:var(--ink);font-weight:600}
-/* actions */
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 8px}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:13px 14px;font-weight:600;font-size:16px}
-.btn.primary{grid-column:1/-1;background:var(--gold);border-color:var(--gold);color:var(--on-gold);font-size:18px;padding:15px}
-.btn.sel-done{background:var(--done);border-color:var(--done);color:#fff}
-.btn.sel-partial{background:var(--partial);border-color:var(--partial);color:#fff}
-.btn.sel-missed{background:var(--missed);border-color:var(--missed);color:#fff}
-.mins{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 10px 8px 16px;margin-bottom:6px}
-.step{display:flex;align-items:center;gap:6px}
-.step button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);font-size:20px;line-height:1}
-.step input{width:64px;text-align:center;border:1px solid var(--line);border-radius:10px;padding:8px 4px;background:var(--surface2)}
-/* status line */
-.status{border-radius:14px;padding:12px 16px;margin:14px 0 6px;font-weight:600}
-.status.ok{background:color-mix(in srgb,var(--done) 16%,transparent);color:var(--done)}
-.status.behind{background:color-mix(in srgb,var(--missed) 15%,transparent);color:var(--missed)}
-.status.wait{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
-.status small{display:block;font-weight:400;color:var(--muted);margin-top:2px}
-.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
-.fact{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
-.fact .k{font-size:14px;color:var(--muted)}
-.fact .v{font-size:22px;font-weight:700;line-height:1.2;margin-top:2px}
-.fact .s{font-size:14px;color:var(--muted)}
-.fact.siyum{grid-column:1/-1}
-.fact.siyum .v{font-family:var(--serif);font-size:24px}
-.next{margin-top:18px}
-.next h3{margin-bottom:6px}
-.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.h2{font-family:var(--serif);font-size:28px;letter-spacing:.2px}
+.sec{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 2px 8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.pad{padding:14px 16px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
-.linkish{background:none;border:0;padding:0;color:var(--gold);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.linkish{background:none;border:0;padding:4px 0;color:var(--gold);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.bar{height:6px;border-radius:99px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:99px}
+.bar.ok i{background:var(--done)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);
+  border-radius:14px;padding:12px 14px;font-weight:700;font-size:16px;min-height:48px;transition:transform .08s ease,background .15s ease}
+.btn:active{transform:scale(.98)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--on-gold)}
+.btn.isdone{background:var(--done);border-color:var(--done);color:#fff}
+.btn.ismissed{background:var(--missed);border-color:var(--missed);color:#fff}
+.btn.wide{display:flex;width:100%}
+.btn.big{font-size:18px;min-height:56px}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--missed)}
+.btn[disabled]{opacity:.45}
+
+/* top of Today */
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:8px 2px 0}
+.top .hd{font-family:var(--serif);font-size:15px;color:var(--gold);direction:rtl;unicode-bidi:isolate}
+.top .date{font-family:var(--serif);font-size:26px;line-height:1.15}
+.top .dayno{font-size:14px;color:var(--muted);white-space:nowrap;text-align:right}
+.top .dayno b{display:block;font-size:20px;color:var(--ink)}
+.ded{color:var(--gold);font-size:17px;margin:4px 2px 0;text-align:right}
+.overall{display:flex;align-items:center;gap:10px;margin:12px 2px 0;font-size:14px;color:var(--muted)}
+.overall .bar{flex:1}
+
+/* week strip */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:14px 0 4px}
+.wd{border:0;background:none;padding:4px 0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+.wd .c{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--ink);background:var(--future)}
+.wd.done .c{background:var(--done);color:#fff}
+.wd.partial .c{background:var(--partial);color:#fff}
+.wd.missed .c{background:var(--missed);color:#fff}
+.wd.late .c{background:var(--late)}
+.wd.off .c{background:repeating-linear-gradient(135deg,var(--off1) 0 4px,var(--off2) 4px 8px);color:var(--muted)}
+.wd.out .c{background:transparent;color:var(--faint)}
+.wd.today .c{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--ink)}
+.wd.today{color:var(--ink);font-weight:700}
+
+/* learning card */
+.leaf{margin:14px 0 12px;overflow:hidden}
+.band{background:var(--gold-soft);color:var(--gold);padding:10px 16px;text-align:right;font-family:var(--serif);font-size:19px;font-weight:700;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.band span:first-child{font-family:var(--sans);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.mas{padding:16px 16px 4px}
+.mas+.mas{border-top:1px solid var(--line)}
+.mas .meta{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);letter-spacing:.02em}
+.mas .meta .sd{font-family:var(--serif);direction:rtl;font-size:15px;color:var(--accent);font-weight:700}
+.mtitle{font-family:var(--serif);font-size:calc(38px * var(--rs));line-height:1.1;font-weight:700;text-align:right;direction:rtl;margin:6px 0 0}
+.msub{text-align:right;color:var(--muted);font-size:15px;margin-top:2px}
+.perek{padding:12px 0 10px;border-top:1px dashed var(--line)}
+.mas .perek:first-of-type{margin-top:10px}
+.prow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.pname{font-family:var(--serif);font-size:calc(21px * var(--rs));font-weight:700}
+.sef{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:700;text-decoration:none;color:var(--gold);padding:6px 10px;border-radius:99px;background:var(--gold-soft)}
+.sef svg{width:14px;height:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;direction:rtl}
+.mc{min-width:44px;height:44px;padding:0 6px;border-radius:12px;border:1.5px solid var(--line2);background:var(--surface);font-family:var(--serif);font-size:calc(19px * var(--rs));font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;transition:background .12s ease,transform .08s ease}
+.mc:active{transform:scale(.94)}
+.mc.on{background:var(--done);border-color:var(--done);color:#fff}
+.mc[disabled]{opacity:1;cursor:default}
+.lfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line);font-size:14px;color:var(--muted);background:var(--surface2)}
+.lfoot b{color:var(--ink)}
+.lfoot .mp{flex:1;max-width:170px}
+.lfoot .mp .t{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.hint{font-size:13px;color:var(--muted);text-align:center;margin:-4px 0 10px}
+.empty{padding:22px 16px;color:var(--muted);text-align:center}
+
+/* day off card */
+.offcard{margin:14px 0 12px;padding:20px 18px;border:1px dashed var(--line2);border-radius:18px;
+  background:repeating-linear-gradient(135deg,transparent 0 10px,color-mix(in srgb,var(--off2) 28%,transparent) 10px 20px),var(--surface)}
+.offcard .t{font-family:var(--serif);font-size:30px;font-weight:700}
+.offcard p{margin:6px 0 0;color:var(--muted);font-size:15px}
+
+/* actions */
+.acts{display:grid;gap:10px;margin:0 0 6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mins{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 8px 8px 14px;flex-wrap:wrap}
+.two .btn{white-space:nowrap;font-size:15px;padding:12px 8px}
+.mins .lbl{font-weight:600}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);font-size:20px;line-height:1;flex:none}
+.step input{width:58px;text-align:center;border:1px solid var(--line);border-radius:10px;padding:8px 4px;background:var(--surface2)}
+.step .timer{width:auto;min-width:44px;min-height:40px;height:40px;padding:0 10px;border-radius:12px;font-size:15px;margin-left:4px;color:var(--accent)}
+.step .timer svg{width:20px;height:20px}
+.step .timer.run{background:var(--accent);border-color:var(--accent);color:#fff;font-variant-numeric:tabular-nums}
+
+/* status */
+.status{border-radius:18px;padding:14px 16px;margin:14px 0 0;border:1px solid transparent}
+.status .h{font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px}
+.status .h svg{width:20px;height:20px}
+.status p{margin:4px 0 0;font-size:14px;color:var(--muted)}
+.status.ok{background:var(--accent-soft);border-color:color-mix(in srgb,var(--done) 30%,transparent)}
+.status.ok .h{color:var(--done)}
+.status.behind{background:color-mix(in srgb,var(--missed) 12%,var(--surface));border-color:color-mix(in srgb,var(--missed) 30%,transparent)}
+.status.behind .h{color:var(--missed)}
+.status.wait{background:var(--surface);border-color:var(--line)}
+.status .btn{margin-top:12px;color:var(--ink)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.fact{padding:12px 14px}
+.fact .k{font-size:13px;color:var(--muted)}
+.fact .v{font-size:22px;font-weight:700;line-height:1.2;margin-top:2px}
+.fact .s{font-size:13px;color:var(--muted)}
+.fact.full{grid-column:1/-1}
+.fact .v.he{font-family:var(--serif);font-size:25px}
+.fact .bar{margin-top:8px}
+.next .row{font-size:15px}
+.remind{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 14px;margin:12px 0;font-size:14px}
+.remind .btn{white-space:nowrap;flex:none;min-height:44px}
+.offlink{text-align:center;margin:6px 0 0}
+
 /* calendar */
-.calhead{display:flex;align-items:center;justify-content:space-between;margin:8px 0 12px}
-.calhead button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:20px}
-.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-.dow{text-align:center;font-size:13px;color:var(--muted);padding-bottom:2px}
+.calhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 10px}
+.calhead .mid{text-align:center}
+.calhead .mid .hm{font-size:13px;color:var(--gold)}
+.calhead button.nav{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:22px}
+.caltools{display:flex;justify-content:center;margin:-4px 0 10px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:15px;white-space:nowrap;font-weight:600}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;touch-action:pan-y}
+.dow{text-align:center;font-size:12px;color:var(--muted);padding-bottom:2px;font-weight:600}
 .dow.sh{color:var(--gold)}
-.cell{aspect-ratio:1/1.05;border-radius:10px;border:0;background:var(--ahead);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px;position:relative;padding:0}
-.cell.out{background:transparent;color:var(--muted);opacity:.35}
-.cell.done{background:var(--done);color:#fff;font-weight:700}
-.cell.partial{background:var(--partial);color:#fff;font-weight:700}
-.cell.missed{background:var(--missed);color:#fff;font-weight:700}
+.cell{aspect-ratio:1/1.08;border-radius:10px;border:0;background:var(--future);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:16px;position:relative;padding:0;font-weight:600}
+.cell small{font-size:10px;font-weight:400;opacity:.8;line-height:1}
+.cell.out{background:transparent;color:var(--faint);font-weight:400}
+.cell.done{background:var(--done);color:#fff}
+.cell.partial{background:var(--partial);color:#fff}
+.cell.missed{background:var(--missed);color:#fff}
 .cell.late{background:var(--late)}
-.cell.today{outline:2px solid var(--ink);outline-offset:-2px;font-weight:700}
-.cell .dot{position:absolute;bottom:5px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.cell.off{background:repeating-linear-gradient(135deg,var(--off1) 0 4px,var(--off2) 4px 8px);color:var(--muted)}
+.cell.today{outline:2.5px solid var(--ink);outline-offset:-2.5px}
+.cell .dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
 .cell.done .dot,.cell.partial .dot,.cell.missed .dot{background:#fff}
-.cell.sh{box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--gold) 55%,transparent)}
-.legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin:14px 0 4px;font-size:14px;color:var(--muted)}
+.cell.sh:not(.out){box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--gold) 55%,transparent)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:14px 2px 4px;font-size:13px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
-.monthsum{margin-top:14px}
+.legend i.lg-off{background:repeating-linear-gradient(135deg,var(--off1) 0 3px,var(--off2) 3px 6px)}
+
 /* siyumim */
-.mh{font-family:var(--serif);font-size:20px;margin:20px 0 6px;color:var(--muted)}
-.sy{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);margin-bottom:8px}
-.sy .nm{font-family:var(--serif);font-size:21px;font-weight:700;text-align:right;grid-column:1/-1;direction:rtl}
-.sy .en2{font-size:15px}
-.sy .when{font-size:15px;color:var(--muted);text-align:right;white-space:nowrap}
-.sy.major{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}
+.filters{display:flex;gap:8px;margin:12px 0 2px;overflow-x:auto;padding-bottom:4px}
+.mh{font-family:var(--serif);font-size:19px;margin:20px 2px 8px;color:var(--muted)}
+.sylist{overflow:hidden}
+.sy{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:11px 14px;border-bottom:1px solid var(--line);align-items:center}
+.sy:last-child{border-bottom:0}
+.sy .en2{font-size:15px;font-weight:700}
+.sy .en2 .muted{font-weight:400}
+.sy .nm{font-family:var(--serif);font-size:20px;font-weight:700;text-align:right;direction:rtl;grid-row:1/3;grid-column:2}
+.sy .bar{grid-column:1/-1;margin-top:6px}
 .sy.major .nm{color:var(--gold)}
-.sy.done{opacity:.6}
-.sy.done .when{color:var(--done);font-weight:600}
-.sy.nextone{background:var(--gold-soft);border-color:var(--gold)}
-.filters{display:flex;gap:8px;margin:10px 0 2px;overflow-x:auto}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:15px;white-space:nowrap}
-.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-/* shelf */
-.shelf{display:flex;align-items:flex-end;gap:6px;padding:14px 10px 0;border-bottom:10px solid var(--shelf);border-radius:2px;margin:6px 0 2px;min-height:210px}
-.spine{flex:1;position:relative;border-radius:4px 4px 2px 2px;overflow:hidden;border:0;padding:0;
-  display:flex;align-items:center;justify-content:center;color:#E9D7A6;box-shadow:inset -3px 0 0 rgba(0,0,0,.25), inset 3px 0 0 rgba(255,255,255,.06)}
-.spine .foil{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#E8CB7E,#B88A2E);opacity:.92}
-.spine .lbl{position:relative;writing-mode:vertical-rl;font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:1px;text-shadow:0 1px 0 rgba(0,0,0,.35)}
+.sy.made .nm{opacity:.75}
+.sy .ok{color:var(--done);font-weight:700}
+.sy .late2{color:var(--missed)}
+.sy.nextone{background:var(--gold-soft)}
+.more{margin:12px 0 0}
+
+/* progress */
+.ringwrap{display:flex;align-items:center;gap:18px;padding:16px}
+.ring{width:118px;height:118px;flex:none}
+.ring .pct{font-size:24px;font-weight:700;fill:var(--ink)}
+.ring .sub{font-size:11px;fill:var(--muted)}
+.ringwrap .stats{display:grid;gap:6px;font-size:15px}
+.ringwrap .stats b{font-size:18px}
+.shelf{display:flex;align-items:flex-end;gap:8px;padding:16px 12px 0;border-bottom:10px solid var(--shelf);border-radius:2px;margin:6px 0 2px;min-height:200px}
+.spine{flex:1;position:relative;border-radius:5px 5px 2px 2px;overflow:hidden;border:0;padding:0;display:flex;align-items:center;justify-content:center;color:#E9D7A6;
+  box-shadow:inset -3px 0 0 rgba(0,0,0,.25),inset 3px 0 0 rgba(255,255,255,.06)}
+.spine .foil{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,var(--foil1),var(--foil2));opacity:.92;transition:height .4s ease}
+.spine .lbl{position:relative;writing-mode:vertical-rl;font-family:var(--serif);font-size:18px;font-weight:700;letter-spacing:1px;text-shadow:0 1px 0 rgba(0,0,0,.35)}
 .spine .bands{position:absolute;left:0;right:0;top:10px;height:5px;border-top:1px solid rgba(233,215,166,.55);border-bottom:1px solid rgba(233,215,166,.55)}
-.spine.sel{outline:2px solid var(--gold);outline-offset:2px}
-.shelfcap{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:12px}
-.detail{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin:6px 0 16px}
-.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;margin-top:6px}
-.bar i{display:block;height:100%;background:var(--gold);border-radius:99px}
-.unit{padding:10px 0;border-bottom:1px solid var(--line)}
+.spine.sel{outline:2.5px solid var(--gold);outline-offset:2px}
+.shelfcap{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin:4px 2px 12px}
+.unit{padding:12px 0;border-bottom:1px solid var(--line)}
 .unit:last-child{border-bottom:0}
-.unit .u1{display:flex;justify-content:space-between;gap:10px;font-size:15px}
-.chart{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 12px 6px;margin:10px 0 16px}
+.unit .u1{display:flex;justify-content:space-between;gap:10px;font-size:15px;align-items:baseline}
+.unit .u1 .he{font-size:19px;font-weight:700}
+.pmap{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;direction:rtl}
+.pmap i{width:16px;height:16px;border-radius:4px;background:var(--surface2);border:1px solid var(--line2)}
+.pmap i.p{background:color-mix(in srgb,var(--gold) 45%,var(--surface2));border-color:var(--gold)}
+.pmap i.f{background:var(--gold);border-color:var(--gold)}
+.chart{padding:12px 12px 6px;margin:0 0 12px}
 .chart svg{width:100%;height:auto;display:block}
-.stretch{display:grid;grid-template-columns:1fr;gap:2px;padding:10px 0;border-bottom:1px solid var(--line)}
-.stretch.now{background:var(--gold-soft);margin:0 -14px;padding:10px 14px;border-radius:10px}
-.stretch .pair{font-size:15px}
-.stretch .pair b{color:var(--mishnah)} .stretch .pair em{font-style:normal;color:var(--rambam)}
-.stretch .dates{font-size:14px;color:var(--muted)}
-details summary{cursor:pointer;font-weight:600;padding:8px 0}
+
 /* settings */
 .field{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.field:last-child{border-bottom:0}
 .field label{font-size:16px}
-.field .hint{grid-column:1/-1;font-size:14px;color:var(--muted);margin-top:-4px}
-.field input{width:150px;text-align:right;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:var(--surface)}
+.field .fh{grid-column:1/-1;font-size:13px;color:var(--muted);margin-top:-4px}
+.field input:not([type=checkbox]),.field select{width:150px;text-align:right;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:var(--surface2);min-height:42px}
 .field input[type=text]{width:100%;grid-column:1/-1;text-align:right;direction:rtl}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 16px;margin:12px 0}
-.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
-textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:10px;font:14px/1.4 var(--sans);color:var(--ink)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface2)}
+.seg button{border:0;background:none;padding:8px 12px;font-weight:600;font-size:15px;min-width:44px}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.switch{appearance:none;-webkit-appearance:none;width:50px;height:30px;border-radius:99px;background:var(--line2);position:relative;transition:background .15s;margin:0;cursor:pointer;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.switch:checked{background:var(--done)}
+.switch:checked::after{left:23px}
+.preview{padding:12px 16px;font-size:15px}
+.preview b{font-weight:700}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:10px;font:16px/1.4 var(--sans);color:var(--ink)}
 .note{font-size:14px;color:var(--muted)}
-/* tab bar */
+
+/* tabs */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;
-  background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);
   border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
 nav.tabs .in{display:flex;max-width:560px;width:100%}
-nav.tabs button{flex:1;background:none;border:0;padding:6px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--muted)}
-nav.tabs button svg{width:24px;height:24px}
+nav.tabs button{flex:1;background:none;border:0;padding:6px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--muted)}
+nav.tabs button svg{width:25px;height:25px}
 nav.tabs button.on{color:var(--gold)}
-/* sheet + modal */
-.scrim{position:fixed;inset:0;background:rgba(10,8,9,.5);z-index:30;display:none}
-.scrim.on{display:block}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--bg);border-radius:20px 20px 0 0;max-height:88vh;overflow:auto;
-  padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px));transform:translateY(calc(100% + 40px));visibility:hidden;transition:transform .28s ease,visibility 0s linear .28s}
-.sheet.on{transform:none;visibility:visible;transition:transform .28s ease}
-.sheet .grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 10px}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,8,9,.45);z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--bg);border-radius:22px 22px 0 0;max-height:90vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:8px 16px calc(20px + env(safe-area-inset-bottom,0px));transform:translateY(calc(100% + 40px));visibility:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),visibility 0s linear .28s;box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+.sheet.on{transform:none;visibility:visible;transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.sheet .grab{width:42px;height:5px;border-radius:9px;background:var(--line2);margin:4px auto 10px}
 .sheet .inner{max-width:560px;margin:0 auto}
-.closex{float:right;background:none;border:0;font-size:16px;color:var(--muted);padding:6px}
+.shead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.shead .date{font-family:var(--serif);font-size:24px;line-height:1.2}
+.closex{background:var(--surface2);border:1px solid var(--line);border-radius:99px;font-size:15px;font-weight:700;color:var(--muted);padding:6px 14px;min-height:36px}
+.welcome{text-align:center;padding:8px 4px 0}
+.welcome .mark{font-family:var(--serif);font-size:46px;font-weight:700;color:var(--gold);line-height:1}
+.welcome h2{font-family:var(--serif);font-size:30px;margin:10px 0 6px}
+.welcome p{color:var(--muted);margin:0 auto 14px;max-width:420px}
+.welcome .card{text-align:left}
+.choice{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line);text-align:left}
+.choice:last-child{border-bottom:0}
+.choice input{margin-top:4px;width:20px;height:20px;accent-color:var(--gold)}
+.choice small{display:block;color:var(--muted)}
+
+/* celebrate + toast */
 .celebrate{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(10,8,9,.6)}
 .celebrate.on{display:flex}
-.celebrate .box{background:var(--surface);border:1px solid var(--gold);border-radius:20px;padding:26px 22px;text-align:center;max-width:420px;width:100%}
-.celebrate .hadran{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--gold);direction:rtl;line-height:1.3}
+.celebrate .box{background:var(--surface);border:1px solid var(--gold);border-radius:22px;padding:28px 22px 20px;text-align:center;max-width:420px;width:100%}
+.celebrate .hadran{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--gold);direction:rtl;line-height:1.35}
 .celebrate p{margin:10px 0 18px;color:var(--muted)}
+.celebrate .two{margin-top:8px}
 .foilbit{position:fixed;top:-20px;width:9px;height:14px;z-index:41;pointer-events:none;border-radius:2px;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
-.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);
-  padding:10px 16px;border-radius:12px;font-size:15px;z-index:50;opacity:0;transition:opacity .2s}
-.toast.on{opacity:1}
-@media (prefers-reduced-motion: reduce){.sheet{transition:none}.foilbit{display:none}}
-@media (min-width:700px){body{font-size:17px}.title{font-size:40px}}
-/* days off */
-:root{--off1:#E3E6DE;--off2:#C9CDC2}
-@media (prefers-color-scheme: dark){:root{--off1:#2A2225;--off2:#51454A}}
-.cell.off{background:repeating-linear-gradient(135deg,var(--off1) 0 4px,var(--off2) 4px 8px);color:var(--muted)}
-.legend i.lg-off{background:repeating-linear-gradient(135deg,var(--off1) 0 3px,var(--off2) 3px 6px)}
-.offcard{border:1px dashed var(--line);border-radius:18px;margin:16px 0 12px;padding:18px;
-  background:repeating-linear-gradient(135deg,transparent 0 10px,color-mix(in srgb,var(--off2) 30%,transparent) 10px 20px),var(--surface)}
-.offcard .t{font-family:var(--serif);font-size:30px;font-weight:700}
-.offcard p{margin:4px 0 0;color:var(--muted);font-size:15px}
-.btn.wide{display:block;width:100%;margin:6px 0}
-.status .btn.catch{margin:10px 0 2px;color:var(--ink);font-weight:700}
-.offlink{text-align:center;margin:6px 0 0}
-.toast{pointer-events:none;max-width:calc(100% - 32px);width:max-content;text-align:center}
-.toast.on{pointer-events:auto}
-.toast .undo{background:none;border:0;padding:0 0 0 12px;font-weight:700;color:inherit;text-decoration:underline;text-underline-offset:3px}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);background:var(--ink);color:var(--bg);
+  padding:11px 16px;border-radius:14px;font-size:15px;z-index:50;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;
+  max-width:calc(100% - 32px);width:max-content;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.toast.on{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.toast .undo{background:none;border:0;padding:0 0 0 14px;font-weight:700;color:inherit;text-decoration:underline;text-underline-offset:3px}
+@media (prefers-reduced-motion: reduce){.sheet,.scrim,.toast,.spine .foil{transition:none}.screen.on{animation:none}.foilbit{display:none}}
+@media (min-width:700px){.wrap{padding-top:24px}}
 </style>
 </head>
 <body>
@@ -220,51 +332,24 @@ nav.tabs button.on{color:var(--gold)}
   <section class="screen on" id="today" aria-label="Today"></section>
   <section class="screen" id="calendar" aria-label="Calendar"></section>
   <section class="screen" id="siyumim" aria-label="Siyumim"></section>
-  <section class="screen" id="shelf" aria-label="Progress"></section>
+  <section class="screen" id="progress" aria-label="Progress"></section>
   <section class="screen" id="settings" aria-label="Settings"></section>
 </div>
 <nav class="tabs" aria-label="Sections"><div class="in">
-  <button data-tab="today" class="on" aria-label="Today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5v-13zM20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5v-13z"/></svg>Today</button>
-  <button data-tab="calendar" aria-label="Calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendar</button>
-  <button data-tab="siyumim" aria-label="Siyumim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8-4.3-4.1 5.9-.9z"/></svg>Siyumim</button>
-  <button data-tab="shelf" aria-label="Progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4v15M9.5 6v13M14 4v15M17.2 6.5l3.3 12.3M3 20h18"/></svg>Progress</button>
-  <button data-tab="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Settings</button>
+  <button data-tab="today" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5v-13zM20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5v-13z"/></svg>Today</button>
+  <button data-tab="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendar</button>
+  <button data-tab="siyumim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8-4.3-4.1 5.9-.9z"/></svg>Siyumim</button>
+  <button data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4v15M9.5 6v13M14 4v15M17.2 6.5l3.3 12.3M3 20h18"/></svg>Progress</button>
+  <button data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Settings</button>
 </div></nav>
 <div class="scrim" id="scrim"></div>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div class="inner" id="sheetInner"></div></div>
-<div class="celebrate" id="celebrate" role="dialog" aria-modal="true"><div class="box" id="celebrateBox"></div></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Details"><div class="grab"></div><div class="inner" id="sheetInner"></div></div>
+<div class="celebrate" id="celebrate" role="dialog" aria-modal="true" aria-label="Siyum"><div class="box" id="celebrateBox"></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
-const D = {"m":[{"n":"Taanit","he":"תענית","s":"Moed","she":"מועד","u":"Mishnah_Taanit","c":[7,10,9,8]},{"n":"Berachot","he":"ברכות","s":"Zeraim","she":"זרעים","u":"Mishnah_Berakhot","c":[5,8,6,7,5,8,5,8,5]},{"n":"Peah","he":"פאה","s":"Zeraim","she":"זרעים","u":"Mishnah_Peah","c":[6,8,8,11,8,11,8,9]},{"n":"Demai","he":"דמאי","s":"Zeraim","she":"זרעים","u":"Mishnah_Demai","c":[4,5,6,7,11,12,8]},{"n":"Kilayim","he":"כלאים","s":"Zeraim","she":"זרעים","u":"Mishnah_Kilayim","c":[9,11,7,9,8,9,8,6,10]},{"n":"Sheviit","he":"שביעית","s":"Zeraim","she":"זרעים","u":"Mishnah_Sheviit","c":[8,10,10,10,9,6,7,11,9,9]},{"n":"Terumot","he":"תרומות","s":"Zeraim","she":"זרעים","u":"Mishnah_Terumot","c":[10,6,9,13,9,6,7,12,7,12,10]},{"n":"Maasrot","he":"מעשרות","s":"Zeraim","she":"זרעים","u":"Mishnah_Maasrot","c":[8,8,10,6,8]},{"n":"Maaser Sheni","he":"מעשר שני","s":"Zeraim","she":"זרעים","u":"Mishnah_Maaser_Sheni","c":[7,10,13,12,15]},{"n":"Challah","he":"חלה","s":"Zeraim","she":"זרעים","u":"Mishnah_Challah","c":[9,8,10,11]},{"n":"Orlah","he":"ערלה","s":"Zeraim","she":"זרעים","u":"Mishnah_Orlah","c":[9,17,9]},{"n":"Bikkurim","he":"ביכורים","s":"Zeraim","she":"זרעים","u":"Mishnah_Bikkurim","c":[11,11,12,5]},{"n":"Shabbat","he":"שבת","s":"Moed","she":"מועד","u":"Mishnah_Shabbat","c":[11,7,6,2,4,10,4,7,7,6,6,6,7,4,3,8,8,3,6,5,3,6,5,5]},{"n":"Eruvin","he":"עירובין","s":"Moed","she":"מועד","u":"Mishnah_Eruvin","c":[10,6,9,11,9,10,11,11,4,15]},{"n":"Pesachim","he":"פסחים","s":"Moed","she":"מועד","u":"Mishnah_Pesachim","c":[7,8,8,9,10,6,13,8,11,9]},{"n":"Shekalim","he":"שקלים","s":"Moed","she":"מועד","u":"Mishnah_Shekalim","c":[7,5,4,9,6,6,7,8]},{"n":"Yoma","he":"יומא","s":"Moed","she":"מועד","u":"Mishnah_Yoma","c":[8,7,11,6,7,8,5,9]},{"n":"Sukkah","he":"סוכה","s":"Moed","she":"מועד","u":"Mishnah_Sukkah","c":[11,9,15,10,8]},{"n":"Beitzah","he":"ביצה","s":"Moed","she":"מועד","u":"Mishnah_Beitzah","c":[10,10,8,7,7]},{"n":"Rosh Hashanah","he":"ראש השנה","s":"Moed","she":"מועד","u":"Mishnah_Rosh_Hashanah","c":[9,9,8,9]},{"n":"Megillah","he":"מגילה","s":"Moed","she":"מועד","u":"Mishnah_Megillah","c":[11,6,6,10]},{"n":"Moed Katan","he":"מועד קטן","s":"Moed","she":"מועד","u":"Mishnah_Moed_Katan","c":[10,5,9]},{"n":"Chagigah","he":"חגיגה","s":"Moed","she":"מועד","u":"Mishnah_Chagigah","c":[8,7,8]},{"n":"Yevamot","he":"יבמות","s":"Nashim","she":"נשים","u":"Mishnah_Yevamot","c":[4,10,10,13,6,6,6,6,6,9,7,6,13,9,10,7]},{"n":"Ketubot","he":"כתובות","s":"Nashim","she":"נשים","u":"Mishnah_Ketubot","c":[10,10,9,12,9,7,10,8,9,6,6,4,11]},{"n":"Nedarim","he":"נדרים","s":"Nashim","she":"נשים","u":"Mishnah_Nedarim","c":[4,5,11,8,6,10,9,7,10,8,12]},{"n":"Nazir","he":"נזיר","s":"Nashim","she":"נשים","u":"Mishnah_Nazir","c":[7,10,7,7,7,11,4,2,5]},{"n":"Sotah","he":"סוטה","s":"Nashim","she":"נשים","u":"Mishnah_Sotah","c":[9,6,8,5,5,4,8,7,15]},{"n":"Gittin","he":"גיטין","s":"Nashim","she":"נשים","u":"Mishnah_Gittin","c":[6,7,8,9,9,7,9,10,10]},{"n":"Kiddushin","he":"קידושין","s":"Nashim","she":"נשים","u":"Mishnah_Kiddushin","c":[10,10,13,14]},{"n":"Bava Kamma","he":"בבא קמא","s":"Nezikin","she":"נזיקין","u":"Mishnah_Bava_Kamma","c":[4,6,11,9,7,6,7,7,12,10]},{"n":"Bava Metzia","he":"בבא מציעא","s":"Nezikin","she":"נזיקין","u":"Mishnah_Bava_Metzia","c":[8,11,12,12,11,8,11,9,13,6]},{"n":"Bava Batra","he":"בבא בתרא","s":"Nezikin","she":"נזיקין","u":"Mishnah_Bava_Batra","c":[6,14,8,9,11,8,4,8,10,8]},{"n":"Sanhedrin","he":"סנהדרין","s":"Nezikin","she":"נזיקין","u":"Mishnah_Sanhedrin","c":[6,5,8,5,5,6,11,7,6,6,6]},{"n":"Makkot","he":"מכות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Makkot","c":[10,8,16]},{"n":"Shevuot","he":"שבועות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Shevuot","c":[7,5,11,13,5,7,8,6]},{"n":"Eduyot","he":"עדיות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Eduyot","c":[14,10,12,12,7,3,9,7]},{"n":"Avodah Zarah","he":"עבודה זרה","s":"Nezikin","she":"נזיקין","u":"Mishnah_Avodah_Zarah","c":[9,7,10,12,12]},{"n":"Avot","he":"אבות","s":"Nezikin","she":"נזיקין","u":"Pirkei_Avot","c":[18,16,18,22,23,11]},{"n":"Horayot","he":"הוריות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Horayot","c":[5,7,8]},{"n":"Zevachim","he":"זבחים","s":"Kodashim","she":"קדשים","u":"Mishnah_Zevachim","c":[4,5,6,6,8,7,6,12,7,8,8,6,8,10]},{"n":"Menachot","he":"מנחות","s":"Kodashim","she":"קדשים","u":"Mishnah_Menachot","c":[4,5,7,5,9,7,6,7,9,9,9,5,11]},{"n":"Chullin","he":"חולין","s":"Kodashim","she":"קדשים","u":"Mishnah_Chullin","c":[7,10,7,7,5,7,6,6,8,4,2,5]},{"n":"Bechorot","he":"בכורות","s":"Kodashim","she":"קדשים","u":"Mishnah_Bekhorot","c":[7,9,4,10,6,12,7,10,8]},{"n":"Arachin","he":"ערכין","s":"Kodashim","she":"קדשים","u":"Mishnah_Arakhin","c":[4,6,5,4,6,5,5,7,8]},{"n":"Temurah","he":"תמורה","s":"Kodashim","she":"קדשים","u":"Mishnah_Temurah","c":[6,3,5,4,6,5,6]},{"n":"Keritot","he":"כריתות","s":"Kodashim","she":"קדשים","u":"Mishnah_Keritot","c":[7,6,10,3,8,9]},{"n":"Meilah","he":"מעילה","s":"Kodashim","she":"קדשים","u":"Mishnah_Meilah","c":[4,9,8,6,5,6]},{"n":"Tamid","he":"תמיד","s":"Kodashim","she":"קדשים","u":"Mishnah_Tamid","c":[4,5,9,3,6,3,4]},{"n":"Middot","he":"מידות","s":"Kodashim","she":"קדשים","u":"Mishnah_Middot","c":[9,6,8,7,4]},{"n":"Kinnim","he":"קינים","s":"Kodashim","she":"קדשים","u":"Mishnah_Kinnim","c":[4,5,6]},{"n":"Kelim","he":"כלים","s":"Taharot","she":"טהרות","u":"Mishnah_Kelim","c":[9,8,8,4,11,4,6,11,8,8,9,8,8,8,6,8,17,9,10,7,3,10,5,17,9,9,12,10,8,4]},{"n":"Oholot","he":"אהלות","s":"Taharot","she":"טהרות","u":"Mishnah_Oholot","c":[8,7,7,3,7,7,6,6,16,7,9,8,6,7,10,5,5,10]},{"n":"Negaim","he":"נגעים","s":"Taharot","she":"טהרות","u":"Mishnah_Negaim","c":[6,5,8,11,5,8,5,10,3,10,12,7,12,13]},{"n":"Parah","he":"פרה","s":"Taharot","she":"טהרות","u":"Mishnah_Parah","c":[4,5,11,4,9,5,12,11,9,6,9,11]},{"n":"Taharot","he":"טהרות","s":"Taharot","she":"טהרות","u":"Mishnah_Tahorot","c":[9,8,8,13,9,10,9,9,9,8]},{"n":"Mikvaot","he":"מקואות","s":"Taharot","she":"טהרות","u":"Mishnah_Mikvaot","c":[8,10,4,5,6,11,7,5,7,8]},{"n":"Niddah","he":"נדה","s":"Taharot","she":"טהרות","u":"Mishnah_Niddah","c":[7,7,7,7,9,14,5,4,11,8]},{"n":"Machshirin","he":"מכשירין","s":"Taharot","she":"טהרות","u":"Mishnah_Makhshirin","c":[6,11,8,10,11,8]},{"n":"Zavim","he":"זבים","s":"Taharot","she":"טהרות","u":"Mishnah_Zavim","c":[6,4,3,7,12]},{"n":"Tevul Yom","he":"טבול יום","s":"Taharot","she":"טהרות","u":"Mishnah_Tevul_Yom","c":[5,8,6,7]},{"n":"Yadayim","he":"ידים","s":"Taharot","she":"טהרות","u":"Mishnah_Yadayim","c":[5,4,5,8]},{"n":"Uktzin","he":"עוקצים","s":"Taharot","she":"טהרות","u":"Mishnah_Oktzin","c":[6,10,12]}],"r":[{"n":"Taaniyot","he":"הלכות תעניות","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Fasts","o":0,"c":5},{"n":"Kriat Shema","he":"הלכות קריאת שמע","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Reading_the_Shema","o":0,"c":4},{"n":"Tefillah","he":"הלכות תפילה","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Prayer_and_the_Priestly_Blessing","o":0,"c":15},{"n":"Berachot","he":"הלכות ברכות","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Blessings","o":0,"c":11},{"n":"Seder Tefillot","he":"סדר התפילות","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_The_Order_of_Prayer","o":0,"c":4},{"n":"Matnot Aniyim","he":"הלכות מתנות עניים","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Gifts_to_the_Poor","o":0,"c":10},{"n":"Maaser","he":"הלכות מעשרות","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Tithes","o":0,"c":14},{"n":"Kilayim","he":"הלכות כלאים","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Diverse_Species","o":0,"c":10},{"n":"Shemitah vYovel","he":"הלכות שמיטה ויובל","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Sabbatical_Year_and_the_Jubilee","o":0,"c":13},{"n":"Terumot","he":"הלכות תרומות","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Heave_Offerings","o":0,"c":15},{"n":"Maaser Sheni","he":"הלכות מעשר שני ונטע רבעי","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_Second_Tithes_and_Fourth_Year's_Fruit","o":0,"c":11},{"n":"Bikkurim","he":"הלכות ביכורים","s":"Zeraim","she":"זרעים","u":"Mishneh_Torah,_First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary","o":0,"c":12},{"n":"Shabbat","he":"הלכות שבת","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Sabbath","o":0,"c":30},{"n":"Milah","he":"הלכות מילה","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Circumcision","o":0,"c":3},{"n":"Eruvin","he":"הלכות עירובין","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Eruvin","o":0,"c":8},{"n":"Chametz uMatzah","he":"הלכות חמץ ומצה","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Leavened_and_Unleavened_Bread","o":0,"c":8},{"n":"Nusach HaHaggadah","he":"נוסח ההגדה","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Leavened_and_Unleavened_Bread","o":8,"c":1},{"n":"Korban Pesach","he":"הלכות קרבן פסח","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Paschal_Offering","o":0,"c":10},{"n":"Shekalim","he":"הלכות שקלים","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Sheqel_Dues","o":0,"c":4},{"n":"Shevitat Asor","he":"הלכות שביתת עשור","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Rest_on_the_Tenth_of_Tishrei","o":0,"c":3},{"n":"Avodat Yom HaKippurim","he":"הלכות עבודת יום הכפורים","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Service_on_the_Day_of_Atonement","o":0,"c":5},{"n":"Teshuvah","he":"הלכות תשובה","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Repentance","o":0,"c":10},{"n":"Shofar, Sukkah, Lulav","he":"הלכות שופר וסוכה ולולב","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Shofar,_Sukkah_and_Lulav","o":0,"c":8},{"n":"Shevitat Yom Tov","he":"הלכות שביתת יום טוב","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Rest_on_a_Holiday","o":0,"c":8},{"n":"Kiddush HaChodesh","he":"הלכות קידוש החודש","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Sanctification_of_the_New_Month","o":0,"c":19},{"n":"Megillah vaChanukah","he":"הלכות מגילה וחנוכה","s":"Zemanim","she":"זמנים","u":"Mishneh_Torah,_Scroll_of_Esther_and_Hanukkah","o":0,"c":4},{"n":"Evel","he":"הלכות אבל","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_Mourning","o":0,"c":14},{"n":"Chagigah","he":"הלכות חגיגה","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Festival_Offering","o":0,"c":3},{"n":"Yesodei HaTorah","he":"הלכות יסודי התורה","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Foundations_of_the_Torah","o":0,"c":10},{"n":"Yibbum vaChalitzah","he":"הלכות יבום וחליצה","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Levirate_Marriage_and_Release","o":0,"c":8},{"n":"Ishut","he":"הלכות אישות","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Marriage","o":0,"c":25},{"n":"Naarah Betulah","he":"הלכות נערה בתולה","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Virgin_Maiden","o":0,"c":3},{"n":"Nedarim","he":"הלכות נדרים","s":"Haflaah","she":"הפלאה","u":"Mishneh_Torah,_Vows","o":0,"c":13},{"n":"Nezirut","he":"הלכות נזירות","s":"Haflaah","she":"הפלאה","u":"Mishneh_Torah,_Nazariteship","o":0,"c":10},{"n":"Sotah","he":"הלכות סוטה","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Woman_Suspected_of_Infidelity","o":0,"c":4},{"n":"Gerushin","he":"הלכות גירושין","s":"Nashim","she":"נשים","u":"Mishneh_Torah,_Divorce","o":0,"c":13},{"n":"Avadim","he":"הלכות עבדים","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Slaves","o":0,"c":9},{"n":"Nizkei Mamon","he":"הלכות נזקי ממון","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_Damages_to_Property","o":0,"c":14},{"n":"Geneivah","he":"הלכות גניבה","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_Theft","o":0,"c":9},{"n":"Gezelah vaAvedah","he":"הלכות גזילה ואבידה","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_Robbery_and_Lost_Property","o":0,"c":18},{"n":"Chovel uMazik","he":"הלכות חובל ומזיק","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_One_Who_Injures_a_Person_or_Property","o":0,"c":8},{"n":"Sechirut","he":"הלכות שכירות","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Hiring","o":0,"c":13},{"n":"Malveh vLoveh","he":"הלכות מלוה ולוה","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Creditor_and_Debtor","o":0,"c":27},{"n":"Shechenim","he":"הלכות שכנים","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Neighbors","o":0,"c":14},{"n":"Mechirah","he":"הלכות מכירה","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Sales","o":0,"c":30},{"n":"Zechiyah uMatanah","he":"הלכות זכייה ומתנה","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Ownerless_Property_and_Gifts","o":0,"c":12},{"n":"Sheluchin vShutafin","he":"הלכות שלוחין ושותפין","s":"Kinyan","she":"קנין","u":"Mishneh_Torah,_Agents_and_Partners","o":0,"c":10},{"n":"Nachalot","he":"הלכות נחלות","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Inheritances","o":0,"c":11},{"n":"Sanhedrin","he":"הלכות סנהדרין","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction","o":0,"c":26},{"n":"Edut","he":"הלכות עדות","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_Testimony","o":0,"c":22},{"n":"Rotzeach uShmirat Nefesh","he":"הלכות רוצח ושמירת נפש","s":"Nezikin","she":"נזיקין","u":"Mishneh_Torah,_Murderer_and_the_Preservation_of_Life","o":0,"c":13},{"n":"Shevuot","he":"הלכות שבועות","s":"Haflaah","she":"הפלאה","u":"Mishneh_Torah,_Oaths","o":0,"c":12},{"n":"Toen vNitan","he":"הלכות טוען ונטען","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Plaintiff_and_Defendant","o":0,"c":16},{"n":"Sheelah uFikadon","he":"הלכות שאלה ופקדון","s":"Mishpatim","she":"משפטים","u":"Mishneh_Torah,_Borrowing_and_Deposit","o":0,"c":8},{"n":"Mamrim","he":"הלכות ממרים","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_Rebels","o":0,"c":7},{"n":"Avodah Zarah","he":"הלכות עבודה זרה","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Foreign_Worship_and_Customs_of_the_Nations","o":0,"c":12},{"n":"Hakdamah","he":"הקדמה","s":"Introduction","she":"הקדמה","u":"Mishneh_Torah,_Transmission_of_the_Oral_Law","o":0,"c":3},{"n":"Mitzvot Aseh","he":"מצוות עשה","s":"Introduction","she":"הקדמה","u":"Mishneh_Torah,_Positive_Mitzvot","o":0,"c":3},{"n":"Mitzvot Lo Taaseh","he":"מצוות לא תעשה","s":"Introduction","she":"הקדמה","u":"Mishneh_Torah,_Negative_Mitzvot","o":0,"c":3},{"n":"Contents of the Books","he":"תוכן הספרים","s":"Introduction","she":"הקדמה","u":"Mishneh_Torah,_Overview_of_Mishneh_Torah_Contents","o":0,"c":3},{"n":"Deot","he":"הלכות דעות","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Human_Dispositions","o":0,"c":7},{"n":"Talmud Torah","he":"הלכות תלמוד תורה","s":"Madda","she":"מדע","u":"Mishneh_Torah,_Torah_Study","o":0,"c":7},{"n":"Maaseh HaKorbanot","he":"הלכות מעשה הקרבנות","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Sacrificial_Procedure","o":0,"c":19},{"n":"Pesulei HaMukdashin","he":"הלכות פסולי המוקדשין","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Sacrifices_Rendered_Unfit","o":0,"c":19},{"n":"Tefillin, Mezuzah, Sefer Torah","he":"הלכות תפילין ומזוזה וספר תורה","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Tefillin,_Mezuzah_and_the_Torah_Scroll","o":0,"c":10},{"n":"Tzitzit","he":"הלכות ציצית","s":"Ahavah","she":"אהבה","u":"Mishneh_Torah,_Fringes","o":0,"c":3},{"n":"Issurei HaMizbeach","he":"הלכות איסורי המזבח","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Things_Forbidden_on_the_Altar","o":0,"c":7},{"n":"Shechitah","he":"הלכות שחיטה","s":"Kedushah","she":"קדושה","u":"Mishneh_Torah,_Ritual_Slaughter","o":0,"c":14},{"n":"Maachalot Asurot","he":"הלכות מאכלות אסורות","s":"Kedushah","she":"קדושה","u":"Mishneh_Torah,_Forbidden_Foods","o":0,"c":17},{"n":"Bechorot","he":"הלכות בכורות","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Firstlings","o":0,"c":8},{"n":"Biat HaMikdash","he":"הלכות ביאת המקדש","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Admission_into_the_Sanctuary","o":0,"c":9},{"n":"Arachin vaCharamin","he":"הלכות ערכים וחרמים","s":"Haflaah","she":"הפלאה","u":"Mishneh_Torah,_Appraisals_and_Devoted_Property","o":0,"c":8},{"n":"Temurah","he":"הלכות תמורה","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Substitution","o":0,"c":4},{"n":"Shegagot","he":"הלכות שגגות","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Offerings_for_Unintentional_Transgressions","o":0,"c":15},{"n":"Mechusarei Kapparah","he":"הלכות מחוסרי כפרה","s":"Korbanot","she":"קרבנות","u":"Mishneh_Torah,_Offerings_for_Those_with_Incomplete_Atonement","o":0,"c":5},{"n":"Meilah","he":"הלכות מעילה","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Trespass","o":0,"c":8},{"n":"Temidin uMusafin","he":"הלכות תמידין ומוספין","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Daily_Offerings_and_Additional_Offerings","o":0,"c":10},{"n":"Klei HaMikdash","he":"הלכות כלי המקדש","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein","o":0,"c":10},{"n":"Beit HaBechirah","he":"הלכות בית הבחירה","s":"Avodah","she":"עבודה","u":"Mishneh_Torah,_The_Chosen_Temple","o":0,"c":8},{"n":"Kelim","he":"הלכות כלים","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Vessels","o":0,"c":28},{"n":"Tumat Met","he":"הלכות טומאת מת","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Defilement_by_a_Corpse","o":0,"c":25},{"n":"Tumat Tzaraat","he":"הלכות טומאת צרעת","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Defilement_by_Leprosy","o":0,"c":16},{"n":"Parah Adumah","he":"הלכות פרה אדומה","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Red_Heifer","o":0,"c":15},{"n":"Shear Avot HaTumah","he":"הלכות שאר אבות הטומאות","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Other_Sources_of_Defilement","o":0,"c":20},{"n":"Mikvaot","he":"הלכות מקואות","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Immersion_Pools","o":0,"c":11},{"n":"Issurei Biah","he":"הלכות איסורי ביאה","s":"Kedushah","she":"קדושה","u":"Mishneh_Torah,_Forbidden_Intercourse","o":0,"c":22},{"n":"Tumat Ochalin","he":"הלכות טומאת אוכלין","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Defilement_of_Foods","o":0,"c":16},{"n":"Metamei Mishkav uMoshav","he":"הלכות מטמאי משכב ומושב","s":"Taharah","she":"טהרה","u":"Mishneh_Torah,_Those_Who_Defile_Bed_or_Seat","o":0,"c":13},{"n":"Melachim uMilchamot","he":"הלכות מלכים ומלחמות","s":"Shoftim","she":"שופטים","u":"Mishneh_Torah,_Kings_and_Wars","o":0,"c":12}],"seg":[{"m":[0],"r":[0]},{"m":[1],"r":[1,2,3,4]},{"m":[2],"r":[5]},{"m":[3],"r":[6]},{"m":[4],"r":[7]},{"m":[5],"r":[8]},{"m":[6],"r":[9]},{"m":[7,8],"r":[10]},{"m":[9,10,11],"r":[11]},{"m":[12],"r":[12,13]},{"m":[13],"r":[14]},{"m":[14],"r":[15,16,17]},{"m":[15],"r":[18]},{"m":[16],"r":[19,20,21]},{"m":[17],"r":[22]},{"m":[18],"r":[23]},{"m":[19],"r":[24]},{"m":[20],"r":[25]},{"m":[21],"r":[26]},{"m":[22],"r":[27,28]},{"m":[23],"r":[29]},{"m":[24],"r":[30,31]},{"m":[25],"r":[32]},{"m":[26],"r":[33]},{"m":[27],"r":[34]},{"m":[28],"r":[35]},{"m":[29],"r":[36]},{"m":[30],"r":[37,38,39,40]},{"m":[31],"r":[41,42]},{"m":[32],"r":[43,44,45,46,47]},{"m":[33],"r":[48,49]},{"m":[34],"r":[50]},{"m":[35],"r":[51,52,53]},{"m":[36],"r":[54]},{"m":[37],"r":[55]},{"m":[38,39],"r":[56,57,58,59,60,61]},{"m":[40],"r":[62,63]},{"m":[41],"r":[64,65,66]},{"m":[42],"r":[67,68]},{"m":[43],"r":[69,70]},{"m":[44],"r":[71]},{"m":[45],"r":[72]},{"m":[46],"r":[73,74]},{"m":[47],"r":[75]},{"m":[48],"r":[76,77]},{"m":[49,50],"r":[78]},{"m":[51],"r":[79]},{"m":[52],"r":[80]},{"m":[53],"r":[81]},{"m":[54],"r":[82]},{"m":[55],"r":[83]},{"m":[56],"r":[84]},{"m":[57],"r":[85]},{"m":[58],"r":[86]},{"m":[59],"r":[87]},{"m":[60,61,62],"r":[88]}],"ev":[{"k":"M","p":34,"p2":null,"n":"Taanit","he":"מסכת תענית","t":"Masechet"},{"k":"D","p":34,"p2":5,"n":"Taanit: Mishnah and Rambam","he":"תענית","t":"Dedication"},{"k":"M","p":91,"p2":null,"n":"Berachot","he":"מסכת ברכות","t":"Masechet"},{"k":"M","p":160,"p2":null,"n":"Peah","he":"מסכת פאה","t":"Masechet"},{"k":"M","p":213,"p2":null,"n":"Demai","he":"מסכת דמאי","t":"Masechet"},{"k":"M","p":290,"p2":null,"n":"Kilayim","he":"מסכת כלאים","t":"Masechet"},{"k":"M","p":379,"p2":null,"n":"Sheviit","he":"מסכת שביעית","t":"Masechet"},{"k":"M","p":480,"p2":null,"n":"Terumot","he":"מסכת תרומות","t":"Masechet"},{"k":"M","p":520,"p2":null,"n":"Maasrot","he":"מסכת מעשרות","t":"Masechet"},{"k":"M","p":577,"p2":null,"n":"Maaser Sheni","he":"מסכת מעשר שני","t":"Masechet"},{"k":"M","p":615,"p2":null,"n":"Challah","he":"מסכת חלה","t":"Masechet"},{"k":"M","p":650,"p2":null,"n":"Orlah","he":"מסכת ערלה","t":"Masechet"},{"k":"R","p":124,"p2":null,"n":"Sefer Zeraim","he":"ספר זרעים","t":"Sefer"},{"k":"M","p":689,"p2":null,"n":"Bikkurim","he":"מסכת ביכורים","t":"Masechet"},{"k":"M","p":689,"p2":null,"n":"Seder Zeraim","he":"סדר זרעים","t":"Seder"},{"k":"M","p":828,"p2":null,"n":"Shabbat","he":"מסכת שבת","t":"Masechet"},{"k":"M","p":924,"p2":null,"n":"Eruvin","he":"מסכת עירובין","t":"Masechet"},{"k":"M","p":1013,"p2":null,"n":"Pesachim","he":"מסכת פסחים","t":"Masechet"},{"k":"M","p":1065,"p2":null,"n":"Shekalim","he":"מסכת שקלים","t":"Masechet"},{"k":"M","p":1126,"p2":null,"n":"Yoma","he":"מסכת יומא","t":"Masechet"},{"k":"M","p":1179,"p2":null,"n":"Sukkah","he":"מסכת סוכה","t":"Masechet"},{"k":"M","p":1221,"p2":null,"n":"Beitzah","he":"מסכת ביצה","t":"Masechet"},{"k":"M","p":1256,"p2":null,"n":"Rosh Hashanah","he":"מסכת ראש השנה","t":"Masechet"},{"k":"R","p":245,"p2":null,"n":"Sefer Zemanim","he":"ספר זמנים","t":"Sefer"},{"k":"M","p":1289,"p2":null,"n":"Megillah","he":"מסכת מגילה","t":"Masechet"},{"k":"M","p":1313,"p2":null,"n":"Moed Katan","he":"מסכת מועד קטן","t":"Masechet"},{"k":"M","p":1336,"p2":null,"n":"Chagigah","he":"מסכת חגיגה","t":"Masechet"},{"k":"M","p":1336,"p2":null,"n":"Seder Moed","he":"סדר מועד","t":"Seder"},{"k":"M","p":1464,"p2":null,"n":"Yevamot","he":"מסכת יבמות","t":"Masechet"},{"k":"M","p":1575,"p2":null,"n":"Ketubot","he":"מסכת כתובות","t":"Masechet"},{"k":"M","p":1665,"p2":null,"n":"Nedarim","he":"מסכת נדרים","t":"Masechet"},{"k":"M","p":1725,"p2":null,"n":"Nazir","he":"מסכת נזיר","t":"Masechet"},{"k":"M","p":1792,"p2":null,"n":"Sotah","he":"מסכת סוטה","t":"Masechet"},{"k":"R","p":348,"p2":null,"n":"Sefer Nashim","he":"ספר נשים","t":"Sefer"},{"k":"M","p":1867,"p2":null,"n":"Gittin","he":"מסכת גיטין","t":"Masechet"},{"k":"M","p":1914,"p2":null,"n":"Kiddushin","he":"מסכת קידושין","t":"Masechet"},{"k":"M","p":1914,"p2":null,"n":"Seder Nashim","he":"סדר נשים","t":"Seder"},{"k":"M","p":1993,"p2":null,"n":"Bava Kamma","he":"מסכת בבא קמא","t":"Masechet"},{"k":"M","p":2094,"p2":null,"n":"Bava Metzia","he":"מסכת בבא מציעא","t":"Masechet"},{"k":"R","p":512,"p2":null,"n":"Sefer Kinyan","he":"ספר קנין","t":"Sefer"},{"k":"M","p":2180,"p2":null,"n":"Bava Batra","he":"מסכת בבא בתרא","t":"Masechet"},{"k":"M","p":2251,"p2":null,"n":"Sanhedrin","he":"מסכת סנהדרין","t":"Masechet"},{"k":"R","p":584,"p2":null,"n":"Sefer Nezikin","he":"ספר נזיקין","t":"Sefer"},{"k":"M","p":2285,"p2":null,"n":"Makkot","he":"מסכת מכות","t":"Masechet"},{"k":"R","p":620,"p2":null,"n":"Sefer Mishpatim","he":"ספר משפטים","t":"Sefer"},{"k":"M","p":2347,"p2":null,"n":"Shevuot","he":"מסכת שבועות","t":"Masechet"},{"k":"M","p":2421,"p2":null,"n":"Eduyot","he":"מסכת עדיות","t":"Masechet"},{"k":"M","p":2471,"p2":null,"n":"Avodah Zarah","he":"מסכת עבודה זרה","t":"Masechet"},{"k":"M","p":2579,"p2":null,"n":"Avot","he":"מסכת אבות","t":"Masechet"},{"k":"R","p":665,"p2":null,"n":"Sefer Madda","he":"ספר מדע","t":"Sefer"},{"k":"M","p":2599,"p2":null,"n":"Horayot","he":"מסכת הוריות","t":"Masechet"},{"k":"M","p":2599,"p2":null,"n":"Seder Nezikin","he":"סדר נזיקין","t":"Seder"},{"k":"M","p":2700,"p2":null,"n":"Zevachim","he":"מסכת זבחים","t":"Masechet"},{"k":"R","p":716,"p2":null,"n":"Sefer Ahavah","he":"ספר אהבה","t":"Sefer"},{"k":"M","p":2793,"p2":null,"n":"Menachot","he":"מסכת מנחות","t":"Masechet"},{"k":"M","p":2867,"p2":null,"n":"Chullin","he":"מסכת חולין","t":"Masechet"},{"k":"M","p":2940,"p2":null,"n":"Bechorot","he":"מסכת בכורות","t":"Masechet"},{"k":"R","p":779,"p2":null,"n":"Sefer Haflaah","he":"ספר הפלאה","t":"Sefer"},{"k":"M","p":2990,"p2":null,"n":"Arachin","he":"מסכת ערכין","t":"Masechet"},{"k":"M","p":3025,"p2":null,"n":"Temurah","he":"מסכת תמורה","t":"Masechet"},{"k":"R","p":803,"p2":null,"n":"Sefer Korbanot","he":"ספר קרבנות","t":"Sefer"},{"k":"M","p":3068,"p2":null,"n":"Keritot","he":"מסכת כריתות","t":"Masechet"},{"k":"M","p":3106,"p2":null,"n":"Meilah","he":"מסכת מעילה","t":"Masechet"},{"k":"M","p":3140,"p2":null,"n":"Tamid","he":"מסכת תמיד","t":"Masechet"},{"k":"M","p":3174,"p2":null,"n":"Middot","he":"מסכת מידות","t":"Masechet"},{"k":"R","p":839,"p2":null,"n":"Sefer Avodah","he":"ספר עבודה","t":"Sefer"},{"k":"M","p":3189,"p2":null,"n":"Kinnim","he":"מסכת קינים","t":"Masechet"},{"k":"M","p":3189,"p2":null,"n":"Seder Kodashim","he":"סדר קדשים","t":"Seder"},{"k":"M","p":3443,"p2":null,"n":"Kelim","he":"מסכת כלים","t":"Masechet"},{"k":"M","p":3577,"p2":null,"n":"Oholot","he":"מסכת אהלות","t":"Masechet"},{"k":"M","p":3692,"p2":null,"n":"Negaim","he":"מסכת נגעים","t":"Masechet"},{"k":"M","p":3788,"p2":null,"n":"Parah","he":"מסכת פרה","t":"Masechet"},{"k":"M","p":3880,"p2":null,"n":"Taharot","he":"מסכת טהרות","t":"Masechet"},{"k":"M","p":3951,"p2":null,"n":"Mikvaot","he":"מסכת מקואות","t":"Masechet"},{"k":"R","p":976,"p2":null,"n":"Sefer Kedushah","he":"ספר קדושה","t":"Sefer"},{"k":"M","p":4030,"p2":null,"n":"Niddah","he":"מסכת נדה","t":"Masechet"},{"k":"M","p":4084,"p2":null,"n":"Machshirin","he":"מסכת מכשירין","t":"Masechet"},{"k":"R","p":1005,"p2":null,"n":"Sefer Taharah","he":"ספר טהרה","t":"Sefer"},{"k":"M","p":4116,"p2":null,"n":"Zavim","he":"מסכת זבים","t":"Masechet"},{"k":"M","p":4142,"p2":null,"n":"Tevul Yom","he":"מסכת טבול יום","t":"Masechet"},{"k":"M","p":4164,"p2":null,"n":"Yadayim","he":"מסכת ידים","t":"Masechet"},{"k":"R","p":1017,"p2":null,"n":"Sefer Shoftim","he":"ספר שופטים","t":"Sefer"},{"k":"R","p":1017,"p2":null,"n":"Mishneh Torah","he":"משנה תורה","t":"Rambam"},{"k":"M","p":4192,"p2":null,"n":"Uktzin","he":"מסכת עוקצים","t":"Masechet"},{"k":"M","p":4192,"p2":null,"n":"Seder Taharot","he":"סדר טהרות","t":"Seder"},{"k":"M","p":4192,"p2":null,"n":"Shas Mishnayot","he":"ש״ס משניות","t":"Shas"}],"sedarim":[["Zeraim","זרעים"],["Moed","מועד"],["Nashim","נשים"],["Nezikin","נזיקין"],["Kodashim","קדשים"],["Taharot","טהרות"]],"sefarim":[["Introduction","הקדמה"],["Madda","מדע"],["Ahavah","אהבה"],["Zemanim","זמנים"],["Nashim","נשים"],["Kedushah","קדושה"],["Haflaah","הפלאה"],["Zeraim","זרעים"],["Avodah","עבודה"],["Korbanot","קרבנות"],["Taharah","טהרה"],["Nezikin","נזיקין"],["Kinyan","קנין"],["Mishpatim","משפטים"],["Shoftim","שופטים"]]};
-const W = 14;
+const D = {"m":[{"n":"Taanit","he":"תענית","s":"Moed","she":"מועד","u":"Mishnah_Taanit","c":[7,10,9,8]},{"n":"Berachot","he":"ברכות","s":"Zeraim","she":"זרעים","u":"Mishnah_Berakhot","c":[5,8,6,7,5,8,5,8,5]},{"n":"Peah","he":"פאה","s":"Zeraim","she":"זרעים","u":"Mishnah_Peah","c":[6,8,8,11,8,11,8,9]},{"n":"Demai","he":"דמאי","s":"Zeraim","she":"זרעים","u":"Mishnah_Demai","c":[4,5,6,7,11,12,8]},{"n":"Kilayim","he":"כלאים","s":"Zeraim","she":"זרעים","u":"Mishnah_Kilayim","c":[9,11,7,9,8,9,8,6,10]},{"n":"Sheviit","he":"שביעית","s":"Zeraim","she":"זרעים","u":"Mishnah_Sheviit","c":[8,10,10,10,9,6,7,11,9,9]},{"n":"Terumot","he":"תרומות","s":"Zeraim","she":"זרעים","u":"Mishnah_Terumot","c":[10,6,9,13,9,6,7,12,7,12,10]},{"n":"Maasrot","he":"מעשרות","s":"Zeraim","she":"זרעים","u":"Mishnah_Maasrot","c":[8,8,10,6,8]},{"n":"Maaser Sheni","he":"מעשר שני","s":"Zeraim","she":"זרעים","u":"Mishnah_Maaser_Sheni","c":[7,10,13,12,15]},{"n":"Challah","he":"חלה","s":"Zeraim","she":"זרעים","u":"Mishnah_Challah","c":[9,8,10,11]},{"n":"Orlah","he":"ערלה","s":"Zeraim","she":"זרעים","u":"Mishnah_Orlah","c":[9,17,9]},{"n":"Bikkurim","he":"ביכורים","s":"Zeraim","she":"זרעים","u":"Mishnah_Bikkurim","c":[11,11,12,5]},{"n":"Shabbat","he":"שבת","s":"Moed","she":"מועד","u":"Mishnah_Shabbat","c":[11,7,6,2,4,10,4,7,7,6,6,6,7,4,3,8,8,3,6,5,3,6,5,5]},{"n":"Eruvin","he":"עירובין","s":"Moed","she":"מועד","u":"Mishnah_Eruvin","c":[10,6,9,11,9,10,11,11,4,15]},{"n":"Pesachim","he":"פסחים","s":"Moed","she":"מועד","u":"Mishnah_Pesachim","c":[7,8,8,9,10,6,13,8,11,9]},{"n":"Shekalim","he":"שקלים","s":"Moed","she":"מועד","u":"Mishnah_Shekalim","c":[7,5,4,9,6,6,7,8]},{"n":"Yoma","he":"יומא","s":"Moed","she":"מועד","u":"Mishnah_Yoma","c":[8,7,11,6,7,8,5,9]},{"n":"Sukkah","he":"סוכה","s":"Moed","she":"מועד","u":"Mishnah_Sukkah","c":[11,9,15,10,8]},{"n":"Beitzah","he":"ביצה","s":"Moed","she":"מועד","u":"Mishnah_Beitzah","c":[10,10,8,7,7]},{"n":"Rosh Hashanah","he":"ראש השנה","s":"Moed","she":"מועד","u":"Mishnah_Rosh_Hashanah","c":[9,9,8,9]},{"n":"Megillah","he":"מגילה","s":"Moed","she":"מועד","u":"Mishnah_Megillah","c":[11,6,6,10]},{"n":"Moed Katan","he":"מועד קטן","s":"Moed","she":"מועד","u":"Mishnah_Moed_Katan","c":[10,5,9]},{"n":"Chagigah","he":"חגיגה","s":"Moed","she":"מועד","u":"Mishnah_Chagigah","c":[8,7,8]},{"n":"Yevamot","he":"יבמות","s":"Nashim","she":"נשים","u":"Mishnah_Yevamot","c":[4,10,10,13,6,6,6,6,6,9,7,6,13,9,10,7]},{"n":"Ketubot","he":"כתובות","s":"Nashim","she":"נשים","u":"Mishnah_Ketubot","c":[10,10,9,12,9,7,10,8,9,6,6,4,11]},{"n":"Nedarim","he":"נדרים","s":"Nashim","she":"נשים","u":"Mishnah_Nedarim","c":[4,5,11,8,6,10,9,7,10,8,12]},{"n":"Nazir","he":"נזיר","s":"Nashim","she":"נשים","u":"Mishnah_Nazir","c":[7,10,7,7,7,11,4,2,5]},{"n":"Sotah","he":"סוטה","s":"Nashim","she":"נשים","u":"Mishnah_Sotah","c":[9,6,8,5,5,4,8,7,15]},{"n":"Gittin","he":"גיטין","s":"Nashim","she":"נשים","u":"Mishnah_Gittin","c":[6,7,8,9,9,7,9,10,10]},{"n":"Kiddushin","he":"קידושין","s":"Nashim","she":"נשים","u":"Mishnah_Kiddushin","c":[10,10,13,14]},{"n":"Bava Kamma","he":"בבא קמא","s":"Nezikin","she":"נזיקין","u":"Mishnah_Bava_Kamma","c":[4,6,11,9,7,6,7,7,12,10]},{"n":"Bava Metzia","he":"בבא מציעא","s":"Nezikin","she":"נזיקין","u":"Mishnah_Bava_Metzia","c":[8,11,12,12,11,8,11,9,13,6]},{"n":"Bava Batra","he":"בבא בתרא","s":"Nezikin","she":"נזיקין","u":"Mishnah_Bava_Batra","c":[6,14,8,9,11,8,4,8,10,8]},{"n":"Sanhedrin","he":"סנהדרין","s":"Nezikin","she":"נזיקין","u":"Mishnah_Sanhedrin","c":[6,5,8,5,5,6,11,7,6,6,6]},{"n":"Makkot","he":"מכות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Makkot","c":[10,8,16]},{"n":"Shevuot","he":"שבועות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Shevuot","c":[7,5,11,13,5,7,8,6]},{"n":"Eduyot","he":"עדיות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Eduyot","c":[14,10,12,12,7,3,9,7]},{"n":"Avodah Zarah","he":"עבודה זרה","s":"Nezikin","she":"נזיקין","u":"Mishnah_Avodah_Zarah","c":[9,7,10,12,12]},{"n":"Avot","he":"אבות","s":"Nezikin","she":"נזיקין","u":"Pirkei_Avot","c":[18,16,18,22,23,11]},{"n":"Horayot","he":"הוריות","s":"Nezikin","she":"נזיקין","u":"Mishnah_Horayot","c":[5,7,8]},{"n":"Zevachim","he":"זבחים","s":"Kodashim","she":"קדשים","u":"Mishnah_Zevachim","c":[4,5,6,6,8,7,6,12,7,8,8,6,8,10]},{"n":"Menachot","he":"מנחות","s":"Kodashim","she":"קדשים","u":"Mishnah_Menachot","c":[4,5,7,5,9,7,6,7,9,9,9,5,11]},{"n":"Chullin","he":"חולין","s":"Kodashim","she":"קדשים","u":"Mishnah_Chullin","c":[7,10,7,7,5,7,6,6,8,4,2,5]},{"n":"Bechorot","he":"בכורות","s":"Kodashim","she":"קדשים","u":"Mishnah_Bekhorot","c":[7,9,4,10,6,12,7,10,8]},{"n":"Arachin","he":"ערכין","s":"Kodashim","she":"קדשים","u":"Mishnah_Arakhin","c":[4,6,5,4,6,5,5,7,8]},{"n":"Temurah","he":"תמורה","s":"Kodashim","she":"קדשים","u":"Mishnah_Temurah","c":[6,3,5,4,6,5,6]},{"n":"Keritot","he":"כריתות","s":"Kodashim","she":"קדשים","u":"Mishnah_Keritot","c":[7,6,10,3,8,9]},{"n":"Meilah","he":"מעילה","s":"Kodashim","she":"קדשים","u":"Mishnah_Meilah","c":[4,9,8,6,5,6]},{"n":"Tamid","he":"תמיד","s":"Kodashim","she":"קדשים","u":"Mishnah_Tamid","c":[4,5,9,3,6,3,4]},{"n":"Middot","he":"מידות","s":"Kodashim","she":"קדשים","u":"Mishnah_Middot","c":[9,6,8,7,4]},{"n":"Kinnim","he":"קינים","s":"Kodashim","she":"קדשים","u":"Mishnah_Kinnim","c":[4,5,6]},{"n":"Kelim","he":"כלים","s":"Taharot","she":"טהרות","u":"Mishnah_Kelim","c":[9,8,8,4,11,4,6,11,8,8,9,8,8,8,6,8,17,9,10,7,3,10,5,17,9,9,12,10,8,4]},{"n":"Oholot","he":"אהלות","s":"Taharot","she":"טהרות","u":"Mishnah_Oholot","c":[8,7,7,3,7,7,6,6,16,7,9,8,6,7,10,5,5,10]},{"n":"Negaim","he":"נגעים","s":"Taharot","she":"טהרות","u":"Mishnah_Negaim","c":[6,5,8,11,5,8,5,10,3,10,12,7,12,13]},{"n":"Parah","he":"פרה","s":"Taharot","she":"טהרות","u":"Mishnah_Parah","c":[4,5,11,4,9,5,12,11,9,6,9,11]},{"n":"Taharot","he":"טהרות","s":"Taharot","she":"טהרות","u":"Mishnah_Tahorot","c":[9,8,8,13,9,10,9,9,9,8]},{"n":"Mikvaot","he":"מקואות","s":"Taharot","she":"טהרות","u":"Mishnah_Mikvaot","c":[8,10,4,5,6,11,7,5,7,8]},{"n":"Niddah","he":"נדה","s":"Taharot","she":"טהרות","u":"Mishnah_Niddah","c":[7,7,7,7,9,14,5,4,11,8]},{"n":"Machshirin","he":"מכשירין","s":"Taharot","she":"טהרות","u":"Mishnah_Makhshirin","c":[6,11,8,10,11,8]},{"n":"Zavim","he":"זבים","s":"Taharot","she":"טהרות","u":"Mishnah_Zavim","c":[6,4,3,7,12]},{"n":"Tevul Yom","he":"טבול יום","s":"Taharot","she":"טהרות","u":"Mishnah_Tevul_Yom","c":[5,8,6,7]},{"n":"Yadayim","he":"ידים","s":"Taharot","she":"טהרות","u":"Mishnah_Yadayim","c":[5,4,5,8]},{"n":"Uktzin","he":"עוקצים","s":"Taharot","she":"טהרות","u":"Mishnah_Oktzin","c":[6,10,12]}],"sedarim":[["Zeraim","זרעים"],["Moed","מועד"],["Nashim","נשים"],["Nezikin","נזיקין"],["Kodashim","קדשים"],["Taharot","טהרות"]]};
 const KEY = "limud-plan-v1";
-const DEFAULTS = {start:"2026-11-03", months:12, wk:1, sh:3.5, minM:2, minR:28, ded:""};
-
-/* ---------- static structures ---------- */
-let mi = 0;
-const MU = D.m.map((u, i) => { const starts = []; u.c.forEach(n => { starts.push(mi + 1); mi += n; }); return {...u, i, first: starts[0], last: mi, starts}; });
-const NM = mi;
-const MCH = []; MU.forEach(u => u.c.forEach((n, p) => MCH.push({u: u.i, p: p + 1, first: u.starts[p], last: u.starts[p] + n - 1})));
-let ri = 0;
-const RU = D.r.map((u, i) => { const first = ri + 1; ri += u.c; return {...u, i, first, last: ri}; });
-const NR = ri;
-const RUNIT = new Array(NR + 1); RU.forEach(u => { for (let k = u.first; k <= u.last; k++) RUNIT[k] = u.i; });
-let cm = 0, cr = 0, wsum = 0;
-const SEG = D.seg.map((s, i) => {
-  const m = s.m.reduce((a, j) => a + MU[j].last - MU[j].first + 1, 0), r = s.r.reduce((a, j) => a + RU[j].c, 0);
-  const o = {i, mu: s.m, ru: s.r, m, r, cm, cr, w0: wsum, w: m + W * r}; cm += m; cr += r; wsum += o.w; return o;
-});
-const TW = wsum;
-function chapOf(x){ let lo = 0, hi = MCH.length - 1; while (lo < hi){ const mid = (lo + hi + 1) >> 1; if (MCH[mid].first <= x) lo = mid; else hi = mid - 1; } return MCH[lo]; }
-/* Every mishnah and Rambam chapter is an "atom" placed at the centre of its share of its topic stretch.
-   A day covers the atoms whose centre falls inside its slice of the plan; this is the same split as
-   interpolating mishnah and Rambam positions through each stretch. */
-const MSEG = new Int32Array(NM + 1), RSEG = new Int32Array(NR + 1), ATOMS = [];
-SEG.forEach(g => {
-  for (let j = 1; j <= g.m; j++){ MSEG[g.cm + j] = g.i; ATOMS.push({k: 0, x: g.cm + j, c: g.w0 + (j - .5) / g.m * g.w}); }
-  for (let j = 1; j <= g.r; j++){ RSEG[g.cr + j] = g.i; ATOMS.push({k: 1, x: g.cr + j, c: g.w0 + (j - .5) / g.r * g.w}); }
-});
-ATOMS.sort((a, b) => a.c - b.c);
+const VERSION = 3;
 
 /* ---------- dates ---------- */
 const DAY = 864e5;
@@ -272,6 +357,7 @@ const isoRe = /^\d{4}-\d{2}-\d{2}$/;
 const parseDN = s => { const [y, m, d] = s.split("-").map(Number); return Date.UTC(y, m - 1, d) / DAY; };
 const dnDate = dn => new Date(dn * DAY);
 const wd = dn => dnDate(dn).getUTCDay();
+const isoOf = dn => dnDate(dn).toISOString().slice(0, 10);
 function edateDN(s, k){ const [y, m, d] = s.split("-").map(Number); const t = new Date(Date.UTC(y, m - 1 + k, 1)); const dim = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate(); return Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), Math.min(d, dim)) / DAY; }
 function todayDN(){ const n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) / DAY; }
 const fmt = (dn, o) => dnDate(dn).toLocaleDateString("en-GB", {timeZone: "UTC", ...o});
@@ -279,54 +365,104 @@ const dayName = dn => wd(dn) === 6 ? "Shabbat" : fmt(dn, {weekday: "long"});
 const longDate = dn => `${dayName(dn)}, ${fmt(dn, {day: "numeric", month: "long"})}`;
 const shortDate = dn => `${wd(dn) === 6 ? "Shabbat" : fmt(dn, {weekday: "short"})} ${fmt(dn, {day: "numeric", month: "short"})}`;
 const fullDate = dn => fmt(dn, {day: "numeric", month: "short", year: "numeric"});
-const isoOf = dn => dnDate(dn).toISOString().slice(0, 10);
+const mk = (loc, o) => { try { return new Intl.DateTimeFormat(loc, {timeZone: "UTC", ...o}); } catch (e) { return null; } };
+const HE_FMT = mk("he-u-ca-hebrew", {day: "numeric", month: "long", year: "numeric"});
+const HM_FMT = mk("en-u-ca-hebrew", {month: "long", year: "numeric"});
+const HN_FMT = mk("en-u-ca-hebrew", {day: "numeric"});
+/* Hebrew dates written with letters: י״ד בכסלו תשפ״ז. */
+function gem(n){ const L = [[400,"ת"],[300,"ש"],[200,"ר"],[100,"ק"],[90,"צ"],[80,"פ"],[70,"ע"],[60,"ס"],[50,"נ"],[40,"מ"],[30,"ל"],[20,"כ"],[10,"י"],[9,"ט"],[8,"ח"],[7,"ז"],[6,"ו"],[5,"ה"],[4,"ד"],[3,"ג"],[2,"ב"],[1,"א"]];
+  let s = ""; n %= 1000; while (n >= 400){ s += "ת"; n -= 400; } if (n % 100 === 15 || n % 100 === 16){ for (const [v, c] of L) if (v >= 100 && n >= v){ s += c; n -= v; } s += n === 15 ? "טו" : "טז"; n = 0; }
+  for (const [v, c] of L) while (n >= v){ s += c; n -= v; }
+  return s.length > 1 ? s.slice(0, -1) + "״" + s.slice(-1) : s + "׳"; }
+function heDate(dn){
+  if (!HE_FMT) return "";
+  try { return HE_FMT.formatToParts(dnDate(dn)).map(p => p.type === "day" || p.type === "year" ? (/^\d+$/.test(p.value) ? gem(+p.value) : p.value) : p.value).join(""); } catch (e){ return HE_FMT.format(dnDate(dn)); }
+}
+const heMonth = dn => HM_FMT ? HM_FMT.format(dnDate(dn)) : "";
+const heDay = dn => { if (!HN_FMT) return ""; const v = HN_FMT.format(dnDate(dn)); return /^\d+$/.test(v) ? gem(+v) : v; };
 
 /* ---------- Hebrew numerals ---------- */
 function heL(n){ const o = ["","א","ב","ג","ד","ה","ו","ז","ח","ט"], t = ["","י","כ","ל","מ","נ","ס","ע","פ","צ"]; if (n === 15) return "טו"; if (n === 16) return "טז"; return t[Math.floor(n / 10)] + o[n % 10]; }
 
+/* ---------- the Mishnah ---------- */
+/* Every mishnah has a number 1..4192 in plan order (Taanit first, then Zeraim through Taharot). */
+let mi = 0;
+const MU = D.m.map((u, i) => { const starts = []; u.c.forEach(n => { starts.push(mi + 1); mi += n; }); return {...u, i, first: starts[0], last: mi, starts}; });
+const NM = mi;
+const MCH = []; MU.forEach(u => u.c.forEach((n, p) => MCH.push({i: MCH.length, u: u.i, p: p + 1, first: u.starts[p], last: u.starts[p] + n - 1})));
+const CHI = new Int32Array(NM + 1); MCH.forEach(c => { for (let x = c.first; x <= c.last; x++) CHI[x] = c.i; });
+const CH_ENDS = MCH.map(c => c.last);
+const SED = D.sedarim.map(([en, he], i) => ({i, en, he, units: MU.filter(u => u.s === en)}));
+MU.forEach(u => { u.sed = SED.find(g => g.en === u.s); });
+function nearestEnd(T){ let lo = 0, hi = CH_ENDS.length - 1; while (lo < hi){ const mid = (lo + hi) >> 1; if (CH_ENDS[mid] >= T) hi = mid; else lo = mid + 1; } const a = CH_ENDS[lo], b = lo ? CH_ENDS[lo - 1] : 0; return Math.abs(a - T) <= Math.abs(T - b) ? a : b; }
+const sefUrl = (u, ref) => `https://www.sefaria.org/${encodeURIComponent(u.u)}.${ref}?lang=bi`;
+
 /* ---------- storage ---------- */
-/* The log is keyed by date ("2026-11-03"). Older versions keyed it by plan day number; those keys
-   are converted using the start date they were saved with. */
+const DEFAULTS = () => ({start: isoOf(todayDN()), months: 12, shab: 3.5, snap: true, minM: 2, ded: "", theme: "auto", rs: 1, lastBackup: ""});
+const LIM = {months: [6, 24], shab: [0, 6], minM: [0.2, 30], rs: [0.9, 1.4]};
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 function normLog(log, start){
   const s0 = parseDN(start), out = {};
   for (const [k, v] of Object.entries(log || {})){
     if (!v || typeof v !== "object") continue;
     const key = /^\d+$/.test(k) ? isoOf(s0 + +k - 1) : isoRe.test(k) ? k : null;
-    if (key) out[key] = v;
+    if (!key) continue;
+    const e = {};
+    if (["done", "missed", "partial", "off"].includes(v.s)) e.s = v.s;
+    if (+v.m > 0) e.m = Math.min(900, Math.round(+v.m));
+    if (v.k && Array.isArray(v.k.m)) e.k = {m: v.k.m.filter(r => Array.isArray(r) && r.length === 2).map(([a, b]) => [+a, +b])};
+    if (Array.isArray(v.t)) e.t = v.t.map(Number).filter(x => x >= 1 && x <= NM);
+    if (e.s || e.m || e.t) out[key] = e;
   }
   return out;
 }
-let S = {v: 2, settings: {...DEFAULTS}, log: {}};
-try { const raw = localStorage.getItem(KEY); if (raw) { const p = JSON.parse(raw); const settings = {...DEFAULTS, ...(p.settings || {})}; S = {v: 2, settings, log: normLog(p.log, settings.start)}; } } catch (e) {}
+function migrate(p){
+  const old = (p && p.settings) || {}, st = DEFAULTS();
+  if (isoRe.test(old.start || "")) st.start = old.start;
+  if (+old.months) st.months = Math.round(clamp(+old.months, ...LIM.months));
+  if (old.shab !== undefined && !isNaN(+old.shab)) st.shab = clamp(+old.shab, ...LIM.shab);
+  else if (+old.wk > 0 && old.sh !== undefined) st.shab = clamp(Math.round(+old.sh / +old.wk * 2) / 2, ...LIM.shab);
+  if (+old.minM) st.minM = clamp(+old.minM, ...LIM.minM);
+  if (typeof old.snap === "boolean") st.snap = old.snap;
+  if (typeof old.ded === "string") st.ded = old.ded;
+  if (["auto", "light", "dark"].includes(old.theme)) st.theme = old.theme;
+  if (+old.rs) st.rs = clamp(+old.rs, ...LIM.rs);
+  if (isoRe.test(old.lastBackup || "")) st.lastBackup = old.lastBackup;
+  return {v: VERSION, settings: st, log: normLog(p && p.log, st.start), onboarded: p && p.v === VERSION ? !!p.onboarded : false, timer: p && p.v === VERSION && p.timer && isoRe.test(p.timer.iso || "") && +p.timer.t0 ? p.timer : null};
+}
+let S = migrate(null), firstRun = true, hadOld = false;
+try { const raw = localStorage.getItem(KEY); if (raw){ const p = JSON.parse(raw); S = migrate(p); firstRun = false; hadOld = p.v !== VERSION && Object.keys(S.log).length > 0; if (p.v !== VERSION && !hadOld) S.onboarded = false; } } catch (e) {}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast("Couldn't save on this device"); } }
-const stOf = iso => (S.log[iso] && S.log[iso].s) || "";
-const st = d => stOf(d.iso);
-function tidy(iso){ const e = S.log[iso]; if (e && !e.s && !e.m) delete S.log[iso]; }
+function tidy(iso){ const e = S.log[iso]; if (!e) return; if (e.t && !e.t.length) delete e.t; if (!e.s && !e.m && !e.t) delete S.log[iso]; }
 function shiftLog(delta){ const out = {}; for (const [k, v] of Object.entries(S.log)) out[isoOf(parseDN(k) + delta)] = v; S.log = out; }
 
 /* ---------- plan ---------- */
-/* The pace (material per hour) comes from the start date, plan length and daily hours.
-   Days are then filled in order: a day off takes nothing, a day marked done keeps exactly what it
-   held when it was marked ("k"), and every other day takes the next material by its hours.
-   Skipping therefore pushes everything after it later and the plan simply runs longer. */
+/* Each plan day has a weight (weekday 1, Shabbat = the Shabbat setting). The year's mishnayot are spread by weight.
+   Days are filled in order: a day off takes nothing; a day already marked done, or with mishnayot ticked, keeps exactly
+   what it held (its lock "k"); every other day takes the next mishnayot by its weight. Skipping a day therefore moves
+   everything after it later and the plan runs longer. When "end on a perek" is on, a day's end moves to a nearby
+   end of perek. */
 let P;
-function toRanges(xs){ const out = []; for (const x of xs){ const l = out[out.length - 1]; if (l && x === l[1] + 1) l[1] = x; else out.push([x, x]); } return out; }
+const toRanges = xs => { const out = []; for (const x of xs){ const l = out[out.length - 1]; if (l && x === l[1] + 1) l[1] = x; else out.push([x, x]); } return out; };
+function planShape(st){
+  const s0 = parseDN(st.start), basePd = Math.max(1, edateDN(st.start, +st.months) - s0);
+  let tload = 0, sats = 0; for (let n = 1; n <= basePd; n++){ const sat = wd(s0 + n - 1) === 6; tload += sat ? +st.shab : 1; sats += sat; }
+  const pace = NM / tload;
+  return {s0, basePd, tload, pace, wkAmt: pace, shAmt: pace * st.shab, end: s0 + basePd - 1};
+}
 function computePlan(){
-  const s = S.settings, s0 = parseDN(s.start), basePd = Math.max(1, edateDN(s.start, +s.months) - s0);
-  const loadOf = dn => wd(dn) === 6 ? +s.sh : +s.wk;
-  let tload = 0; for (let n = 1; n <= basePd; n++) tload += loadOf(s0 + n - 1);
-  const pace = tload ? TW / tload : 0;
-  const mDay = new Int32Array(NM + 1), rDay = new Int32Array(NR + 1);
+  const st = S.settings, sh = planShape(st), {s0, pace} = sh;
+  const loadOf = dn => wd(dn) === 6 ? +st.shab : 1;
+  const mDay = new Int32Array(NM + 1);
   let lastLock = 0;
   for (const [iso, e] of Object.entries(S.log)){
-    if (!e || e.s !== "done" || !e.k) continue;
+    if (!e.k || e.s === "off") continue;
     const n = parseDN(iso) - s0 + 1; if (!(n >= 1)) continue;
     lastLock = Math.max(lastLock, n);
-    for (const [a, b] of e.k.m || []) for (let x = Math.max(1, a); x <= Math.min(NM, b); x++) if (!mDay[x]) mDay[x] = n;
-    for (const [a, b] of e.k.r || []) for (let x = Math.max(1, a); x <= Math.min(NR, b); x++) if (!rDay[x]) rDay[x] = n;
+    for (const [a, b] of e.k.m) for (let x = Math.max(1, a); x <= Math.min(NM, b); x++) if (!mDay[x]) mDay[x] = n;
   }
-  let left = 0; for (const a of ATOMS) if (!(a.k ? rDay : mDay)[a.x]) left++;
-  const days = [], heal = []; let cum = 0, ptr = 0;
+  let left = 0; for (let x = 1; x <= NM; x++) if (!mDay[x]) left++;
+  const days = [], heal = []; let cum = 0, ptr = 0, prevEnd = 0;
   for (let n = 1; n <= 9000; n++){
     if (n > 1 && left === 0 && n > lastLock) break;
     const dn = s0 + n - 1, iso = isoOf(dn), e = S.log[iso], s1 = (e && e.s) || "", load = loadOf(dn);
@@ -334,354 +470,367 @@ function computePlan(){
     days.push(d);
     if (d.off) continue;
     cum += load;
-    if (s1 === "done" && e.k) continue;
-    const T = cum * pace + 1e-7;
-    while (ptr < ATOMS.length && ATOMS[ptr].c <= T){ const a = ATOMS[ptr++], arr = a.k ? rDay : mDay; if (!arr[a.x]){ arr[a.x] = n; left--; } }
+    if (e && e.k) continue;
+    const T = cum * pace, amt = load * pace;
+    let end = amt > 0 ? Math.floor(T + 0.5 + 1e-9) : prevEnd;
+    if (st.snap && amt > 0 && T < NM - 0.5){
+      const e2 = nearestEnd(T), tol = Math.min(0.3 * amt, 3);
+      if (Math.abs(e2 - T) <= tol + 1e-9 && e2 - prevEnd >= Math.max(1, 0.5 * amt)) end = e2;
+    }
+    end = Math.min(NM, end); prevEnd = Math.max(prevEnd, end);
+    while (ptr < end){ ptr++; if (!mDay[ptr]){ mDay[ptr] = n; left--; } }
     if (s1 === "done") heal.push(d);
   }
-  const pd = days.length, mL = days.map(() => []), rL = days.map(() => []);
-  for (let x = 1; x <= NM; x++) if (mDay[x] >= 1 && mDay[x] <= pd) mL[mDay[x] - 1].push(x);
-  for (let x = 1; x <= NR; x++) if (rDay[x] >= 1 && rDay[x] <= pd) rL[rDay[x] - 1].push(x);
-  let cumW = 0, lastSeg = 0;
-  days.forEach((d, i) => {
-    d.mr = toRanges(mL[i]); d.rr = toRanges(rL[i]); d.mc = mL[i].length; d.rc = rL[i].length; d.w = d.mc + W * d.rc;
-    cumW += d.w; d.cumW = cumW;
-    if (d.mc || d.rc) lastSeg = Math.max(d.mc ? MSEG[mL[i][d.mc - 1]] : 0, d.rc ? RSEG[rL[i][d.rc - 1]] : 0);
-    d.seg = lastSeg;
-  });
-  // Done days saved before locking existed get locked to what they hold now.
-  if (heal.length){ heal.forEach(d => { S.log[d.iso].k = {m: d.mr.map(r => r.slice()), r: d.rr.map(r => r.slice())}; }); save(); }
-  const unitMax = (arr, u) => { let mx = 0; for (let x = u.first; x <= u.last; x++) mx = Math.max(mx, arr[x]); return mx; };
-  const mU = MU.map(u => unitMax(mDay, u)), rU = RU.map(u => unitMax(rDay, u));
-  const mx = a => Math.min(pd, Math.max(1, ...a));
-  const evDay = e => {
-    if (e.t === "Masechet") return mx([mU[MU.find(u => u.n === e.n).i]]);
-    if (e.t === "Seder"){ const g = e.n.replace("Seder ", ""); return mx(MU.filter(u => u.s === g).map(u => mU[u.i])); }
-    if (e.t === "Shas") return mx(mU);
-    if (e.t === "Sefer"){ const g = e.n.replace("Sefer ", ""); return mx(RU.filter(u => u.s === g).map(u => rU[u.i])); }
-    if (e.t === "Rambam") return mx(rU);
-    return mx([mU[0], rU[0]]);
-  };
-  const events = D.ev.map((e, i) => ({...e, i, day: evDay(e)})).sort((a, b) => a.day - b.day || a.i - b.i);
+  const pd = days.length, L = days.map(() => []);
+  for (let x = 1; x <= NM; x++) if (mDay[x] >= 1 && mDay[x] <= pd) L[mDay[x] - 1].push(x);
+  let cumM = 0;
+  days.forEach((d, i) => { d.xs = L[i]; d.mr = toRanges(L[i]); d.mc = L[i].length; cumM += d.mc; d.cumM = cumM; });
+  // Done days saved before locks existed get locked to what they hold now.
+  if (heal.length){ heal.forEach(d => { S.log[d.iso].k = {m: d.mr.map(r => r.slice())}; }); save(); }
+  const unitDay = u => { let mx = 1; for (let x = u.first; x <= u.last; x++) mx = Math.max(mx, mDay[x]); return Math.min(pd, mx); };
+  const uDay = MU.map(unitDay);
+  const events = [
+    ...MU.map(u => ({t: "Masechet", n: u.n, he: "מסכת " + u.he, units: [u], day: uDay[u.i], r: 0})),
+    ...SED.map(g => ({t: "Seder", n: "Seder " + g.en, he: "סדר " + g.he, units: g.units, day: Math.max(...g.units.map(u => uDay[u.i])), r: 1})),
+    {t: "Shas", n: "Shas Mishnah", he: "ש״ס משניות", units: MU, day: Math.max(...uDay), r: 2}
+  ].sort((a, b) => a.day - b.day || a.r - b.r).map((e, i) => ({...e, i}));
   const evByDay = {}; events.forEach(e => (evByDay[e.day] = evByDay[e.day] || []).push(e));
-  const segDays = SEG.map(() => ({start: Infinity, end: 0}));
-  const touch = (g, n) => { if (n){ g.start = Math.min(g.start, n); g.end = Math.max(g.end, n); } };
-  for (let x = 1; x <= NM; x++) touch(segDays[MSEG[x]], mDay[x]);
-  for (let x = 1; x <= NR; x++) touch(segDays[RSEG[x]], rDay[x]);
-  segDays.forEach(g => { if (g.start === Infinity) g.start = g.end = 1; });
-  P = {s0, pd, end: s0 + pd - 1, days, tload, events, evByDay, segDays, mDay, rDay, offCount: days.filter(d => d.off).length, totMin: NM * s.minM + NR * s.minR};
-  P.minPerLoad = tload ? P.totMin / tload : 0;
+  P = {...sh, pd, end: s0 + pd - 1, days, mDay, events, evByDay, offCount: days.filter(d => d.off).length};
 }
-function mParts(d){
-  const out = [];
-  for (const [a, b] of d.mr){
-    let x = a;
-    while (x <= b){
-      const cx = chapOf(x), u = MU[cx.u], y = Math.min(b, u.last), cy = chapOf(y);
-      const m1 = x - cx.first + 1, m2 = y - cy.first + 1, whole = m1 === 1 && y === cy.last;
-      const en = whole ? `${u.n} ${cx.p}${cy.p > cx.p ? "–" + cy.p : ""}` : `${u.n} ${cx.p}:${m1}${y > x ? "–" + (cy.p === cx.p ? m2 : cy.p + ":" + m2) : ""}`;
-      const he = whole ? (cy.p > cx.p ? `פרקים ${heL(cx.p)}–${heL(cy.p)}` : `פרק ${heL(cx.p)}`) : `${heL(cx.p)}:${heL(m1)}${y > x ? " – " + (cy.p === cx.p ? heL(m2) : heL(cy.p) + ":" + heL(m2)) : ""}`;
-      const ref = whole ? `${cx.p}${cy.p > cx.p ? "-" + cy.p : ""}` : `${cx.p}.${m1}${y > x ? "-" + (cy.p === cx.p ? m2 : cy.p + "." + m2) : ""}`;
-      out.push({u, n: y - x + 1, en, title: u.he, he, url: `https://www.sefaria.org/${encodeURIComponent(u.u)}.${ref}?lang=bi`});
-      x = y + 1;
-    }
-  }
-  return out;
+const dayAt = iso => P.days[parseDN(iso) - P.s0];
+const entry = iso => S.log[iso];
+function ticksOf(d){ const e = S.log[d.iso]; if (!e) return new Set(); if (e.s === "done") return new Set(d.xs); return new Set((e.t || []).filter(x => P.mDay[x] === d.n)); }
+/* What the day shows as: done, off, partial (some mishnayot ticked), missed or nothing. */
+function stat(d){
+  const e = S.log[d.iso]; if (!e) return "";
+  if (e.s === "done" || e.s === "off") return e.s;
+  if (e.t && e.t.some(x => P.mDay[x] === d.n)) return "partial";
+  return e.s || "";
 }
-function rParts(d){
-  const out = [];
-  for (const [a, b] of d.rr){
-    let x = a;
-    while (x <= b){
-      const u = RU[RUNIT[x]], y = Math.min(b, u.last), c1 = x - u.first + 1, c2 = y - u.first + 1;
-      out.push({u, n: y - x + 1, en: `${u.n} ${c1}${c2 > c1 ? "–" + c2 : ""}`, title: u.he,
-        he: c2 > c1 ? `פרקים ${heL(c1)}–${heL(c2)}` : `פרק ${heL(c1)}`,
-        url: `https://www.sefaria.org/${encodeURIComponent(u.u)}.${c1 + (u.o || 0)}${c2 > c1 ? "-" + (c2 + (u.o || 0)) : ""}?lang=bi`});
-      x = y + 1;
-    }
-  }
-  return out;
-}
-const est = d => d.mc * S.settings.minM + d.rc * S.settings.minR;
+const est = n => n * S.settings.minM;
+const fmtMin = m => m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? " " + Math.round(m % 60) + " min" : ""}` : `${Math.round(m)} min`;
 
 /* ---------- progress ---------- */
 function progress(){
-  const tday = todayDN() - P.s0 + 1, pd = P.pd, done = new Uint8Array(pd + 2), off = new Uint8Array(pd + 2);
-  let doneW = 0, mDone = 0, rDone = 0, mins = 0, logged = 0, estOnLogged = 0, minsOnLogged = 0, behindW = 0, aheadW = 0, late = 0, catchable = 0;
+  const tday = todayDN() - P.s0 + 1, pd = P.pd, learned = new Uint8Array(NM + 2), status = [""];
+  let mins = 0, logged = 0, minsOnDone = 0, mOnDone = 0, late = 0, catchable = 0, behind = 0, ahead = 0;
   for (const d of P.days){
-    const s = st(d);
-    if (s === "done"){ done[d.n] = 1; doneW += d.w; mDone += d.mc; rDone += d.rc; if (d.n >= tday) aheadW += d.w; }
-    if (s === "off") off[d.n] = 1;
-    if (d.n < tday){ if (s !== "done" && s !== "off") behindW += d.w; if (!s) late++; if (!s || s === "missed") catchable++; }
-    const m = S.log[d.iso] && +S.log[d.iso].m; if (m > 0){ mins += m; logged++; if (s === "done"){ minsOnLogged += m; estOnLogged += est(d); } }
+    const s = stat(d); status.push(s);
+    const tk = ticksOf(d); tk.forEach(x => { learned[x] = 1; });
+    if (d.n < tday){ if (s !== "done" && s !== "off") behind += d.mc - tk.size; if (!s) late++; if (!s || s === "missed") catchable++; }
+    else if (d.n > tday) ahead += tk.size;
+    const m = S.log[d.iso] && +S.log[d.iso].m; if (m > 0){ mins += m; logged++; if (s === "done"){ minsOnDone += m; mOnDone += d.mc; } }
   }
-  const chDone = MCH.map(c => { for (let x = c.first; x <= c.last; x++) if (!done[P.mDay[x]]) return false; return true; });
-  const rChDone = new Uint8Array(NR + 1); for (let k = 1; k <= NR; k++) rChDone[k] = done[P.rDay[k]];
-  const gapW = behindW - aheadW;
-  // Days off neither add to a streak nor break it.
-  let streak = 0; { let n = Math.min(Math.max(tday, 0), pd); if (n >= 1 && !done[n] && !off[n]) n--; while (n >= 1){ if (off[n]){ n--; continue; } if (!done[n]) break; streak++; n--; } }
-  let best = 0, run = 0; for (let n = 1; n <= pd; n++){ if (off[n]) continue; run = done[n] ? run + 1 : 0; best = Math.max(best, run); }
-  let proj = null;
-  if (tday >= 1 && doneW > 0){
-    let el = 0; for (let n = 1; n <= Math.min(tday, pd); n++) if (!off[n]) el++;
-    const need = Math.ceil(el * TW / doneW); let c = 0, n = 0;
-    while (c < need && n < 40000){ n++; if (n > pd || !off[n]) c++; }
-    proj = P.s0 + n - 1;
-  }
-  const evDone = e => {
-    if (e.t === "Masechet"){ const u = MU.find(u => u.n === e.n); return MCH.every((c, i) => c.u !== u.i || chDone[i]); }
-    if (e.t === "Seder"){ const g = e.n.replace("Seder ", ""); return MCH.every((c, i) => MU[c.u].s !== g || chDone[i]); }
-    if (e.t === "Shas") return chDone.every(Boolean);
-    if (e.t === "Sefer"){ const g = e.n.replace("Sefer ", ""); return RU.every(u => u.s !== g || [...Array(u.c)].every((_, k) => rChDone[u.first + k])); }
-    if (e.t === "Rambam") return rChDone.slice(1).every(Boolean);
-    return MCH.every((c, i) => c.u !== 0 || chDone[i]) && [...Array(RU[0].c)].every((_, k) => rChDone[RU[0].first + k]);
-  };
-  const evDoneMap = []; P.events.forEach(e => { evDoneMap[e.i] = evDone(e); });
-  return {tday, doneW, mDone, rDone, chDone, rChDone, gapW, streak, best, late, catchable, proj, mins, logged, estOnLogged, minsOnLogged, evDoneMap,
-    pct: doneW / TW, perakim: chDone.filter(Boolean).length, rch: rChDone.reduce((a, b) => a + b, 0)};
+  let mLearned = 0; for (let x = 1; x <= NM; x++) mLearned += learned[x];
+  const chState = MCH.map(c => { let k = 0; for (let x = c.first; x <= c.last; x++) k += learned[x]; return k === 0 ? 0 : k === c.last - c.first + 1 ? 2 : 1; });
+  const uLearned = MU.map(u => { let k = 0; for (let x = u.first; x <= u.last; x++) k += learned[x]; return k; });
+  const uDone = MU.map(u => uLearned[u.i] === u.last - u.first + 1);
+  const evDone = P.events.map(e => e.units.every(u => uDone[u.i]));
+  let streak = 0; { let n = Math.min(Math.max(tday, 0), pd); if (n >= 1 && status[n] !== "done" && status[n] !== "off") n--; while (n >= 1){ if (status[n] === "off"){ n--; continue; } if (status[n] !== "done") break; streak++; n--; } }
+  let best = 0, run = 0; for (let n = 1; n <= pd; n++){ if (status[n] === "off") continue; run = status[n] === "done" ? run + 1 : 0; best = Math.max(best, run); }
+  return {tday, learned, status, mLearned, pct: mLearned / NM, chState, perakim: chState.filter(v => v === 2).length, uLearned, uDone,
+    masechtot: uDone.filter(Boolean).length, sedarim: SED.filter(g => g.units.every(u => uDone[u.i])).length, evDone,
+    gap: behind - ahead, behind, ahead, late, catchable, streak, best, mins, logged, minsOnDone, mOnDone};
 }
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const plural = (n, w, pl) => `${n.toLocaleString()} ${n === 1 ? w : (pl || w + "s")}`;
+const mish = n => plural(n, "mishnah", "mishnayot");
+const inDays = k => k === 0 ? "today" : k === 1 ? "tomorrow" : k > 0 ? `in ${k} days` : `${-k} days ago`;
+const endsLine = () => `Plan ends ${fullDate(P.end)}${P.offCount ? ` (${plural(P.offCount, "day")} off)` : ""}`;
+const ICON = {
+  ext: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
+  arrow: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>`,
+  warn: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 8v5M12 16.5v.5M10.3 4.3L2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>`
+};
 let toastT, undoFn = null;
 function toast(t, undo){
   const el = $("#toast"); undoFn = undo || null;
   el.innerHTML = esc(t) + (undo ? `<button class="undo" data-undo>Undo</button>` : "");
   el.classList.add("on"); clearTimeout(toastT);
-  toastT = setTimeout(() => { el.classList.remove("on"); undoFn = null; }, undo ? 6000 : 1800);
+  toastT = setTimeout(() => { el.classList.remove("on"); undoFn = null; }, undo ? 6000 : 2200);
 }
-const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
-const inDays = k => k === 0 ? "today" : k === 1 ? "tomorrow" : k > 0 ? `in ${k} days` : `${-k} days ago`;
-const evHe = e => e.t === "Dedication" ? "תענית: משנה ורמב״ם" : e.he;
-const endsLine = () => `Plan ends ${fullDate(P.end)}${P.offCount ? ` (${plural(P.offCount, "day")} off)` : ""}`;
-const dayAt = iso => P.days[parseDN(iso) - P.s0];
+/* English label for a stretch of mishnayot, e.g. "Berachot 3:5–4:2". */
+function rangeLabel(a, b){
+  const out = []; let x = a;
+  while (x <= b){
+    const cx = MCH[CHI[x]], u = MU[cx.u], y = Math.min(b, u.last), cy = MCH[CHI[y]];
+    const m1 = x - cx.first + 1, m2 = y - cy.first + 1, whole = m1 === 1 && y === cy.last;
+    out.push(whole ? `${u.n} ${cx.p}${cy.p > cx.p ? "–" + cy.p : ""}` : `${u.n} ${cx.p}:${m1}${y > x ? "–" + (cy.p === cx.p ? m2 : cy.p + ":" + m2) : ""}`);
+    x = y + 1;
+  }
+  return out;
+}
+const dayLabel = d => d.mr.flatMap(([a, b]) => rangeLabel(a, b)).join(", ");
+/* Group a day's mishnayot by masechet, then by perek. */
+function dayGroups(d){
+  const groups = [];
+  for (const x of d.xs){
+    const c = MCH[CHI[x]], u = MU[c.u];
+    let g = groups[groups.length - 1]; if (!g || g.u !== u) groups.push(g = {u, pereks: [], xs: []});
+    let p = g.pereks[g.pereks.length - 1]; if (!p || p.c !== c) g.pereks.push(p = {c, xs: []});
+    p.xs.push(x); g.xs.push(x);
+  }
+  return groups;
+}
 
-function partsHTML(parts, kind){
-  if (!parts.length) return "";
-  const label = kind === "m" ? "משנה" : "רמב״ם";
-  const total = parts.reduce((a, p) => a + p.n, 0);
-  const unit = kind === "m" ? plural(total, "mishnah").replace("mishnahs", "mishnayot") : plural(total, "chapter");
-  return `<div class="part"><div class="kind ${kind}">${label}</div>${parts.map((p, i) => `
-    <div class="${i ? "parts-line" : ""}"><div class="title he ${parts.length > 1 ? "sm" : ""}">${esc(p.title)}</div>
-    <div class="ref he">${esc(p.he)}</div>
-    <div class="en">${esc(p.en)}</div>
-    <a class="open" href="${p.url}" target="_blank" rel="noopener">Open on Sefaria</a></div>`).join("")}
-    <div class="en" style="margin-top:10px">${unit}</div></div>`;
-}
-function dayCard(d){
-  const evs = P.evByDay[d.n] || [];
-  const band = evs.length ? `<div class="siyum-band he">סיום ${evs.map(e => esc(evHe(e))).join(" · ")}</div>` : "";
-  const g = SEG[d.seg];
-  const pair = `${g.mu.map(j => MU[j].n).join(", ")} with ${g.ru.map(j => RU[j].n).join(", ")}`;
-  const body = partsHTML(mParts(d), "m") + partsHTML(rParts(d), "r");
-  return `<div class="leaf">${band}${body || `<div class="part"><div class="en">Nothing is planned for this day.</div></div>`}
-    <div class="meta"><span style="white-space:nowrap">About <b>${Math.round(est(d))} min</b></span><span style="text-align:right">${esc(pair)}</span></div></div>`;
+/* ---------- pieces ---------- */
+function dayCard(d, G){
+  if (!d.mc) return `<div class="card leaf"><div class="empty">Nothing is planned for this day.</div></div>`;
+  const tk = ticksOf(d);
+  const evs = (P.evByDay[d.n] || []);
+  const band = evs.length ? `<div class="band"><span>Siyum</span><span class="he">${evs.map(e => esc(e.he)).join(" · ")}</span></div>` : "";
+  const body = dayGroups(d).map(g => {
+    const per = g.pereks.map(p => {
+      const c = p.c, m1 = p.xs[0] - c.first + 1, m2 = p.xs[p.xs.length - 1] - c.first + 1, whole = m1 === 1 && m2 === c.last - c.first + 1;
+      const ref = whole ? `${c.p}` : `${c.p}.${m1}${m2 > m1 ? "-" + m2 : ""}`;
+      const label = whole ? `פרק ${heL(c.p)}` : `פרק ${heL(c.p)} · ${heL(m1)}${m2 > m1 ? "–" + heL(m2) : ""}`;
+      return `<div class="perek"><div class="prow"><a class="sef" href="${sefUrl(g.u, ref)}" target="_blank" rel="noopener">Sefaria ${ICON.ext}</a><span class="pname he">${label}</span></div>
+        <div class="chips">${p.xs.map(x => { const k = x - c.first + 1, on = tk.has(x); return `<button class="mc ${on ? "on" : ""}" data-tick="${x}" data-d="${d.iso}" aria-pressed="${on}" aria-label="Perek ${c.p}, mishnah ${k}${on ? ", learned" : ""}">${heL(k)}</button>`; }).join("")}</div></div>`;
+    }).join("");
+    return `<div class="mas"><div class="meta"><span>Masechet ${g.u.i + 1} of ${MU.length}</span><span class="sd">סדר ${esc(g.u.sed.he)}</span></div>
+      <h2 class="mtitle">${esc(g.u.he)}</h2><div class="msub">${esc(rangeLabel(g.xs[0], g.xs[g.xs.length - 1]).join(", "))}</div>${per}</div>`;
+  }).join("");
+  const lu = MU[MCH[CHI[d.xs[d.xs.length - 1]]].u], lt = lu.last - lu.first + 1, ld = G ? G.uLearned[lu.i] : 0;
+  return `<article class="card leaf">${band}${body}
+    <div class="lfoot"><span><b>${mish(d.mc)}</b><br>about ${fmtMin(est(d.mc))}</span>
+      <div class="mp"><div class="t"><span>${esc(lu.n)}</span><span>${ld} / ${lt}</span></div><div class="bar ${ld === lt ? "ok" : ""}"><i style="width:${(ld / lt * 100).toFixed(1)}%"></i></div></div></div></article>`;
 }
 function offCard(d, isToday){
   return `<div class="offcard"><div class="t">Day off</div>
-    <p>No learning ${isToday ? "today" : "on this day"}. Its learning moved to the days after it, and the plan ends later.</p></div>
-    <button class="btn wide" data-skip="${d.iso}">Day off · Undo</button>`;
+    <p>No learning ${isToday ? "today" : "on this day"}. Its mishnayot moved to the days after it, and the plan ends later.</p></div>
+    <div class="acts"><button class="btn wide" data-skip="${d.iso}">Undo day off</button></div>`;
 }
-function statusButtons(d){
-  const s = st(d), m = (S.log[d.iso] && S.log[d.iso].m) || "";
-  return `<div class="actions">
-    <button class="btn primary ${s === "done" ? "sel-done" : ""}" data-set="done" data-d="${d.iso}">${s === "done" ? "Done" : "Mark done"}</button>
-    <button class="btn ${s === "partial" ? "sel-partial" : ""}" data-set="partial" data-d="${d.iso}">Partial</button>
-    <button class="btn ${s === "missed" ? "sel-missed" : ""}" data-set="missed" data-d="${d.iso}">Missed</button></div>
-    <div class="mins"><span>Minutes learned</span><span class="step">
+function actions(d, isToday){
+  const s = stat(d), e = S.log[d.iso] || {}, m = e.m || "";
+  const running = S.timer && S.timer.iso === d.iso;
+  const doneBtn = s === "done"
+    ? `<button class="btn big wide isdone" data-done="${d.iso}" aria-pressed="true">${ICON.check} Learned · tap to undo</button>`
+    : `<button class="btn big wide primary" data-done="${d.iso}">${ICON.check} Mark all learned</button>`;
+  const missed = `<button class="btn ${s === "missed" ? "ismissed" : ""}" data-missed="${d.iso}" aria-pressed="${s === "missed"}">${s === "missed" ? "Missed" : "Mark missed"}</button>`;
+  const push = isToday && s !== "done" ? `<button class="btn" data-skip="${d.iso}">Push to tomorrow</button>` : "";
+  return `<div class="acts">${doneBtn}<div class="${push ? "two" : ""}">${missed.replace('class="btn', push ? 'class="btn' : 'class="btn wide')}${push}</div>
+    <div class="card mins"><span class="lbl">Minutes</span><span class="step">
       <button data-min="-5" data-d="${d.iso}" aria-label="5 minutes less">−</button>
       <input inputmode="numeric" pattern="[0-9]*" aria-label="Minutes learned" data-mins="${d.iso}" value="${esc(m)}" placeholder="0">
-      <button data-min="5" data-d="${d.iso}" aria-label="5 minutes more">+</button></span></div>`;
+      <button data-min="5" data-d="${d.iso}" aria-label="5 minutes more">+</button>
+      <button class="btn timer ${running ? "run" : ""}" data-timer="${d.iso}" aria-label="${running ? "Stop timer and add the minutes" : "Start a timer"}">${running ? `<span id="timerTxt">${timerText()}</span> Stop` : ICON.clock}</button></span></div></div>`;
+}
+function weekStrip(G){
+  const t = todayDN(), base = Math.min(Math.max(t, P.s0), P.end), sun = base - wd(base);
+  let h = "";
+  for (let k = 0; k < 7; k++){
+    const dn = sun + k, n = dn - P.s0 + 1, inPlan = n >= 1 && n <= P.pd, s = inPlan ? G.status[n] : "";
+    let cls = "wd"; if (!inPlan) cls += " out"; else if (s) cls += " " + s; else if (n < G.tday) cls += " late";
+    if (dn === t) cls += " today";
+    h += `<button class="${cls}" ${inPlan ? `data-day="${n}"` : "disabled"} aria-label="${longDate(dn)}${s ? ", " + (s === "off" ? "day off" : s) : ""}"><span>${["S","M","T","W","T","F","Sh"][k]}</span><span class="c">${fmt(dn, {day: "numeric"})}</span></button>`;
+  }
+  return `<div class="week">${h}</div>`;
 }
 
 /* ---------- screens ---------- */
 function renderToday(){
-  const G = progress(), t = G.tday, idx = Math.max(1, Math.min(t, P.pd)), d = P.days[idx - 1];
-  const isToday = t >= 1 && t <= P.pd;
-  const head = t < 1 ? `First session ${longDate(P.s0)}` : t > P.pd ? "The plan period is over" : longDate(todayDN());
+  const G = progress(), t = G.tday, idx = clamp(t, 1, P.pd), d = P.days[idx - 1], isToday = t >= 1 && t <= P.pd, now = todayDN();
+  const head = longDate(now);
   const ded = S.settings.ded ? `<div class="ded he">לעילוי נשמת ${esc(S.settings.ded)}</div>` : "";
+  const dayno = t < 1 ? `<b>${plural(1 - t, "day")}</b>to start` : t > P.pd ? `<b>Done</b>plan over` : `<b>Day ${t}</b>of ${P.pd}`;
   let status;
-  if (t < 1) status = `<div class="status wait">Starts ${longDate(P.s0)}<small>${endsLine()}</small></div>`;
-  else if (G.pct >= 0.9999) status = `<div class="status ok">Finished. Mazal tov!</div>`;
-  else if (G.gapW <= 0.5) status = `<div class="status ok">On track${G.gapW < -0.5 ? ", ahead of plan" : ""}<small>Day ${Math.min(t, P.pd)} of ${P.pd}${G.proj ? `, projected finish ${fullDate(G.proj)}` : ""}</small><small>${endsLine()}</small></div>`;
-  else status = `<div class="status behind">Behind by about ${(G.gapW * P.totMin / TW / 60).toFixed(1)} hours<small>${G.late ? `${plural(G.late, "past day")} not logged. ` : ""}Shabbat is a good time to catch up.</small>
-    ${G.catchable ? `<button class="btn wide catch" data-catchup>Push the plan back instead</button><small>Turns ${plural(G.catchable, "past day")} with no learning into days off. Days marked done or partial stay.</small>` : ""}<small>${endsLine()}</small></div>`;
-  const nx = P.events.find(e => e.day >= Math.max(1, t) && !G.evDoneMap[e.i]);
-  let nd = null; for (let j = idx; j < P.pd; j++){ const x = P.days[j]; if (!x.off && (x.mc || x.rc)){ nd = x; break; } }
-  const nextHTML = nd ? `<div class="next"><h3>Next: ${longDate(nd.dn)}</h3>
-    ${mParts(nd).map(p => `<div class="row"><span>${esc(p.en)}</span><span class="he muted">${esc(p.title)}</span></div>`).join("")}
-    ${rParts(nd).map(p => `<div class="row"><span>${esc(p.en)}</span><span class="he muted">${esc(p.title)}</span></div>`).join("")}</div>` : "";
-  const card = d.off ? offCard(d, isToday)
-    : dayCard(d) + statusButtons(d) + (isToday && st(d) !== "done" ? `<button class="btn wide" data-skip="${d.iso}">Busy today, push to tomorrow</button>` : "");
+  const minsBehind = fmtMin(est(G.gap));
+  if (t < 1) status = `<div class="status wait"><div class="h">Your plan starts ${inDays(1 - t)}</div><p>${endsLine()}. You can learn day 1 early; it counts.</p></div>`;
+  else if (G.mLearned === NM) status = `<div class="status ok"><div class="h">${ICON.check} Shas Mishnah complete. Mazal tov!</div></div>`;
+  else if (G.gap <= 0) status = `<div class="status ok"><div class="h">${ICON.check} ${G.gap < 0 ? `Ahead by ${mish(-G.gap)}` : "On track"}</div><p>${endsLine()}</p></div>`;
+  else status = `<div class="status behind"><div class="h">${ICON.warn} Behind by ${mish(G.gap)}</div><p>About ${minsBehind} of learning. ${G.late ? `${plural(G.late, "past day")} not logged yet. ` : ""}Shabbat is a good time to catch up.</p>
+    ${G.catchable ? `<button class="btn wide" data-catchup>Push the plan back instead</button><p>Turns ${plural(G.catchable, "past day")} with nothing learned into days off. Days with mishnayot ticked stay.</p>` : ""}<p>${endsLine()}</p></div>`;
+  const nx = P.events.find(e => !G.evDone[e.i]);
+  let nxHTML = `<div class="v">All made</div>`;
+  if (nx){ const tot = nx.units.reduce((a, u) => a + u.last - u.first + 1, 0), got = nx.units.reduce((a, u) => a + G.uLearned[u.i], 0);
+    nxHTML = `<div class="v he">${esc(nx.he)}</div><div class="s">${esc(nx.n)} · ${nx.day < t ? `was planned for ${shortDate(P.s0 + nx.day - 1)}` : `${shortDate(P.s0 + nx.day - 1)}, ${inDays(nx.day - t)}`}</div><div class="bar"><i style="width:${(got / tot * 100).toFixed(1)}%"></i></div>`; }
+  let nd = null; for (let j = idx; j < P.pd; j++){ const x = P.days[j]; if (!x.off && x.mc){ nd = x; break; } }
+  const card = d.off ? offCard(d, isToday) : !d.mc ? dayCard(d, G) : dayCard(d, G) + (stat(d) !== "done" ? `<p class="hint">Tap each mishnah as you learn it, or mark the whole day.</p>` : "") + actions(d, isToday);
+  const lb = S.settings.lastBackup, needBackup = Object.keys(S.log).length >= 5 && (!lb || now - parseDN(lb) > 30);
   $("#today").innerHTML = `
-    <div class="top"><div class="date">${head}</div><div class="day">${isToday ? `Day ${t}` : ""}</div></div>${ded}
-    ${card}<p class="offlink"><button class="linkish" data-offpanel>Plan days off…</button></p>${status}
+    <div class="top"><div><div class="hd">${esc(heDate(now))}</div><div class="date">${head}</div></div><div class="dayno">${dayno}</div></div>${ded}
+    <div class="overall"><span>${(G.pct * 100).toFixed(1)}% of Shas</span><div class="bar"><i style="width:${(G.pct * 100).toFixed(2)}%"></i></div><span>${G.mLearned.toLocaleString()} / ${NM.toLocaleString()}</span></div>
+    ${weekStrip(G)}
+    ${card}
+    <p class="offlink"><button class="linkish" data-offpanel>Plan days off…</button></p>
+    ${status}
     <div class="facts">
-      <div class="fact siyum"><div class="k">Next siyum</div>${nx ? `<div class="v he">${esc(evHe(nx))}</div><div class="s">${esc(nx.n)}, ${longDate(P.s0 + nx.day - 1)}, ${inDays(nx.day - t)}</div>` : `<div class="v">All done</div>`}</div>
-      <div class="fact"><div class="k">Streak</div><div class="v">${plural(G.streak, "day")}</div><div class="s">Best ${G.best}</div></div>
-      <div class="fact"><div class="k">Overall</div><div class="v">${(G.pct * 100).toFixed(1)}%</div><div class="s">${G.perakim}/${MCH.length} perakim, ${G.rch}/${NR} chapters</div></div>
-    </div>${G.late ? `<p class="note">${plural(G.late, "past day")} not logged. <button class="linkish" data-tab-go="calendar">Open the calendar</button></p>` : ""}${nextHTML}`;
+      <div class="card fact full"><div class="k">Next siyum</div>${nxHTML}</div>
+      <div class="card fact"><div class="k">Streak</div><div class="v">${plural(G.streak, "day")}</div><div class="s">Best ${G.best}</div></div>
+      <div class="card fact"><div class="k">Learned</div><div class="v">${G.perakim} <span class="small muted">/ ${MCH.length}</span></div><div class="s">perakim · ${G.masechtot} masechtot</div></div>
+    </div>
+    ${needBackup ? `<div class="card remind"><span>${lb ? `Last backup ${fullDate(parseDN(lb))}.` : "You haven't made a backup yet."} Your progress lives only on this phone.</span><button class="btn" data-backup>Back up</button></div>` : ""}
+    ${nd ? `<div class="sec">Next · ${shortDate(nd.dn)}</div><div class="card pad next">${dayGroups(nd).map(g => `<div class="row"><span>${esc(rangeLabel(g.xs[0], g.xs[g.xs.length - 1]).join(", "))}</span><span class="he muted">${esc(g.u.he)}</span></div>`).join("")}<div class="row"><span class="muted small">${mish(nd.mc)} · about ${fmtMin(est(nd.mc))}</span></div></div>` : ""}`;
 }
 let calMonth = null;
 function renderCalendar(){
   const G = progress(), t = G.tday;
-  if (calMonth === null){ const base = dnDate(Math.min(Math.max(todayDN(), P.s0), P.end)); calMonth = [base.getUTCFullYear(), base.getUTCMonth()]; }
-  const [y, m] = calMonth, first = Date.UTC(y, m, 1) / DAY, dim = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
-  const lead = wd(first); let cells = "";
-  for (let i = 0; i < lead; i++) cells += `<div></div>`;
-  let mDone = 0, mPlan = 0, mOff = 0, mSiy = 0;
+  if (calMonth === null){ const base = dnDate(clamp(todayDN(), P.s0, P.end)); calMonth = [base.getUTCFullYear(), base.getUTCMonth()]; }
+  const [y, m] = calMonth, first = Date.UTC(y, m, 1) / DAY, dim = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), last = first + dim - 1;
+  let cells = ""; for (let i = 0; i < wd(first); i++) cells += `<div></div>`;
+  let mDone = 0, mPlan = 0, mOff = 0, mSiy = 0, mM = 0;
   for (let k = 0; k < dim; k++){
-    const dn = first + k, n = dn - P.s0 + 1, inPlan = n >= 1 && n <= P.pd, s = inPlan ? st(P.days[n - 1]) : "";
+    const dn = first + k, n = dn - P.s0 + 1, inPlan = n >= 1 && n <= P.pd, s = inPlan ? G.status[n] : "";
     let cls = "cell"; if (!inPlan) cls += " out"; else if (s) cls += " " + s; else if (n < t) cls += " late";
-    if (n === t) cls += " today"; if (wd(dn) === 6 && inPlan) cls += " sh";
+    if (n === t) cls += " today"; if (wd(dn) === 6) cls += " sh";
     const siy = inPlan && P.evByDay[n];
-    if (inPlan){ if (s === "off") mOff++; else { mPlan++; if (s === "done") mDone++; } if (siy) mSiy += siy.length; }
-    cells += `<button class="${cls}" ${inPlan ? `data-day="${n}"` : "disabled"} aria-label="${fmt(dn, {day: "numeric", month: "long"})}${s ? ", " + (s === "off" ? "day off" : s) : ""}${siy ? ", siyum" : ""}">${k + 1}${siy ? '<span class="dot"></span>' : ""}</button>`;
+    if (inPlan){ if (s === "off") mOff++; else { mPlan++; mM += P.days[n - 1].mc; if (s === "done") mDone++; } if (siy) mSiy += siy.length; }
+    cells += `<button class="${cls}" ${inPlan ? `data-day="${n}"` : "disabled"} aria-label="${longDate(dn)}${s ? ", " + (s === "off" ? "day off" : s) : ""}${siy ? ", siyum" : ""}">${k + 1}<small class="he">${heDay(dn)}</small>${siy ? '<span class="dot"></span>' : ""}</button>`;
   }
+  const hm1 = heMonth(first), hm2 = heMonth(last), hm = hm1 === hm2 ? hm1 : `${hm1.replace(/ \d+$/, hm1.slice(-4) === hm2.slice(-4) ? "" : "$&")} – ${hm2}`;
+  const tdn = todayDN(), showToday = !(tdn >= first && tdn <= last);
   $("#calendar").innerHTML = `
-    <div class="calhead"><button data-cal="-1" aria-label="Previous month">‹</button><h2>${fmt(first, {month: "long", year: "numeric"})}</h2><button data-cal="1" aria-label="Next month">›</button></div>
-    <div class="grid">${["Sun","Mon","Tue","Wed","Thu","Fri","Shab"].map((x, i) => `<div class="dow ${i === 6 ? "sh" : ""}">${x}</div>`).join("")}${cells}</div>
-    <div class="legend"><span><i style="background:var(--done)"></i>Done</span><span><i style="background:var(--partial)"></i>Partial</span><span><i style="background:var(--missed)"></i>Missed</span><span><i class="lg-off"></i>Day off</span><span><i style="background:var(--late)"></i>Not logged</span><span><i style="background:var(--gold);border-radius:50%"></i>Siyum</span></div>
-    <p class="monthsum muted small">${mPlan || mOff ? `${mDone} of ${plural(mPlan, "day")} done this month${mOff ? `, ${plural(mOff, "day")} off` : ""}${mSiy ? `, ${plural(mSiy, "siyum")} planned`.replace("siyums", "siyumim") : ""}. Tap a day to see its learning or log it.` : "No learning planned this month."}</p>`;
+    <div class="calhead"><button class="nav" data-cal="-1" aria-label="Previous month">‹</button><div class="mid"><div class="h2">${fmt(first, {month: "long", year: "numeric"})}</div><div class="hm">${esc(hm)}</div></div><button class="nav" data-cal="1" aria-label="Next month">›</button></div>
+    ${showToday ? `<div class="caltools"><button class="chip" data-cal="today">Back to today</button></div>` : ""}
+    <div class="grid" id="calgrid">${["Sun","Mon","Tue","Wed","Thu","Fri","Shab"].map((x, i) => `<div class="dow ${i === 6 ? "sh" : ""}">${x}</div>`).join("")}${cells}</div>
+    <div class="legend"><span><i style="background:var(--done)"></i>Done</span><span><i style="background:var(--partial)"></i>Partly</span><span><i style="background:var(--missed)"></i>Missed</span><span><i class="lg-off"></i>Day off</span><span><i style="background:var(--late)"></i>Not logged</span><span><i style="background:var(--gold);border-radius:50%"></i>Siyum</span></div>
+    <div class="card pad" style="margin-top:12px">${mPlan || mOff ? `<div class="row"><span>Days done</span><b>${mDone} of ${mPlan}</b></div><div class="row"><span>Mishnayot this month</span><b>${mM.toLocaleString()}</b></div>${mOff ? `<div class="row"><span>Days off</span><b>${mOff}</b></div>` : ""}${mSiy ? `<div class="row"><span>Siyumim planned</span><b>${mSiy}</b></div>` : ""}` : `<div class="row"><span class="muted">No learning planned this month.</span></div>`}</div>
+    <p class="note" style="text-align:center">Tap a day to see its mishnayot or log it. Swipe to change month.</p>`;
 }
-let syFilter = "all";
+let syFilter = "left", syAll = false;
 function renderSiyumim(){
   const G = progress(), t = G.tday;
-  const nx = P.events.find(e => e.day >= Math.max(1, t) && !G.evDoneMap[e.i]), nextI = nx ? nx.i : -1;
-  const major = e => e.t !== "Masechet";
-  const list = P.events.filter(e => syFilter === "all" || (syFilter === "major" ? major(e) : syFilter === "left" ? !G.evDoneMap[e.i] : true));
-  let html = `<h2>Siyumim</h2><p class="muted small">${G.evDoneMap.filter(Boolean).length} of ${P.events.length} made. The next one is highlighted.</p>
-    <div class="filters">${[["all","All"],["left","Still ahead"],["major","Sedarim and sefarim"]].map(([k, l]) => `<button class="chip ${syFilter === k ? "on" : ""}" data-filter="${k}">${l}</button>`).join("")}</div>`;
-  let lastM = "";
+  const nx = P.events.find(e => !G.evDone[e.i]);
+  const all = P.events.filter(e => syFilter === "all" || (syFilter === "major" ? e.t !== "Masechet" : syFilter === "left" ? !G.evDone[e.i] : G.evDone[e.i]));
+  const LIMIT = 12, list = syAll || syFilter === "major" ? all : all.slice(0, LIMIT);
+  let html = `<h1 class="h2" style="margin-top:6px">Siyumim</h1><p class="muted small" style="margin:4px 2px 0">${G.evDone.filter(Boolean).length} of ${P.events.length} made: 63 masechtot, 6 sedarim and all of Shas.</p>
+    <div class="filters">${[["left","Still ahead"],["made","Made"],["major","Sedarim"],["all","All"]].map(([k, l]) => `<button class="chip ${syFilter === k ? "on" : ""}" data-filter="${k}">${l}</button>`).join("")}</div>`;
+  if (!list.length) html += `<p class="note" style="text-align:center;margin-top:30px">${syFilter === "made" ? "Your siyumim will appear here." : "Nothing here."}</p>`;
+  let lastM = "", open = false;
   for (const e of list){
     const dn = P.s0 + e.day - 1, mh = fmt(dn, {month: "long", year: "numeric"});
-    if (mh !== lastM){ html += `<div class="mh">${mh}</div>`; lastM = mh; }
-    const done = G.evDoneMap[e.i];
-    html += `<div class="sy ${major(e) ? "major" : ""} ${done ? "done" : ""} ${e.i === nextI ? "nextone" : ""}">
-      <div class="nm">${esc(evHe(e))}</div><div class="en2">${esc(e.n)}<div class="muted small">${shortDate(dn)}</div></div>
-      <div class="when">${done ? "Made" : e.day < t ? "Not made yet" : inDays(e.day - t)}</div></div>`;
+    if (mh !== lastM){ html += `${open ? "</div>" : ""}<div class="mh">${mh}</div><div class="card sylist">`; lastM = mh; open = true; }
+    const made = G.evDone[e.i], tot = e.units.reduce((a, u) => a + u.last - u.first + 1, 0), got = e.units.reduce((a, u) => a + G.uLearned[u.i], 0);
+    const when = made ? `<span class="ok">Made ✓</span>` : e.day < t ? `<span class="late2">was due ${shortDate(dn)}</span>` : `${shortDate(dn)} · ${inDays(e.day - t)}`;
+    html += `<div class="sy ${e.t !== "Masechet" ? "major" : ""} ${made ? "made" : ""} ${nx && e.i === nx.i ? "nextone" : ""}">
+      <div class="en2">${esc(e.n)} <span class="muted small">· ${mish(tot)}</span></div><div class="nm">${esc(e.he)}</div>
+      <div class="small muted">${when}</div>${!made && got ? `<div class="bar"><i style="width:${(got / tot * 100).toFixed(1)}%"></i></div>` : ""}</div>`;
   }
+  if (open) html += "</div>";
+  if (list.length < all.length) html += `<button class="btn wide more" data-syall>Show all ${all.length}</button>`;
   $("#siyumim").innerHTML = html;
 }
 let shelfSel = null;
+function ring(p){
+  const r = 50, c = 2 * Math.PI * r;
+  return `<svg class="ring" viewBox="0 0 120 120" role="img" aria-label="${(p * 100).toFixed(1)} percent of Shas learned"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="11"/>
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--gold)" stroke-width="11" stroke-linecap="round" stroke-dasharray="${(c * p).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 60 60)"/>
+    <text x="60" y="62" text-anchor="middle" class="pct">${(p * 100).toFixed(p < .1 ? 1 : 0)}%</text><text x="60" y="80" text-anchor="middle" class="sub">of Shas</text></svg>`;
+}
 function lineChart(G){
-  const pts = 52, w = 320, h = 150, pad = 26; let plan = "", act = "";
-  const dc = new Float64Array(P.pd + 1); for (let i = 1; i <= P.pd; i++){ const d = P.days[i - 1]; dc[i] = dc[i - 1] + (st(d) === "done" ? d.w : 0); }
+  const pts = 60, w = 320, h = 150, pad = 28; let plan = "", act = "";
+  const dc = new Int32Array(P.pd + 1); for (let i = 1; i <= P.pd; i++){ const d = P.days[i - 1]; let k = 0; for (const x of d.xs) k += G.learned[x]; dc[i] = dc[i - 1] + k; }
+  const Y = v => (h - 18 - v * (h - 30)).toFixed(1);
   for (let k = 0; k <= pts; k++){
     const n = Math.round(k * P.pd / pts), x = pad + (w - pad - 6) * k / pts;
-    const pv = n === 0 ? 0 : P.days[n - 1].cumW / TW; plan += `${k ? "L" : "M"}${x.toFixed(1)},${(h - 18 - pv * (h - 30)).toFixed(1)}`;
+    plan += `${k ? "L" : "M"}${x.toFixed(1)},${Y(n === 0 ? 0 : P.days[n - 1].cumM / NM)}`;
     const prevN = Math.round((k - 1) * P.pd / pts);
-    if (G.tday >= 1 && (k === 0 || prevN < G.tday)){
-      const cw = dc[Math.min(n, G.tday, P.pd)];
-      act += `${act ? "L" : "M"}${x.toFixed(1)},${(h - 18 - cw / TW * (h - 30)).toFixed(1)}`;
-    }
+    if (G.tday >= 1 && (k === 0 || prevN < G.tday)) act += `${act ? "L" : "M"}${x.toFixed(1)},${Y(dc[Math.min(n, G.tday, P.pd)] / NM)}`;
   }
-  const yl = [0, 0.5, 1].map(v => `<text x="2" y="${(h - 15 - v * (h - 30)).toFixed(1)}" font-size="10" fill="currentColor" opacity=".6">${v * 100}%</text>`).join("");
-  const xl = [0, 26, 52].map(k => { const n = Math.max(1, Math.round(k * P.pd / pts)); return `<text x="${(pad + (w - pad - 6) * k / pts).toFixed(1)}" y="${h - 2}" font-size="10" fill="currentColor" opacity=".6" text-anchor="${k ? (k === 52 ? "end" : "middle") : "start"}">${fmt(P.s0 + n - 1, {month: "short", year: "2-digit"})}</text>`; }).join("");
-  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Planned and actual progress over the year">${yl}${xl}
+  const yl = [0, .5, 1].map(v => `<text x="0" y="${(+Y(v) + 3).toFixed(1)}" font-size="10" fill="currentColor" opacity=".6">${v * 100}%</text>`).join("");
+  const xl = [0, pts / 2, pts].map(k => { const n = Math.max(1, Math.round(k * P.pd / pts)); return `<text x="${(pad + (w - pad - 6) * k / pts).toFixed(1)}" y="${h - 2}" font-size="10" fill="currentColor" opacity=".6" text-anchor="${k ? (k === pts ? "end" : "middle") : "start"}">${fmt(P.s0 + n - 1, {month: "short", year: "2-digit"})}</text>`; }).join("");
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Planned and actual mishnayot over the plan">${yl}${xl}
     <path d="${plan}" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="4 4"/>
-    ${act ? `<path d="${act}" fill="none" stroke="var(--gold)" stroke-width="2.6" stroke-linejoin="round"/>` : ""}</svg>
-    <div class="legend" style="margin:6px 4px"><span><i style="background:var(--muted)"></i>Plan</span><span><i style="background:var(--gold)"></i>Done</span></div>`;
-}
-function renderShelf(){
-  const G = progress();
-  const groupsM = D.sedarim.map(([en, he]) => { const idx = MCH.map((c, i) => i).filter(i => MU[MCH[i].u].s === en); return {k: "m:" + en, en, he, tot: idx.length, done: idx.filter(i => G.chDone[i]).length}; });
-  const groupsR = D.sefarim.map(([en, he]) => { let tot = 0, done = 0; RU.forEach(u => { if (u.s === en) for (let k = u.first; k <= u.last; k++){ tot++; done += G.rChDone[k]; } }); return {k: "r:" + en, en, he, tot, done}; });
-  const maxM = Math.max(...groupsM.map(g => g.tot)), maxR = Math.max(...groupsR.map(g => g.tot));
-  const spine = (g, kind, i, max) => {
-    const hgt = 120 + 80 * g.tot / max, pct = g.tot ? g.done / g.tot : 0;
-    const bg = kind === "m" ? (i % 2 ? "var(--spine-m2)" : "var(--spine-m1)") : g.en === "Introduction" ? "var(--spine-i)" : (i % 2 ? "var(--spine-r2)" : "var(--spine-r1)");
-    return `<button class="spine ${shelfSel === g.k ? "sel" : ""}" data-spine="${esc(g.k)}" style="height:${hgt.toFixed(0)}px;background:${bg}" aria-label="${esc(g.en)}, ${Math.round(pct * 100)}% done">
-      <span class="foil" style="height:${(pct * 100).toFixed(1)}%"></span><span class="bands"></span><span class="lbl">${esc(g.he)}</span></button>`;
-  };
-  const rA = groupsR.slice(0, 8), rB = groupsR.slice(8);
-  let detail = "";
-  if (shelfSel){
-    const [kind, en] = shelfSel.split(":");
-    const rows = kind === "m" ? MU.filter(u => u.s === en).map(u => { const ix = MCH.map((c, i) => i).filter(i => MCH[i].u === u.i); const dn = ix.filter(i => G.chDone[i]).length; return {en: u.n, he: u.he, dn, tot: ix.length}; })
-      : RU.filter(u => u.s === en).map(u => { let dn = 0; for (let k = u.first; k <= u.last; k++) dn += G.rChDone[k]; return {en: u.n, he: u.he, dn, tot: u.c}; });
-    detail = `<div class="detail">${rows.map(r => `<div class="unit"><div class="u1"><span>${esc(r.en)}</span><span class="he">${esc(r.he)}</span></div>
-      <div class="u1 muted"><span>${r.dn} of ${r.tot}</span></div><div class="bar"><i style="width:${(r.tot ? r.dn / r.tot * 100 : 0).toFixed(1)}%"></i></div></div>`).join("")}</div>`;
-  }
-  const t = G.tday, segNow = t >= 1 && t <= P.pd ? P.days[t - 1].seg : -1;
-  const minsChart = G.logged ? weekBars() : "";
-  $("#shelf").innerHTML = `<h2>Progress</h2>
-    <p class="muted small">Each binding fills with gold as you finish its chapters. Tap one to see what's inside.</p>
-    <h3 style="margin-top:14px">Mishnah</h3>
-    <div class="shelf">${groupsM.map((g, i) => spine(g, "m", i, maxM)).join("")}</div>
-    <div class="shelfcap"><span>${G.perakim} of ${MCH.length} perakim</span><span>${G.mDone.toLocaleString()} of ${NM.toLocaleString()} mishnayot</span></div>
-    ${shelfSel && shelfSel.startsWith("m:") ? detail : ""}
-    <h3 style="margin-top:18px">Mishneh Torah</h3>
-    <div class="shelf">${rA.map((g, i) => spine(g, "r", i, maxR)).join("")}</div>
-    <div class="shelf">${rB.map((g, i) => spine(g, "r", i + 8, maxR)).join("")}</div>
-    <div class="shelfcap"><span>${G.rch} of ${NR} chapters</span><span>${(G.rch / NR * 100).toFixed(1)}%</span></div>
-    ${shelfSel && shelfSel.startsWith("r:") ? detail : ""}
-    <h3 style="margin-top:18px">Plan and progress</h3><div class="chart">${lineChart(G)}</div>
-    ${minsChart}
-    <div class="facts"><div class="fact"><div class="k">Hours logged</div><div class="v">${(G.mins / 60).toFixed(1)}</div><div class="s">${G.logged ? `about ${Math.round(G.mins / G.logged)} min a session` : "Log minutes on any day"}</div></div>
-      <div class="fact"><div class="k">Your pace</div><div class="v">${G.estOnLogged ? Math.round(G.minsOnLogged / G.estOnLogged * 100) + "%" : "Not yet"}</div><div class="s">of the estimated time</div></div></div>
-    <details><summary>The ${SEG.length} topic stretches</summary><div class="detail">${SEG.map((g, i) => `<div class="stretch ${i === segNow ? "now" : ""}">
-      <div class="pair"><b>${esc(g.mu.map(j => MU[j].n).join(", "))}</b> with <em>${esc(g.ru.map(j => RU[j].n).join(", "))}</em></div>
-      <div class="dates">${shortDate(P.s0 + P.segDays[i].start - 1)} to ${shortDate(P.s0 + P.segDays[i].end - 1)}</div></div>`).join("")}</div></details>`;
+    ${act ? `<path d="${act}" fill="none" stroke="var(--gold)" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>` : ""}</svg>
+    <div class="legend" style="margin:6px 4px"><span><i style="background:var(--muted)"></i>Plan</span><span><i style="background:var(--gold)"></i>Learned</span></div>`;
 }
 function weekBars(){
-  const weeks = Math.ceil(P.pd / 7), w = 320, h = 120, bw = (w - 10) / weeks, plan = [], log = [];
-  for (let k = 0; k < weeks; k++){
-    let p = 0, l = 0; for (let n = k * 7 + 1; n <= Math.min(P.pd, k * 7 + 7); n++){ const d = P.days[n - 1]; p += est(d); l += +(S.log[d.iso] && S.log[d.iso].m) || 0; }
-    plan.push(p); log.push(l);
-  }
+  const weeks = Math.ceil(P.pd / 7), w = 320, h = 110, bw = (w - 10) / weeks, plan = [], log = [];
+  for (let k = 0; k < weeks; k++){ let p = 0, l = 0; for (let n = k * 7 + 1; n <= Math.min(P.pd, k * 7 + 7); n++){ const d = P.days[n - 1]; p += est(d.mc); l += +(S.log[d.iso] && S.log[d.iso].m) || 0; } plan.push(p); log.push(l); }
   const max = Math.max(1, ...plan, ...log); let bars = "";
-  plan.forEach((p, k) => {
-    const x = 5 + k * bw, ph = p / max * (h - 20), lh = log[k] / max * (h - 20);
-    bars += `<rect x="${x.toFixed(1)}" y="${(h - 14 - ph).toFixed(1)}" width="${Math.max(1, bw - 1.5).toFixed(1)}" height="${ph.toFixed(1)}" fill="var(--line)"/>`;
-    if (log[k]) bars += `<rect x="${(x + bw * .2).toFixed(1)}" y="${(h - 14 - lh).toFixed(1)}" width="${Math.max(1, bw * .6 - 1).toFixed(1)}" height="${lh.toFixed(1)}" fill="var(--gold)"/>`;
-  });
-  return `<h3 style="margin-top:18px">Minutes each week</h3><div class="chart"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Planned and logged minutes per week">${bars}</svg>
+  plan.forEach((p, k) => { const x = 5 + k * bw, ph = p / max * (h - 16), lh = log[k] / max * (h - 16);
+    bars += `<rect x="${x.toFixed(1)}" y="${(h - 10 - ph).toFixed(1)}" width="${Math.max(1, bw - 1.5).toFixed(1)}" height="${ph.toFixed(1)}" rx="1" fill="var(--line)"/>`;
+    if (log[k]) bars += `<rect x="${(x + bw * .2).toFixed(1)}" y="${(h - 10 - lh).toFixed(1)}" width="${Math.max(1, bw * .6 - 1).toFixed(1)}" height="${lh.toFixed(1)}" rx="1" fill="var(--gold)"/>`; });
+  return `<div class="sec">Minutes each week</div><div class="card chart"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Planned and logged minutes per week">${bars}</svg>
     <div class="legend" style="margin:6px 4px"><span><i style="background:var(--line)"></i>Planned</span><span><i style="background:var(--gold)"></i>Logged</span></div></div>`;
 }
-function renderSettings(){
-  const s = S.settings, wkNeed = P.minPerLoad * s.wk, shNeed = P.minPerLoad * s.sh;
-  $("#settings").innerHTML = `<h2>Settings</h2>
-    <div class="card">
-      <div class="field"><label for="f-start">Start date</label><input id="f-start" type="date" value="${s.start}" data-set-field="start"></div>
-      <div class="field"><label for="f-months">Plan length (months)</label><input id="f-months" type="number" min="6" max="24" step="1" value="${s.months}" data-set-field="months"></div>
-      <div class="field"><label for="f-wk">Weekday study (hours)</label><input id="f-wk" type="number" min="0.25" max="16" step="0.25" value="${s.wk}" data-set-field="wk"></div>
-      <div class="field"><label for="f-sh">Shabbat study (hours)</label><input id="f-sh" type="number" min="0" max="16" step="0.25" value="${s.sh}" data-set-field="sh"></div>
-      <div class="field"><span class="hint">These four set the pace of the whole plan. Days off push the end date later. Changing these only moves learning on days you haven't marked done; done days keep what you learned. Moving the start date moves your logged days and days off along with it.</span></div>
-      <div class="field"><label for="f-mm">Minutes per mishnah</label><input id="f-mm" type="number" min="0.2" max="30" step="0.1" value="${s.minM}" data-set-field="minM"></div>
-      <div class="field"><label for="f-mr">Minutes per Rambam chapter</label><input id="f-mr" type="number" min="1" max="240" step="1" value="${s.minR}" data-set-field="minR"></div>
-      <div class="field"><span class="hint">Only the time estimates use these. Lower them as your reading gets faster.</span></div>
-      <div class="field"><label for="f-ded">Dedication (optional)</label><input id="f-ded" type="text" value="${esc(s.ded)}" placeholder="שם" data-set-field="ded"><span class="hint">Shown at the top of Today as לעילוי נשמת and the name.</span></div>
-    </div>
-    <div class="card"><div class="row"><span>Weekday session at this pace</span><b>${Math.round(wkNeed)} min</b></div>
-      <div class="row"><span>Shabbat session at this pace</span><b>${Math.round(shNeed)} min</b></div>
-      <div class="row"><span>Total learning</span><b>${Math.round(P.totMin / 60)} hours</b></div>
-      <div class="row"><span>Plan ends</span><b>${fullDate(P.end)}</b></div>
-      <div class="row"><span>Days off</span><b>${P.offCount}</b></div></div>
-    <p class="note">Add or remove days off from Today, under “Plan days off…”.</p>
-    <h3 style="margin-top:20px">Backup</h3>
-    <p class="note">Your progress is saved on this phone. Make a backup now and then, especially before changing phones.</p>
-    <div class="btnrow"><button class="btn" id="b-export">Save backup file</button><button class="btn" id="b-copy">Copy backup</button></div>
-    <textarea id="b-text" placeholder="To restore, paste a backup here"></textarea>
-    <div class="btnrow"><button class="btn" id="b-import">Restore from pasted backup</button><button class="btn" id="b-file">Restore from file</button>
-      <input type="file" id="b-filein" accept="application/json,.json" hidden></div>
-    <div class="btnrow"><button class="btn" id="b-reset" style="color:var(--missed)">Clear all progress</button></div>
-    <p class="note">Plan data: perek and mishnah counts from the standard Mishnah Yomi division (4,192 mishnayot); Rambam chapters as divided for Rambam Yomi (1,017). Text links open Sefaria.</p>`;
+function renderProgress(){
+  const G = progress();
+  const groups = SED.map(g => { const ix = MCH.filter(c => MU[c.u].s === g.en); return {g, tot: ix.length, done: ix.filter(c => G.chState[c.i] === 2).length}; });
+  const max = Math.max(...groups.map(x => x.tot));
+  const spines = groups.map((x, i) => { const p = x.tot ? x.done / x.tot : 0;
+    return `<button class="spine ${shelfSel === x.g.i ? "sel" : ""}" data-spine="${x.g.i}" style="height:${(120 + 80 * x.tot / max).toFixed(0)}px;background:var(${i % 2 ? "--spine2" : "--spine1"})" aria-label="Seder ${esc(x.g.en)}, ${Math.round(p * 100)}% done" aria-expanded="${shelfSel === x.g.i}">
+      <span class="foil" style="height:${(p * 100).toFixed(1)}%"></span><span class="bands"></span><span class="lbl">${esc(x.g.he)}</span></button>`; }).join("");
+  let detail = "";
+  if (shelfSel !== null){
+    const g = SED[shelfSel];
+    detail = `<div class="sec">Seder ${esc(g.en)} · ${esc(g.he)}</div><div class="card pad">${g.units.map(u => { const tot = u.last - u.first + 1, k = G.uLearned[u.i];
+      return `<div class="unit"><div class="u1"><span>${esc(u.n)} <span class="muted small">${k} / ${tot}</span></span><span class="he">${esc(u.he)}</span></div>
+        <div class="pmap" aria-label="${u.c.length} perakim">${MCH.filter(c => c.u === u.i).map(c => `<i class="${["", "p", "f"][G.chState[c.i]]}" title="Perek ${c.p}"></i>`).join("")}</div></div>`; }).join("")}</div>`;
+  }
+  const pace = G.mOnDone ? G.minsOnDone / G.mOnDone : 0;
+  $("#progress").innerHTML = `<h1 class="h2" style="margin-top:6px">Progress</h1>
+    <div class="card ringwrap" style="margin-top:12px">${ring(G.pct)}<div class="stats">
+      <span><b>${G.mLearned.toLocaleString()}</b> <span class="muted">of ${NM.toLocaleString()} mishnayot</span></span>
+      <span><b>${G.perakim}</b> <span class="muted">of ${MCH.length} perakim</span></span>
+      <span><b>${G.masechtot}</b> <span class="muted">of ${MU.length} masechtot</span></span>
+      <span><b>${G.sedarim}</b> <span class="muted">of 6 sedarim</span></span></div></div>
+    <div class="sec">The six sedarim</div>
+    <div class="shelf">${spines}</div>
+    <div class="shelfcap"><span>Each binding fills as you finish its perakim</span><span>Tap one</span></div>
+    ${detail}
+    <div class="sec">Plan and progress</div><div class="card chart">${lineChart(G)}</div>
+    ${G.logged ? weekBars() : ""}
+    <div class="facts"><div class="card fact"><div class="k">Time logged</div><div class="v">${(G.mins / 60).toFixed(1)} h</div><div class="s">${G.logged ? `about ${Math.round(G.mins / G.logged)} min a day` : "Log minutes on any day"}</div></div>
+      <div class="card fact"><div class="k">Your pace</div><div class="v">${pace ? pace.toFixed(1) + " min" : "Not yet"}</div><div class="s">${pace ? "per mishnah" : "Log minutes on done days"}</div></div></div>
+    ${pace && Math.abs(pace - S.settings.minM) >= 0.2 ? `<div class="card remind"><span>Estimates use ${S.settings.minM} min per mishnah. Use your pace instead?</span><button class="btn" data-usepace="${pace.toFixed(1)}">Use ${pace.toFixed(1)}</button></div>` : ""}`;
 }
-const R = {today: renderToday, calendar: renderCalendar, siyumim: renderSiyumim, shelf: renderShelf, settings: renderSettings};
+function renderSettings(){
+  const s = S.settings, sh = planShape(s);
+  const shOpts = [0, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6];
+  $("#settings").innerHTML = `<h1 class="h2" style="margin-top:6px">Settings</h1>
+    <div class="sec">Your plan</div>
+    <div class="card pad">
+      <div class="field"><label for="f-start">Start date</label><input id="f-start" type="date" value="${s.start}" data-set="start"><span class="fh">Moving it moves your logged days and days off with it.</span></div>
+      <div class="field"><label for="f-months">Length</label><select id="f-months" data-set="months">${[6, 9, 12, 15, 18, 24].map(v => `<option value="${v}" ${+s.months === v ? "selected" : ""}>${v} months</option>`).join("")}${[6, 9, 12, 15, 18, 24].includes(+s.months) ? "" : `<option value="${s.months}" selected>${s.months} months</option>`}</select></div>
+      <div class="field"><label for="f-shab">Shabbat</label><select id="f-shab" data-set="shab">${shOpts.map(v => `<option value="${v}" ${+s.shab === v ? "selected" : ""}>${v === 0 ? "No learning" : v === 1 ? "Same as a weekday" : v + "× a weekday"}</option>`).join("")}${shOpts.includes(+s.shab) ? "" : `<option value="${s.shab}" selected>${s.shab}× a weekday</option>`}</select></div>
+      <div class="field"><label for="f-snap">End days on a whole perek</label><input id="f-snap" type="checkbox" class="switch" ${s.snap ? "checked" : ""} data-set="snap"><span class="fh">When a perek ends within a few mishnayot of a day's end, the day stops there.</span></div>
+    </div>
+    <div class="card preview" style="margin-top:10px">
+      <div class="row"><span>Weekdays</span><b>about ${Math.round(sh.wkAmt)} mishnayot · ${fmtMin(est(sh.wkAmt))}</b></div>
+      <div class="row"><span>Shabbat</span><b>${s.shab ? `about ${Math.round(sh.shAmt)} mishnayot · ${fmtMin(est(sh.shAmt))}` : "Off"}</b></div>
+      <div class="row"><span>Plan ends</span><b>${fullDate(P.end)}</b></div>
+      <div class="row"><span>Days off</span><b>${P.offCount} <button class="linkish" data-offpanel style="margin-left:8px">Manage</button></b></div>
+    </div>
+    <p class="note">Changes only move mishnayot on days you haven't learned yet; learned days keep what you learned.</p>
+    <div class="sec">Reading</div>
+    <div class="card pad">
+      <div class="field"><label for="f-mm">Minutes per mishnah</label><input id="f-mm" type="number" inputmode="decimal" min="0.2" max="30" step="0.1" value="${s.minM}" data-set="minM"><span class="fh">Only used for time estimates.</span></div>
+      <div class="field"><span>Text size</span><span class="seg">${[[1, "A"], [1.15, "A+"], [1.3, "A++"]].map(([v, l]) => `<button class="${Math.abs(s.rs - v) < .01 ? "on" : ""}" data-rs="${v}">${l}</button>`).join("")}</span></div>
+      <div class="field"><span>Appearance</span><span class="seg">${[["auto", "Auto"], ["light", "Light"], ["dark", "Dark"]].map(([v, l]) => `<button class="${s.theme === v ? "on" : ""}" data-theme-set="${v}">${l}</button>`).join("")}</span></div>
+      <div class="field"><label for="f-ded">Dedication</label><input id="f-ded" type="text" value="${esc(s.ded)}" placeholder="שם (optional)" data-set="ded"><span class="fh">Shown at the top of Today as לעילוי נשמת and the name.</span></div>
+    </div>
+    <div class="sec">Backup</div>
+    <div class="card pad">
+      <p class="note" style="margin:4px 0 8px">Progress is saved only on this phone. ${s.lastBackup ? `Last backup: ${fullDate(parseDN(s.lastBackup))}.` : "No backup yet."}</p>
+      <div class="two"><button class="btn" data-backup>Save backup file</button><button class="btn" id="b-copy">Copy backup</button></div>
+      <textarea id="b-text" placeholder="To restore, paste a backup here" style="margin-top:10px"></textarea>
+      <div class="two" style="margin-top:10px"><button class="btn" id="b-import">Restore pasted</button><button class="btn" id="b-file">Restore from file</button></div>
+      <input type="file" id="b-filein" accept="application/json,.json" hidden>
+    </div>
+    <div class="sec">Start over</div>
+    <div class="card pad"><button class="btn wide danger" id="b-reset">Clear all progress</button><p class="note" style="margin:8px 0 2px">Removes every logged day and day off. Settings stay.</p></div>
+    <p class="note" style="text-align:center;margin-top:20px">Limud · ${MU.length} masechtot, ${MCH.length} perakim, ${NM.toLocaleString()} mishnayot (standard Mishnah Yomi division). Texts open on Sefaria.</p>`;
+}
+const R = {today: renderToday, calendar: renderCalendar, siyumim: renderSiyumim, progress: renderProgress, settings: renderSettings};
 let tab = "today";
 function render(){ R[tab](); }
-function go(t){ tab = t; document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === t)); document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t)); render(); window.scrollTo(0, 0); }
+function go(t){ tab = t; document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === t)); document.querySelectorAll("nav.tabs button").forEach(b => { b.classList.toggle("on", b.dataset.tab === t); b.setAttribute("aria-current", b.dataset.tab === t ? "page" : "false"); }); render(); window.scrollTo(0, 0); }
 
-/* ---------- sheet + celebration ---------- */
+/* ---------- sheets ---------- */
 let sheet = null, offFrom = "", offTo = "";
-function openSheet(n){
-  const d = P.days[n - 1]; if (!d){ closeSheet(); return; }
-  sheet = {k: "day", n};
-  const isToday = n === todayDN() - P.s0 + 1;
-  $("#sheetInner").innerHTML = `<button class="closex" data-close>Close</button><div class="date">${longDate(d.dn)}</div><div class="muted small">Day ${n} of ${P.pd}</div>${d.off ? offCard(d, isToday) : dayCard(d) + statusButtons(d)}`;
-  $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
+function showSheet(html, k){ sheet = k; $("#sheetInner").innerHTML = html; $("#scrim").classList.add("on"); $("#sheet").classList.add("on"); }
+function closeSheet(){ if (sheet && sheet.k === "welcome") return; sheet = null; $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); }
+function openDay(n){
+  const d = P.days[n - 1]; if (!d){ sheet = null; closeSheet(); return; }
+  const G = progress(), isToday = n === G.tday;
+  showSheet(`<div class="shead"><div><div class="date">${longDate(d.dn)}</div><div class="muted small">${esc(heDate(d.dn))} · Day ${n} of ${P.pd}</div></div><button class="closex" data-close>Done</button></div>
+    ${d.off ? offCard(d, isToday) : dayCard(d, G) + (d.mc ? actions(d, isToday) : "")}`, {k: "day", n});
 }
 function offRanges(){
   const ks = Object.keys(S.log).filter(k => S.log[k].s === "off" && parseDN(k) >= P.s0).sort(), out = [];
@@ -689,22 +838,46 @@ function offRanges(){
   return out;
 }
 function openOffPanel(){
-  sheet = {k: "off"};
   const min = isoOf(P.s0), f = offFrom || isoOf(Math.max(todayDN(), P.s0)), to = offTo || f, rs = offRanges();
-  $("#sheetInner").innerHTML = `<button class="closex" data-close>Close</button><div class="date">Days off</div>
-    <p class="note">A day off has no learning. Its learning moves to the days after it and the plan ends later. Days you've marked done never change. Pick one date or a range, in the past or the future.</p>
-    <div class="card"><div class="field"><label for="o-from">From</label><input id="o-from" type="date" value="${f}" min="${min}"></div>
+  showSheet(`<div class="shead"><div class="date">Days off</div><button class="closex" data-close>Done</button></div>
+    <p class="note">A day off has no learning. Its mishnayot move to the days after it and the plan ends later. Days you've learned never change. Pick one date or a range, past or future.</p>
+    <div class="card pad"><div class="field"><label for="o-from">From</label><input id="o-from" type="date" value="${f}" min="${min}"></div>
       <div class="field"><label for="o-to">To</label><input id="o-to" type="date" value="${to}" min="${min}"></div></div>
-    <button class="btn primary wide" id="o-add">Add days off</button>
-    <h3 style="margin-top:18px">Your days off</h3>
-    <div class="card">${rs.length ? rs.map(([a, b]) => `<div class="row"><span>${a === b ? shortDate(a) : `${shortDate(a)} – ${shortDate(b)}`} <span class="muted small">${plural(b - a + 1, "day")}</span></span><button class="linkish" data-unoff="${a}|${b}">Remove</button></div>`).join("") : `<div class="row"><span class="muted">None yet</span></div>`}</div>
-    <p class="note">${endsLine()}</p>`;
-  $("#scrim").classList.add("on"); $("#sheet").classList.add("on");
+    <button class="btn primary big wide" id="o-add" style="margin-top:12px">Add days off</button>
+    <div class="sec">Your days off</div>
+    <div class="card pad">${rs.length ? rs.map(([a, b]) => `<div class="row"><span>${a === b ? shortDate(a) : `${shortDate(a)} – ${shortDate(b)}`} <span class="muted small">· ${plural(b - a + 1, "day")}</span></span><button class="linkish" data-unoff="${a}|${b}">Remove</button></div>`).join("") : `<div class="row"><span class="muted">None yet</span></div>`}</div>
+    <p class="note">${endsLine()}</p>`, {k: "off"});
 }
-function closeSheet(){ sheet = null; $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); }
+let wz = null;
+function openWelcome(){
+  const nLogged = Object.keys(S.log).length;
+  if (!wz) wz = {start: isoOf(todayDN()), shab: S.settings.shab, keep: hadOld};
+  const st = {...S.settings, start: wz.keep ? S.settings.start : wz.start, shab: wz.shab}, sh = planShape(st);
+  const shOpts = [0, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6];
+  showSheet(`<div class="welcome"><div class="mark he">ש״ס משניות</div>
+    <h2>${hadOld ? "Now Mishnah only" : "Shas Mishnah in a year"}</h2>
+    <p>${hadOld ? "Limud is now one clear goal: all 63 masechtot of Mishnah in a year. The Rambam is gone." : "All 63 masechtot, 4,192 mishnayot, spread over your year: a little every weekday and more on Shabbat."}</p>
+    ${hadOld ? `<div class="card pad" style="margin-bottom:12px">
+      <label class="choice"><input type="radio" name="wk" value="keep" ${wz.keep ? "checked" : ""}><span><b>Keep my progress</b><small>${plural(nLogged, "logged day")} and your start date (${fullDate(parseDN(S.settings.start))}) stay. Mishnayot you already marked learned are kept.</small></span></label>
+      <label class="choice"><input type="radio" name="wk" value="fresh" ${wz.keep ? "" : "checked"}><span><b>Start fresh</b><small>Clears the old log and starts a new plan.</small></span></label></div>` : ""}
+    <div class="card pad">
+      ${wz.keep ? "" : `<div class="field"><label for="w-start">Start date</label><input id="w-start" type="date" value="${wz.start}"></div>`}
+      <div class="field"><label for="w-shab">Shabbat</label><select id="w-shab">${shOpts.map(v => `<option value="${v}" ${+wz.shab === v ? "selected" : ""}>${v === 0 ? "No learning" : v === 1 ? "Same as a weekday" : v + "× a weekday"}</option>`).join("")}</select></div>
+    </div>
+    <div class="card preview" style="margin-top:10px"><div class="row"><span>Weekdays</span><b>about ${Math.round(sh.wkAmt)} mishnayot</b></div><div class="row"><span>Shabbat</span><b>${st.shab ? `about ${Math.round(sh.shAmt)} mishnayot` : "Off"}</b></div><div class="row"><span>Finish</span><b>${fullDate(sh.end)}</b></div></div>
+    <button class="btn primary big wide" id="w-go" style="margin-top:14px">${hadOld && wz.keep ? "Continue" : "Start my year"}</button>
+    <p class="note">You can change all of this later in Settings.</p></div>`, {k: "welcome"});
+}
+function finishWelcome(){
+  if (!(hadOld && wz.keep)){ if (hadOld) S.log = {}; S.settings.start = wz.start; S.timer = null; }
+  S.settings.shab = +wz.shab; S.onboarded = true; hadOld = false; wz = null;
+  save(); computePlan(); calMonth = null; sheet = null; $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); render(); toast("Your plan is ready. Behatzlachah!");
+}
 function celebrate(evs){
-  const lines = evs.map(e => e.t === "Masechet" ? `הדרן עלך מסכת ${e.he.replace("מסכת ", "")}` : e.t === "Seder" ? `הדרן עלך ${e.he}` : e.t === "Shas" ? "הדרן עלך ששה סדרי משנה" : e.t === "Dedication" ? "סיום תענית" : `סיום ${e.he}`);
-  $("#celebrateBox").innerHTML = `<div class="hadran">${lines.map(esc).join("<br>")}</div><p>${esc(evs.map(e => e.t === "Dedication" ? "Mishnah and Rambam on Taanit both complete" : e.n).join(", "))}. Mazal tov!</p><button class="btn primary" data-close-cel style="width:100%">Close</button>`;
+  const lines = evs.map(e => e.t === "Masechet" ? `הדרן עלך מסכת ${e.he.replace("מסכת ", "")}` : e.t === "Seder" ? `הדרן עלך ${e.he}` : "הדרן עלך ששה סדרי משנה");
+  const text = `I just finished ${evs.map(e => e.t === "Shas" ? "all of Shas Mishnah" : e.n.startsWith("Seder") ? e.n : "Masechet " + e.n).join(" and ")}!`;
+  $("#celebrateBox").innerHTML = `<div class="hadran">${lines.map(esc).join("<br>")}</div><p>${esc(evs.map(e => e.n).join(", "))} complete. Mazal tov!</p>
+    <div class="two"><button class="btn" data-share="${esc(text)}">Share</button><button class="btn primary" data-close-cel>Close</button></div>`;
   $("#celebrate").classList.add("on");
   if (!matchMedia("(prefers-reduced-motion: reduce)").matches){
     for (let i = 0; i < 46; i++){ const b = document.createElement("span"); b.className = "foilbit";
@@ -713,34 +886,46 @@ function celebrate(evs){
       document.body.appendChild(b); setTimeout(() => b.remove(), 3800); }
   }
 }
-function setStatus(iso, s){
-  const d = dayAt(iso); if (!d || d.off) return;
-  const cur = S.log[iso] || {}, was = cur.s;
-  if (was === s) delete cur.s; else cur.s = s;
-  if (cur.s === "done") cur.k = {m: d.mr.map(r => r.slice()), r: d.rr.map(r => r.slice())}; else delete cur.k;
-  S.log[iso] = cur; tidy(iso);
-  save(); computePlan();
-  if (cur.s === "done"){ const G = progress(); const evs = (P.evByDay[d.n] || []).filter(e => G.evDoneMap[e.i]); if (evs.length) celebrate(evs); else toast("Marked done"); }
-  else toast(cur.s ? `Marked ${cur.s}` : "Cleared");
-  refresh();
-}
-function setMins(iso, v){
-  const cur = S.log[iso] || {}; const m = Math.max(0, Math.min(900, Math.round(+v || 0)));
-  if (m) cur.m = m; else delete cur.m;
-  S.log[iso] = cur; tidy(iso);
-  save();
-}
-/* Changes to days off all go through here so each one can be undone from the toast. */
+
+/* ---------- changes ---------- */
+function refresh(){ render(); if (sheet && sheet.k === "day") openDay(sheet.n); else if (sheet && sheet.k === "off") openOffPanel(); }
+/* Every change to the log goes through here: it saves, re-plans, celebrates new siyumim and offers Undo. */
 function change(mutate, msg){
-  const snap = JSON.stringify(S.log);
+  const snap = JSON.stringify(S.log), before = progress().evDone;
   const r = mutate(); if (r === false) return;
-  save(); computePlan(); refresh();
+  save(); computePlan();
+  const after = progress().evDone, fresh = P.events.filter(e => after[e.i] && !before[e.i]);
+  refresh();
+  if (fresh.length) celebrate(fresh);
   toast(msg(r), () => { S.log = JSON.parse(snap); save(); computePlan(); refresh(); toast("Undone"); });
 }
-function makeOff(iso){ const c = S.log[iso] || {}; if (c.s === "done" || c.s === "off") return false; c.s = "off"; delete c.k; S.log[iso] = c; return true; }
-function unOff(iso){ const c = S.log[iso]; if (!c || c.s !== "off") return false; delete c.s; tidy(iso); return true; }
+const lockOf = d => ({m: d.mr.map(r => r.slice())});
+function toggleDone(iso){
+  const d = dayAt(iso); if (!d || d.off || !d.mc) return;
+  const was = stat(d) === "done";
+  change(() => { const e = S.log[iso] || {}; delete e.t; if (was){ delete e.s; delete e.k; } else { e.s = "done"; e.k = lockOf(d); } S.log[iso] = e; tidy(iso); },
+    () => was ? "Marked not learned" : `Learned ${mish(d.mc)}. Yasher koach!`);
+}
+function toggleTick(iso, x){
+  const d = dayAt(iso); if (!d || d.off || P.mDay[x] !== d.n) return;
+  const tk = ticksOf(d); if (tk.has(x)) tk.delete(x); else tk.add(x);
+  const all = tk.size === d.mc;
+  change(() => { const e = S.log[iso] || {};
+      if (all){ e.s = "done"; delete e.t; e.k = lockOf(d); }
+      else { if (e.s === "done" || e.s === "missed" || e.s === "partial") delete e.s; e.t = [...tk].sort((a, b) => a - b); if (e.t.length){ if (!e.k) e.k = lockOf(d); } else delete e.k; }
+      S.log[iso] = e; tidy(iso); },
+    () => all ? `All ${mish(d.mc)} learned. Yasher koach!` : `${tk.size} of ${d.mc} learned`);
+}
+function toggleMissed(iso){
+  const d = dayAt(iso); if (!d || d.off) return;
+  const was = stat(d) === "missed";
+  change(() => { const e = S.log[iso] || {}; delete e.t; delete e.k; if (was) delete e.s; else e.s = "missed"; S.log[iso] = e; tidy(iso); },
+    () => was ? "Cleared" : "Marked missed. It stays on your list to catch up.");
+}
+function makeOff(iso){ const e = S.log[iso] || {}; if (e.s === "done" || e.s === "off") return false; e.s = "off"; delete e.k; delete e.t; S.log[iso] = e; return true; }
+function unOff(iso){ const e = S.log[iso]; if (!e || e.s !== "off") return false; delete e.s; tidy(iso); return true; }
 function toggleSkip(iso){
-  const s = stOf(iso); if (s === "done") return;
+  const s = (S.log[iso] || {}).s; if (s === "done") return;
   const wasOff = s === "off", isT = iso === isoOf(todayDN());
   change(() => wasOff ? unOff(iso) : makeOff(iso),
     () => wasOff ? `Day off removed. Plan ends ${fullDate(P.end)}.` : `${isT ? "Pushed to tomorrow" : "Day off added"}. Plan now ends ${fullDate(P.end)}.`);
@@ -750,71 +935,115 @@ function addOffRange(){
   if (!isoRe.test(fv) || !isoRe.test(tv)){ toast("Pick a from and to date"); return; }
   let a = parseDN(fv), b = parseDN(tv); if (a > b) [a, b] = [b, a];
   a = Math.max(a, P.s0);
-  if (b < a){ toast("Pick dates on or after the start date"); return; }
+  if (b < a){ toast("Pick dates on or after your start date"); return; }
   if (b - a > 730){ toast("Pick a range of two years or less"); return; }
   let kept = 0, already = 0;
-  change(() => { let n = 0; for (let dn = a; dn <= b; dn++){ const iso = isoOf(dn), s = stOf(iso); if (s === "done") kept++; else if (s === "off") already++; else if (makeOff(iso)) n++; }
-      if (!n){ toast(kept && !already ? "Those days are already done" : "Those days are already off"); return false; } offFrom = offTo = ""; return n; },
-    n => `${plural(n, "day")} off added${kept ? `, ${kept} done ${kept === 1 ? "day" : "days"} kept` : ""}. Plan now ends ${fullDate(P.end)}.`);
+  change(() => { let n = 0; for (let dn = a; dn <= b; dn++){ const iso = isoOf(dn), s = (S.log[iso] || {}).s; if (s === "done") kept++; else if (s === "off") already++; else if (makeOff(iso)) n++; }
+      if (!n){ toast(kept && !already ? "Those days are already learned" : "Those days are already off"); return false; } offFrom = offTo = ""; return n; },
+    n => `${plural(n, "day")} off added${kept ? `, ${kept} learned ${kept === 1 ? "day" : "days"} kept` : ""}. Plan now ends ${fullDate(P.end)}.`);
 }
-function removeOffRange(a, b){
-  change(() => { let n = 0; for (let dn = a; dn <= b; dn++) if (unOff(isoOf(dn))) n++; return n || false; },
-    n => `${plural(n, "day")} off removed. Plan ends ${fullDate(P.end)}.`);
-}
+function removeOffRange(a, b){ change(() => { let n = 0; for (let dn = a; dn <= b; dn++) if (unOff(isoOf(dn))) n++; return n || false; }, n => `${plural(n, "day")} off removed. Plan ends ${fullDate(P.end)}.`); }
 function catchUp(){
   const tday = todayDN() - P.s0 + 1;
-  change(() => { let n = 0; for (const d of P.days){ if (d.n >= tday) break; const s = st(d); if ((!s || s === "missed") && makeOff(d.iso)) n++; } return n || false; },
+  change(() => { let n = 0; for (const d of P.days){ if (d.n >= tday) break; const s = stat(d); if ((!s || s === "missed") && makeOff(d.iso)) n++; } return n || false; },
     n => `${plural(n, "past day")} turned into days off. Plan now ends ${fullDate(P.end)}.`);
 }
-function refresh(){ render(); if (sheet && sheet.k === "day") openSheet(sheet.n); else if (sheet && sheet.k === "off") openOffPanel(); }
+function setMins(iso, v){ const e = S.log[iso] || {}, m = clamp(Math.round(+v || 0), 0, 900); if (m) e.m = m; else delete e.m; S.log[iso] = e; tidy(iso); save(); }
+/* timer */
+let tick = null;
+function timerText(){ if (!S.timer) return ""; const s = Math.max(0, Math.floor((Date.now() - S.timer.t0) / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
+function syncTimer(){ clearInterval(tick); if (S.timer) tick = setInterval(() => { const el = document.getElementById("timerTxt"); if (el) el.textContent = timerText(); }, 1000); }
+function toggleTimer(iso){
+  if (S.timer && S.timer.iso === iso){ const add = Math.max(1, Math.round((Date.now() - S.timer.t0) / 60000)), e = S.log[iso] || {}; e.m = clamp((+e.m || 0) + add, 0, 900); S.log[iso] = e; S.timer = null; save(); syncTimer(); refresh(); toast(`Added ${add} min`); return; }
+  if (S.timer){ toast("Stop the other timer first"); return; }
+  S.timer = {iso, t0: Date.now()}; save(); syncTimer(); refresh();
+}
+/* theme */
+function applyTheme(){
+  const t = S.settings.theme, root = document.documentElement;
+  if (t === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", t);
+  root.style.setProperty("--rs", S.settings.rs);
+  const dark = t === "dark" || (t === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => { m.setAttribute("content", dark ? "#1A1416" : "#F3F1EA"); });
+}
+/* backup */
+function backup(){
+  S.settings.lastBackup = isoOf(todayDN()); save();
+  const blob = new Blob([JSON.stringify(S)], {type: "application/json"}), a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = `limud-backup-${isoOf(todayDN())}.json`; document.body.appendChild(a); a.click(); a.remove();
+  render(); toast("Backup saved");
+}
+function restore(txt){
+  try { const p = JSON.parse(txt); if (!p || typeof p !== "object" || !p.log || typeof p.log !== "object") throw 0;
+    S = migrate(p); S.onboarded = true; save(); applyTheme(); computePlan(); syncTimer(); calMonth = null; render(); toast("Backup restored"); }
+  catch (e){ toast("That isn't a Limud backup"); }
+}
 
 /* ---------- events ---------- */
 document.addEventListener("click", e => {
-  const b = e.target.closest("button, [data-close]"); if (!b) return;
+  const b = e.target.closest("button"); if (!b) return;
+  const ds = b.dataset;
   if (b.hasAttribute("data-undo")){ const f = undoFn; undoFn = null; $("#toast").classList.remove("on"); if (f) f(); return; }
-  if (b.dataset.tab){ go(b.dataset.tab); return; }
-  if (b.dataset.tabGo){ go(b.dataset.tabGo); return; }
-  if (b.dataset.set){ setStatus(b.dataset.d, b.dataset.set); return; }
-  if (b.dataset.min){ const iso = b.dataset.d, cur = +(S.log[iso] && S.log[iso].m) || 0; setMins(iso, cur + +b.dataset.min); refresh(); return; }
-  if (b.dataset.skip){ toggleSkip(b.dataset.skip); return; }
+  if (ds.tab){ go(ds.tab); return; }
+  if (ds.tick){ toggleTick(ds.d, +ds.tick); return; }
+  if (ds.done){ toggleDone(ds.done); return; }
+  if (ds.missed){ toggleMissed(ds.missed); return; }
+  if (ds.skip){ toggleSkip(ds.skip); return; }
+  if (ds.timer){ toggleTimer(ds.timer); return; }
+  if (ds.min){ const iso = ds.d, cur = +(S.log[iso] && S.log[iso].m) || 0; setMins(iso, cur + +ds.min); refresh(); return; }
   if (b.hasAttribute("data-offpanel")){ offFrom = offTo = ""; openOffPanel(); return; }
-  if (b.dataset.unoff){ const [a, c] = b.dataset.unoff.split("|").map(Number); removeOffRange(a, c); return; }
+  if (ds.unoff){ const [a, c] = ds.unoff.split("|").map(Number); removeOffRange(a, c); return; }
   if (b.hasAttribute("data-catchup")){ catchUp(); return; }
   if (b.id === "o-add"){ addOffRange(); return; }
-  if (b.dataset.day){ openSheet(+b.dataset.day); return; }
-  if (b.dataset.cal){ let [y, m] = calMonth; m += +b.dataset.cal; if (m < 0){ m = 11; y--; } if (m > 11){ m = 0; y++; } calMonth = [y, m]; render(); return; }
-  if (b.dataset.filter){ syFilter = b.dataset.filter; render(); return; }
-  if (b.dataset.spine){ shelfSel = shelfSel === b.dataset.spine ? null : b.dataset.spine; render(); return; }
+  if (ds.day){ openDay(+ds.day); return; }
+  if (ds.cal){ if (ds.cal === "today") calMonth = null; else { let [y, m] = calMonth; m += +ds.cal; if (m < 0){ m = 11; y--; } if (m > 11){ m = 0; y++; } calMonth = [y, m]; } render(); return; }
+  if (ds.filter){ syFilter = ds.filter; render(); return; }
+  if (b.hasAttribute("data-syall")){ syAll = true; render(); return; }
+  if (ds.spine){ shelfSel = shelfSel === +ds.spine ? null : +ds.spine; render(); return; }
+  if (ds.usepace){ S.settings.minM = +ds.usepace; save(); render(); toast(`Estimates now use ${ds.usepace} min per mishnah`); return; }
+  if (ds.rs){ S.settings.rs = +ds.rs; save(); applyTheme(); render(); return; }
+  if (ds.themeSet){ S.settings.theme = ds.themeSet; save(); applyTheme(); render(); return; }
   if (b.hasAttribute("data-close")){ closeSheet(); return; }
   if (b.hasAttribute("data-close-cel")){ $("#celebrate").classList.remove("on"); return; }
-  if (b.id === "b-export"){ const blob = new Blob([JSON.stringify(S)], {type: "application/json"}); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `limud-backup-${isoOf(todayDN())}.json`; document.body.appendChild(a); a.click(); a.remove(); return; }
-  if (b.id === "b-copy"){ navigator.clipboard.writeText(JSON.stringify(S)).then(() => toast("Backup copied"), () => { $("#b-text").value = JSON.stringify(S); toast("Copy the text in the box"); }); return; }
+  if (ds.share){ const t = ds.share; if (navigator.share) navigator.share({text: t}).catch(() => {}); else navigator.clipboard.writeText(t).then(() => toast("Copied"), () => {}); return; }
+  if (b.hasAttribute("data-backup")){ backup(); return; }
+  if (b.id === "w-go"){ finishWelcome(); return; }
+  if (b.id === "b-copy"){ const t = JSON.stringify(S); navigator.clipboard.writeText(t).then(() => { S.settings.lastBackup = isoOf(todayDN()); save(); render(); toast("Backup copied"); }, () => { $("#b-text").value = t; toast("Copy the text in the box"); }); return; }
   if (b.id === "b-import"){ restore($("#b-text").value); return; }
   if (b.id === "b-file"){ $("#b-filein").click(); return; }
-  if (b.id === "b-reset"){ if (confirm("Clear every day you logged, including days off? Settings stay.")){ S.log = {}; save(); computePlan(); toast("Progress cleared"); render(); } return; }
+  if (b.id === "b-reset"){ if (confirm("Clear every logged day and day off? Settings stay.")){ const snap = JSON.stringify(S.log); S.log = {}; S.timer = null; save(); computePlan(); syncTimer(); render(); toast("Progress cleared", () => { S.log = JSON.parse(snap); save(); computePlan(); render(); toast("Undone"); }); } return; }
 });
 $("#scrim").addEventListener("click", closeSheet);
 document.addEventListener("change", e => {
   const el = e.target;
   if (el.id === "o-from"){ offFrom = el.value; if (!offTo || offTo < offFrom){ offTo = offFrom; const t = $("#o-to"); if (t) t.value = offFrom; } return; }
   if (el.id === "o-to"){ offTo = el.value; return; }
+  if (el.name === "wk"){ wz.keep = el.value === "keep"; openWelcome(); return; }
+  if (el.id === "w-start"){ if (isoRe.test(el.value)) wz.start = el.value; openWelcome(); return; }
+  if (el.id === "w-shab"){ wz.shab = +el.value; openWelcome(); return; }
   if (el.dataset.mins){ setMins(el.dataset.mins, el.value); refresh(); return; }
-  if (el.dataset.setField){
-    const k = el.dataset.setField; let v = el.value;
-    if (k === "start"){ if (!isoRe.test(v)) return; const delta = parseDN(v) - parseDN(S.settings.start); if (delta) shiftLog(delta); }
-    else if (k !== "ded"){ v = +v; const lim = {months: [6, 24], wk: [0.25, 16], sh: [0, 16], minM: [0.2, 30], minR: [1, 240]}[k]; if (!(v >= lim[0] && v <= lim[1])){ toast(`Enter ${lim[0]} to ${lim[1]}`); render(); return; } if (k === "months") v = Math.round(v); }
+  if (el.dataset.set){
+    const k = el.dataset.set; let v = el.type === "checkbox" ? el.checked : el.value;
+    if (k === "start"){ if (!isoRe.test(v)){ render(); return; } const delta = parseDN(v) - parseDN(S.settings.start); if (delta) shiftLog(delta); }
+    else if (k === "minM" || k === "months" || k === "shab"){ v = +v; const [lo, hi] = LIM[k]; if (!(v >= lo && v <= hi)){ toast(`Enter ${lo} to ${hi}`); render(); return; } }
     S.settings[k] = v; save(); computePlan(); calMonth = null; render(); toast("Saved");
   }
   if (el.id === "b-filein" && el.files[0]){ el.files[0].text().then(restore); }
 });
-function restore(txt){
-  try { const p = JSON.parse(txt); if (!p || typeof p !== "object" || !p.log || typeof p.log !== "object") throw 0; const settings = {...DEFAULTS, ...(p.settings || {})}; S = {v: 2, settings, log: normLog(p.log, settings.start)}; save(); computePlan(); calMonth = null; render(); toast("Backup restored"); }
-  catch (e){ toast("That isn't a Limud backup"); }
-}
+/* swipe between months */
+let sx = null, sy0 = null;
+document.addEventListener("touchstart", e => { if (tab !== "calendar" || !e.target.closest("#calgrid")) { sx = null; return; } sx = e.touches[0].clientX; sy0 = e.touches[0].clientY; }, {passive: true});
+document.addEventListener("touchend", e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy0; sx = null;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5){ let [y, m] = calMonth; m += dx < 0 ? 1 : -1; if (m < 0){ m = 11; y--; } if (m > 11){ m = 0; y++; } calMonth = [y, m]; render(); } }, {passive: true});
 document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeSheet(); $("#celebrate").classList.remove("on"); } });
-document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+let lastDay = todayDN();
+function dayCheck(){ if (todayDN() !== lastDay){ lastDay = todayDN(); calMonth = null; } }
+document.addEventListener("visibilitychange", () => { if (!document.hidden){ dayCheck(); refresh(); } });
+setInterval(() => { if (todayDN() !== lastDay){ dayCheck(); refresh(); } }, 60000);
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", applyTheme);
 
-computePlan(); render();
+applyTheme(); computePlan(); render(); syncTimer();
+if (!S.onboarded) openWelcome();
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>
